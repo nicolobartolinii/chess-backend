@@ -1,11 +1,10 @@
 version: '3.8'
 
 services:
-  app:
+  api:
     build: .
-    container_name: chess-app
+    container_name: chess-backend
     ports:
       - "3000:3000"
-    volumes:
-      - .:/usr/src/app
-    command: npm run dev
+    environment:
+        - NODE_ENV=development
