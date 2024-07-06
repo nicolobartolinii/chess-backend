@@ -10,6 +10,8 @@ services:
         - NODE_ENV=development
     volumes:
       - ./src:/usr/src/app/src
+    env_file:
+      - .env
 
   db:
     image: postgres:16

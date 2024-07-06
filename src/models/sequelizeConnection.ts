@@ -27,3 +27,5 @@ export class SingletonDBConnection {
         return SingletonDBConnection.single_instance.sequelize;
     }
 }
+
+export const sequelize = SingletonDBConnection.getInstance();
