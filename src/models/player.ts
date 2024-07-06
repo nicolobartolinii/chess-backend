@@ -1,12 +1,13 @@
 import { SingletonDBConnection } from './sequelizeConnection';
 import { Sequelize, Model, DataTypes, InferAttributes, InferCreationAttributes } from 'sequelize';
+import { Role } from '../utils/roles';
 
 const db_connection: Sequelize = SingletonDBConnection.getInstance();
 
 class Player extends Model<InferAttributes<Player>, InferCreationAttributes<Player>> {
     declare player_id: number;
     declare email: string;
-    declare role: string;
+    declare role: Role;
     declare points: number;
     declare tokens: number;
 }
@@ -23,7 +24,7 @@ Player.init({
         unique: true
     },
     role: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false
     },
     points: {

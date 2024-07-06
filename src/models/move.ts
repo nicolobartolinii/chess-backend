@@ -3,7 +3,7 @@ import { Sequelize, Model, DataTypes, InferAttributes, InferCreationAttributes }
 
 const db_connection: Sequelize = SingletonDBConnection.getInstance();
 
-class Moves extends Model<InferAttributes<Moves>, InferCreationAttributes<Moves>> {
+class Move extends Model<InferAttributes<Move>, InferCreationAttributes<Move>> {
     declare player_id: number; // foreign key
     declare move_number: number; // number of the move in the match
     declare from_position: string; // position of the piece before the move
@@ -12,12 +12,12 @@ class Moves extends Model<InferAttributes<Moves>, InferCreationAttributes<Moves>
     declare game_id: number; // foreign key
 }
 
-Moves.init({
+Move.init({
     player_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references:{
-            model: 'Players',
+            model: 'Player',
             key: 'player_id'
         }
     },
@@ -25,7 +25,7 @@ Moves.init({
         type: DataTypes.INTEGER,
         allowNull: false,
         references:{
-            model: 'Games',
+            model: 'Game',
             key: 'game_id'
         }
     },
@@ -47,7 +47,7 @@ Moves.init({
     }
 }, {
     sequelize: db_connection,
-    modelName: 'Moves'
+    modelName: 'Move'
 });
 
-export { Moves };
+export { Move };
