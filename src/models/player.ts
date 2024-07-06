@@ -39,7 +39,8 @@ Player.init({
     }
 }, {
     sequelize: db_connection,
-    modelName: 'Player'
+    modelName: 'Player',
+    timestamps: true
 });
 
 export { Player };
