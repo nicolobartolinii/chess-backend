@@ -1,4 +1,4 @@
-import {SingletonDBConnection} from './sequelizeConnection';
+import {SingletonDBConnection} from '../db/sequelizeConnection';
 import {Sequelize, Model, DataTypes, InferAttributes, InferCreationAttributes} from 'sequelize';
 import {Player} from './player';
 
