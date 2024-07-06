@@ -1,5 +1,7 @@
 import { SingletonDBConnection } from './sequelizeConnection';
 import { Sequelize, Model, DataTypes, InferAttributes, InferCreationAttributes } from 'sequelize';
+import { Player } from './player';
+import { Game } from './game';
 
 const db_connection: Sequelize = SingletonDBConnection.getInstance();
 
@@ -17,7 +19,7 @@ Move.init({
         type: DataTypes.INTEGER,
         allowNull: false,
         references:{
-            model: 'Player',
+            model: Player,
             key: 'player_id'
         }
     },
@@ -25,7 +27,7 @@ Move.init({
         type: DataTypes.INTEGER,
         allowNull: false,
         references:{
-            model: 'Game',
+            model: Game,
             key: 'game_id'
         }
     },

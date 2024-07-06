@@ -5,7 +5,7 @@ import { Role } from '../utils/roles';
 const db_connection: Sequelize = SingletonDBConnection.getInstance();
 
 class Player extends Model<InferAttributes<Player>, InferCreationAttributes<Player>> {
-    declare player_id: number;
+    declare player_id?: number;
     declare email: string;
     declare role: Role;
     declare points: number;

@@ -1,19 +1,7 @@
 import app from './app';
-import {sequelize} from './models/sequelizeConnection';
-import { Player } from './models/player';
-import { Game } from './models/game';
+import {seed} from './models/seed'
 
-// Create tables if they do not exist
-
-Player.sync({ force: true })
-    .then(() => {
-        console.log('Database & tables created successfully!');
-    })
-    .catch((error) => {
-        console.error('Error during table creation:', error);
-    });
-
-
+seed(true, true, true).then(() => console.log('Database seeded'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

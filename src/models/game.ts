@@ -1,5 +1,6 @@
 import {SingletonDBConnection} from './sequelizeConnection';
 import {Sequelize, Model, DataTypes, InferAttributes, InferCreationAttributes} from 'sequelize';
+import {Player} from './player';
 
 const db_connection: Sequelize = SingletonDBConnection.getInstance();
 
@@ -31,7 +32,7 @@ Game.init({
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Player',
+            model: Player,
             key: 'player_id'
         }
     },
@@ -39,7 +40,7 @@ Game.init({
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
-            model: 'Player',
+            model: Player,
             key: 'player_id'
         }
     },
@@ -54,7 +55,6 @@ Game.init({
 }, {
     sequelize: db_connection,
     modelName: 'Game',
-    tableName: 'game',
     timestamps: false
 });
 
