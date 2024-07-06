@@ -10,3 +10,12 @@ services:
         - NODE_ENV=development
     volumes:
       - ./src:/usr/src/app/src
+
+  db:
+    image: postgres:16
+    container_name: db
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - '${DATABASE_PORT}:${DATABASE_PORT}'
