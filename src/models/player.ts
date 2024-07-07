@@ -14,6 +14,8 @@ class Player extends Model<InferAttributes<Player>, InferCreationAttributes<Play
     declare points: number;
     declare tokens: number;
     declare authenticate: (password: string) => Promise<boolean>;
+
+
 }
 
 Player.init({
@@ -63,4 +65,10 @@ export { Player };
 
 export async function findPlayerByEmail(email: string): Promise<Player | null> {
     return Player.findOne({where: {email}});
+}
+
+export async function orderPlayers(field: string, order: string): Promise<Player[]> {
+    return Player.findAll({
+        order: [[field, order]]
+    });
 }

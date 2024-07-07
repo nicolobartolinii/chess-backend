@@ -1,19 +1,16 @@
 import {Request, Response} from 'express';
-import {Player} from '../models/player';
+import {orderPlayers, Player} from '../models/player';
 import {StatusCodes, ReasonPhrases} from 'http-status-codes';
 
 export const getPlayerRanking = async (req: Request, res: Response): Promise<void> => {
+    const field = req.query.field as string || 'points'; // Default 'points' if not specified
+    const order  = req.query.order as string   || 'DESC'; // Default 'DESC' if not specified
+
     try {
-        const order: string = req.query.order as string;
-        if (!order || !['asc', 'desc'].includes(order.toLowerCase())) {
-            res.status(400).json({error: "Please specify 'order' as 'asc' or 'desc'."});
-            return;
-        }
-        const players = await Player.findAll({ // TODO: Use repository-MVC pattern (move this logic to model)
-            order: [['points', order.toUpperCase()]]
-        });
-        res.json(players);
-    } catch (error: any) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({error: ReasonPhrases.INTERNAL_SERVER_ERROR});
+        const players = await orderPlayers(field, order);
+        res.status(StatusCodes.OK).json(players);
+    } catch (error) {
+        console.error(error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(ReasonPhrases.INTERNAL_SERVER_ERROR);
     }
-};
+}
