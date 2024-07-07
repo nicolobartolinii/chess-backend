@@ -1,14 +1,25 @@
-import {Request, Response} from 'express';
+import { Request, Response, NextFunction } from 'express';
 import * as authService from '../services/authService';
-import {StatusCodes, ReasonPhrases} from 'http-status-codes';
+import { StatusCodes } from 'http-status-codes';
+import ResponseFactory from '../factories/responseFactory';
+import { ErrorFactory } from '../factories/errorFactory';
 
-export const login = async (req: Request, res: Response): Promise<void> => {
+export const login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        console.log(req.body);
-        const {email, password} = req.body;
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            throw ErrorFactory.badRequest('Email and password are required');
+        }
+
         const token = await authService.loginPlayer(email, password);
-        res.json({token});
-    } catch (error: any) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({error: ReasonPhrases.INTERNAL_SERVER_ERROR});
+
+        if (!token) {
+            throw ErrorFactory.unauthorized('Invalid credentials');
+        }
+
+        res.status(StatusCodes.OK).json(ResponseFactory.success('Login successful', { token }));
+    } catch (error) {
+        next(error);
     }
 };

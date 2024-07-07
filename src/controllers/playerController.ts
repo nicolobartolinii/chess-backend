@@ -1,16 +1,27 @@
-import {Request, Response} from 'express';
-import {orderPlayers, Player} from '../models/player';
-import {StatusCodes, ReasonPhrases} from 'http-status-codes';
+import { Request, Response, NextFunction } from 'express';
+import { orderPlayers } from '../models/player';
+import { StatusCodes } from 'http-status-codes';
+import ResponseFactory from "../factories/responseFactory";
+import { ErrorFactory } from "../factories/errorFactory";
 
-export const getPlayerRanking = async (req: Request, res: Response): Promise<void> => {
-    const field = req.query.field as string || 'points'; // Default 'points' if not specified
-    const order  = req.query.order as string   || 'DESC'; // Default 'DESC' if not specified
+export const getPlayerRanking = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const field = req.query.field as string || 'points';
+    const order = req.query.order as string || 'DESC';
 
     try {
+        // input parameters validation
+        if (!['points', 'gamesPlayed', 'gamesWon'].includes(field)) {
+            throw ErrorFactory.badRequest('Invalid field for ordering');
+        }
+        if (!['ASC', 'DESC'].includes(order.toUpperCase())) {
+            throw ErrorFactory.badRequest('Invalid order direction');
+        }
+
         const players = await orderPlayers(field, order);
-        res.status(StatusCodes.OK).json(players);
+
+        res.status(StatusCodes.OK).json(ResponseFactory.success('Players retrieved successfully', players));
     } catch (error) {
-        console.error(error);
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(ReasonPhrases.INTERNAL_SERVER_ERROR);
+        // error handling middleware will catch this error
+        next(error);
     }
 }

@@ -1,23 +1,25 @@
-import {Request, Response} from 'express';
-import {StatusCodes} from 'http-status-codes';
-import {rechargePlayerTokensmodel}  from "../models/player";
+import { Request, Response, NextFunction } from 'express';
+import { StatusCodes } from 'http-status-codes';
+import { rechargePlayerTokensmodel } from "../models/player";
+import ResponseFactory from "../factories/responseFactory";
+import { ErrorFactory } from "../factories/errorFactory";
 
-// recharge player by email and amount
-export const rechargePlayerTokens = async (req: Request, res: Response) => {
+export const rechargePlayerTokens = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { email, tokens } = req.body;
 
-    if (!email || tokens == null || tokens <= 0) {
-        return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid email or token amount' });
-    }
-
     try {
+        if (!email || tokens == null || tokens <= 0) {
+            throw ErrorFactory.badRequest('Invalid email or token amount');
+        }
+
         const success = await rechargePlayerTokensmodel(email, tokens);
+
         if (success) {
-            res.status(StatusCodes.OK).json({ message: 'Tokens updated successfully' });
+            res.status(StatusCodes.OK).json(ResponseFactory.success('Tokens updated successfully'));
         } else {
-            res.status(StatusCodes.NOT_FOUND).json({ message: 'Player not found or error occurred' });
+            throw ErrorFactory.notFound('Player not found or error occurred');
         }
     } catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error updating tokens', error: error });
+        next(error);
     }
 };
