@@ -3,6 +3,10 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
+        await queryInterface.dropTable('Players');
+        await queryInterface.dropTable('Games');
+        await queryInterface.dropTable('Moves');
+
         await queryInterface.createTable('Players', {
             player_id: {
                 type: Sequelize.INTEGER,

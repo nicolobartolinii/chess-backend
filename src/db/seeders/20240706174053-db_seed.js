@@ -9,8 +9,8 @@ module.exports = {
                 role: 1,
                 points: 0,
                 tokens: 0,
-                createdAt: new Date(), // Assicurati di aggiungere questo
-                updatedAt: new Date()  // e questo
+                createdAt: new Date(),
+                updatedAt: new Date()
 
             },
             {
@@ -18,8 +18,8 @@ module.exports = {
                 role: 0,
                 points: 5,
                 tokens: 0,
-                createdAt: new Date(), // Assicurati di aggiungere questo
-                updatedAt: new Date()  // e questo
+                createdAt: new Date(),
+                updatedAt: new Date()
 
             }], {});
 
