@@ -3,10 +3,6 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.dropTable('Players');
-        await queryInterface.dropTable('Games');
-        await queryInterface.dropTable('Moves');
-
         await queryInterface.createTable('Players', {
             player_id: {
                 type: Sequelize.INTEGER,
@@ -18,8 +14,12 @@ module.exports = {
                 allowNull: false,
                 unique: true
             },
+            password: {
+                type: Sequelize.STRING,
+                allowNull: false
+            },
             role: {
-                type: Sequelize.INTEGER.UNSIGNED,
+                type: Sequelize.INTEGER,
                 allowNull: false
             },
             points: {
@@ -129,8 +129,8 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('Players');
-        await queryInterface.dropTable('Games');
-        await queryInterface.dropTable('Moves');
+        await queryInterface.dropTable('Players', { force: true });
+        await queryInterface.dropTable('Games', { force: true });
+        await queryInterface.dropTable('Moves', { force: true });
     }
 };
