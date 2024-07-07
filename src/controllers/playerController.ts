@@ -9,7 +9,7 @@ export const getPlayerRanking = async (req: Request, res: Response): Promise<voi
             res.status(400).json({error: "Please specify 'order' as 'asc' or 'desc'."});
             return;
         }
-        const players = await Player.findAll({
+        const players = await Player.findAll({ // TODO: Use repository-MVC pattern (move this logic to model)
             order: [['points', order.toUpperCase()]]
         });
         res.json(players);
