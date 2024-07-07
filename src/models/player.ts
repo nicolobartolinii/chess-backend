@@ -13,6 +13,7 @@ class Player extends Model<InferAttributes<Player>, InferCreationAttributes<Play
     declare role: Role;
     declare points: number;
     declare tokens: number;
+    declare authenticate: (password: string) => Promise<boolean>;
 }
 
 Player.init({
@@ -31,7 +32,7 @@ Player.init({
         allowNull: false
     },
     role: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     points: {
@@ -56,6 +57,10 @@ Player.init({
 // The object in the second parameter can specify the field to hash (default: 'password'),
 // the number of rounds for the hashing algorithm (default: 8), and the name of the
 // method to compare the passwords (default: 'authenticate').
-useBcrypt(Player, {rounds: 10});
+useBcrypt(Player, {rounds: 10, field: 'password', method: 'authenticate'});
 
 export { Player };
+
+export async function findPlayerByEmail(email: string): Promise<Player | null> {
+    return Player.findOne({where: {email}});
+}
