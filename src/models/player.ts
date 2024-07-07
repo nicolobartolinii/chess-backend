@@ -72,3 +72,19 @@ export async function orderPlayers(field: string, order: string): Promise<Player
         order: [[field, order]]
     });
 }
+
+// recharge tokens to player by email and amount
+export async function rechargePlayerTokensmodel(email: string, amount: number): Promise<boolean> {
+    try {
+        const player = await findPlayerByEmail(email);
+        if (player) {
+            player.tokens = amount;
+            await player.save();
+            return true;  // Ritorna true se l'operazione ha successo
+        }
+        return false;  // Ritorna false se il giocatore non è trovato
+    } catch (error) {
+        console.error('Error recharging tokens:', error);
+        return false;  // Ritorna false in caso di errore
+    }
+}

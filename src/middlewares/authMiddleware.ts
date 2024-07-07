@@ -20,7 +20,6 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
 
     if (authHeader) {
         const token = authHeader.split(' ')[1]; // Bearer <token>
-
         try {
             req.player = verifyToken(token) as JwtPayload;
             next();
@@ -31,3 +30,16 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
         res.status(StatusCodes.UNAUTHORIZED).json({message: 'Authentication token is missing'});
     }
 }
+
+export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
+    const role = req.player?.role;
+
+    console.log("req.player?.role", role);
+    console.log(typeof role);
+
+    if (typeof role === 'number' && role === 0) {
+        next();
+    } else {
+        res.status(StatusCodes.FORBIDDEN).json({ message: 'You do not have the necessary permissions' });
+    }
+};
