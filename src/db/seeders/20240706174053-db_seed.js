@@ -11,7 +11,7 @@ module.exports = {
                 password: await bcrypt.hash('prova', 10),
                 role: 1,
                 points: 0,
-                tokens: 0,
+                tokens: 10,
                 createdAt: new Date(),
                 updatedAt: new Date()
 
@@ -21,7 +21,7 @@ module.exports = {
                 password: await bcrypt.hash('franco', 10),
                 role: 0,
                 points: 5,
-                tokens: 0,
+                tokens: 10,
                 createdAt: new Date(),
                 updatedAt: new Date()
 

@@ -4,6 +4,7 @@ import playerRoutes from "./routes/playerRoutes";
 import authRoutes from "./routes/authRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import { errorHandler } from "./middlewares/errorMiddleware";
+import gameRoutes from "./routes/gameRoutes";
 
 const app: Application = express();
 
@@ -14,7 +15,7 @@ app.use(bodyParser.json());
 app.use('', authRoutes);
 app.use('/players', playerRoutes);
 app.use('/admin', adminRoutes);
-
+app.use('/games', gameRoutes);
 // Error handling middleware (must be the last middleware)
 app.use(errorHandler);
 

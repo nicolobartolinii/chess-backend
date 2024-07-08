@@ -36,6 +36,10 @@ class ErrorFactory {
         return new CustomError(message, StatusCodes.INTERNAL_SERVER_ERROR);
     }
 
+    static paymentRequired(message: string = ReasonPhrases.PAYMENT_REQUIRED): CustomError {
+        return new CustomError(message, StatusCodes.PAYMENT_REQUIRED);
+    }
+
     static customError(message: string, statusCode: number): CustomError {
         return new CustomError(message, statusCode);
     }

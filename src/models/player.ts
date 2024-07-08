@@ -88,3 +88,47 @@ export async function rechargePlayerTokensmodel(email: string, amount: number): 
         return false;  // Ritorna false in caso di errore
     }
 }
+
+// spend token to player by email and amount
+export async function spendToken(email: string, amount: number): Promise<boolean> {
+    try {
+        const player = await findPlayerByEmail(email);
+        if (player) {
+            player.tokens -= amount;
+            await player.save();
+            return true;  // Ritorna true se l'operazione ha successo
+        }
+        return false;  // Ritorna false se il giocatore non è trovato
+    } catch (error) {
+        console.error('Error spending tokens:', error);
+        return false;  // Ritorna false in caso di errore
+    }
+}
+
+// getplayer tokens by email
+// TODO check if this function using in the code
+export async function getPlayerTokens(email: string): Promise<number> {
+    try {
+        const player = await findPlayerByEmail(email);
+        if (player) {
+            return player.tokens;  // Ritorna il numero di token del giocatore
+        }
+        return 0;  // Ritorna 0 se il giocatore non è trovato
+    } catch (error) {
+        console.error('Error getting player tokens:', error);
+        return 0;  // Ritorna 0 in caso di errore
+    }
+}
+
+export async function checkPlayerToken(email: string, amount: number): Promise<boolean> {
+    try {
+        const player = await findPlayerByEmail(email);
+        if (player) {
+            return player.tokens >= amount;  // Ritorna true se il giocatore ha abbastanza token
+        }
+        return false;  // Ritorna false se il giocatore non è trovato
+    } catch (error) {
+        console.error('Error checking player tokens:', error);
+        return false;  // Ritorna false in caso di errore
+    }
+}
