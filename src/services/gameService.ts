@@ -1,6 +1,6 @@
 import {checkPlayerToken, findPlayerByEmail} from "../models/player";
 import {ErrorFactory} from "../factories/errorFactory";
-import {createNewGame, Game} from "../models/game";
+import {createNewGame, Game, getGamesByPlayerId} from "../models/game";
 import {Statuses} from "../utils/statuses";
 const jsChessEngine = require('js-chess-engine')
 
@@ -36,4 +36,13 @@ export async function createGame(player_1_email: string, player_2_email?: string
         player2 ? player2.player_id : null,
         AI_difficulty
     );
+}
+
+export async function getGamesPlayer(player1_email: string, startDate?: string): Promise<Game[]> {
+    const player1 = await findPlayerByEmail(player1_email);
+    if (!player1 || player1.player_id === undefined) {
+        throw ErrorFactory.badRequest('Player not found');
+    }
+    const games = await getGamesByPlayerId(player1.player_id);
+    return games;
 }
