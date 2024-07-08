@@ -66,4 +66,11 @@ export class GameRepository implements IGameRepository {
     async updateGameStatus(gameId: number, status: Statuses): Promise<[number, Game[]]> {
         return Game.update({game_status: status}, {where: {game_id: gameId} as any, returning: true});
     }
+
+    async WinnerGame(winnerid:number,game_id:number):Promise<Game[]>{
+        console.log(winnerid);
+        console.log("prova")
+        console.log(game_id);
+        return Game.findAll({where:{winner_id:winnerid,game_id:game_id} as any});
+    }
 }

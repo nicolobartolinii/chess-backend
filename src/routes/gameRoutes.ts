@@ -9,5 +9,6 @@ router.use(authenticateJWT); // Authentication middleware
 router.post('/create', gameController.createGame);
 router.get('/history', dateValidationMiddleware, gameController.gamesHistory);
 router.get('/status/:gameId', gameController.gameStatus);
+router.get('/winner/:game_id', gameController.getGameWinner);
 
 export default router;

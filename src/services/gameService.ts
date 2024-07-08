@@ -27,7 +27,7 @@ export async function createGame(player_1_id: number, player_2_email?: string, A
 
     await repositories.game.create({
         game_status: Statuses.ACTIVE,
-        game_configuration: gameConfiguration,
+        game_configuration: JSON.stringify(gameConfiguration),
         number_of_moves: 0,
         start_date: new Date(),
         player_1_id,
@@ -65,4 +65,14 @@ export async function getGameStatus(playerId: number, gameId: number) {
         opponent: game.player_2_id ? (game.player_1_id === playerId ? game.player_2_id : game.player_1_id) : `AI-${game.AI_difficulty}`,
         turn: game.game_configuration.turn === "white" ? game.player_1_id : game.player_2_id
     };
+}
+export async function WinnerGame(player_id: number, game_id: number) {
+
+    const games = await repositories.game.WinnerGame(player_id, game_id);
+    return games.map(game => ({
+        game_status: game.game_status,
+        number_of_moves: game.number_of_moves,
+        start_date: game.start_date,
+        winner_id: game.winner_id
+    }));
 }
