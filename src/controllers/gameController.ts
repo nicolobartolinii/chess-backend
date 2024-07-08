@@ -1,41 +1,55 @@
 import { Request, Response, NextFunction } from 'express';
-import { orderPlayers } from '../models/player';
 import { StatusCodes } from 'http-status-codes';
 import ResponseFactory from "../factories/responseFactory";
 import { ErrorFactory } from "../factories/errorFactory";
-import {createGame, getGamesPlayer} from "../services/gameService";
+import * as gameService from "../services/gameService";
 
 
-export const newGame = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const createGame = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try{
-        const player1_email = req.body.player1_email;
-        console.log(player1_email)
-        const player2_email = req.body.player2_email;
+        if (!req.player) {
+            return next(ErrorFactory.unauthorized('Not logged in'));
+        }
+
+        const player_1_id = req.player.id;
+
+        const player_2_email = req.body.player_2_email;
         const AI_difficulty = req.body.AI_difficulty;
-        await createGame(player1_email, player2_email, AI_difficulty);
+
+        if (!player_2_email && !AI_difficulty) {
+            return next(ErrorFactory.badRequest('Player 2 email or AI difficulty is required'));
+        }
+
+        if (typeof player_2_email !== 'string' && typeof AI_difficulty !== "number") {
+            return next(ErrorFactory.badRequest('Invalid player 2 email or AI difficulty'));
+        }
+
+        await gameService.createGame(player_1_id, player_2_email, AI_difficulty);
+
         res.status(StatusCodes.OK).json(ResponseFactory.success('Game created successfully'));
     } catch (err) {
         next(err);
     }
 }
 
-export const getGames = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const gamesHistory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try{
-        const player1_email = typeof req.query.player1_email === 'string' ? req.query.player1_email : undefined;
-        const start_date = typeof req.query.start_date === 'string' ? req.query.start_date : undefined;
-        if (!player1_email) {
-            throw ErrorFactory.badRequest('Player 1 email is required');
+        if (!req.player) {
+            return next(ErrorFactory.unauthorized('Not logged in'));
         }
-        const games = await getGamesPlayer(player1_email, start_date)
-        console.log(games);
-        const response = games.map(Game => {
-            return {
-                game_id: Game.game_id,
-            }
 
-        })
-        res.json(response);
+        if (!req.startDate) {
+            return next(ErrorFactory.internalServerError('Start date not validated'));
+        }
 
+        const player_id = req.player.id;
+        const startDate = req.startDate;
+
+        // TODO: Add ordering for games history by start_date or end_date
+
+        const games = await gameService.getGamesHistory(player_id, startDate);
+
+        res.status(StatusCodes.OK).json(ResponseFactory.success("Games history retrieved successfully", games));
     } catch (err) {
         next(err);
     }

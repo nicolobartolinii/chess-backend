@@ -23,21 +23,21 @@ module.exports = {
                 allowNull: false
             },
             points: {
-                type: Sequelize.INTEGER,
+                type: Sequelize.DECIMAL(10, 3),
                 allowNull: false,
                 defaultValue: 0
             },
             tokens: {
-                type: Sequelize.INTEGER,
+                type: Sequelize.DECIMAL(10, 4),
                 allowNull: false,
                 defaultValue: 0
             },
-            createdAt: { 
+            createdAt: {
                 allowNull: false,
                 type: Sequelize.DATE,
                 defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             },
-            updatedAt: { 
+            updatedAt: {
                 allowNull: false,
                 type: Sequelize.DATE,
                 defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
@@ -56,6 +56,10 @@ module.exports = {
             },
             game_configuration: {
                 type: Sequelize.JSON,
+                allowNull: false
+            },
+            number_of_moves: {
+                type: Sequelize.INTEGER,
                 allowNull: false
             },
             start_date: {
@@ -87,7 +91,7 @@ module.exports = {
                 allowNull: true
             },
             winner_id: {
-                type: Sequelize.UUID,
+                type: Sequelize.INTEGER,
                 allowNull: true
             }
         });
@@ -128,9 +132,9 @@ module.exports = {
         });
     },
 
-    async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('Players', { force: true });
-        await queryInterface.dropTable('Games', { force: true });
-        await queryInterface.dropTable('Moves', { force: true });
+    async down(queryInterface) {
+        await queryInterface.dropTable('Players', {force: true});
+        await queryInterface.dropTable('Games', {force: true});
+        await queryInterface.dropTable('Moves', {force: true});
     }
 };

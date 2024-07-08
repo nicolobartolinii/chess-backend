@@ -1,11 +1,7 @@
 import {NextFunction, Request, Response} from 'express';
 import {verifyToken} from '../services/authService';
 import {StatusCodes} from 'http-status-codes';
-
-export interface JwtPayload {
-    email: string;
-    role: string;
-}
+import {JwtPayload} from "../utils/jwt";
 
 declare global {
     namespace Express {

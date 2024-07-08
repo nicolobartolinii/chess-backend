@@ -1,11 +1,22 @@
 import {SingletonDBConnection} from '../db/sequelizeConnection';
-import {Sequelize, Model, DataTypes, InferAttributes, InferCreationAttributes,WhereOptions} from 'sequelize';
+import {Sequelize, Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional} from 'sequelize';
 import {Player} from './player';
 import {Statuses} from '../utils/statuses';
 const db_connection: Sequelize = SingletonDBConnection.getInstance();
 
 
-class Game extends Model<InferAttributes<Game>, InferCreationAttributes<Game>> {}
+class Game extends Model<InferAttributes<Game>, InferCreationAttributes<Game>> {
+    declare game_id: CreationOptional<number>;
+    declare game_status: Statuses;
+    declare game_configuration: any;
+    declare number_of_moves: number;
+    declare start_date: Date;
+    declare end_date: CreationOptional<Date | null>;
+    declare player_1_id: number;
+    declare player_2_id: CreationOptional<number | null>;
+    declare AI_difficulty: CreationOptional<string | null>;
+    declare winner_id: CreationOptional<string | null>;
+}
 
 Game.init({
     game_id: {
@@ -19,6 +30,10 @@ Game.init({
     },
     game_configuration: {
         type: DataTypes.JSON,
+        allowNull: false
+    },
+    number_of_moves: {
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     start_date: {
@@ -50,7 +65,7 @@ Game.init({
         allowNull: true
     },
     winner_id: {
-        type: DataTypes.UUID,
+        type: DataTypes.INTEGER,
         allowNull: true
     }
 }, {
@@ -60,16 +75,3 @@ Game.init({
 });
 
 export {Game};
-
-// create game
-export async function createNewGame(game_status: string = Statuses.ACTIVE, game_configuration: string, start_date: Date = new Date(), player_1_id: number | undefined, player_2_id: number | undefined | null, AI_difficulty: string | undefined): Promise<Game> {
-    return await Game.create({game_status, game_configuration, start_date, player_1_id, player_2_id, AI_difficulty});
-}
-
-// get game by player id
-export async function getGamesByPlayerId(player_1_id: number): Promise<Game[]> {
-    return Game.findAll({
-        where: { player_1_id } as WhereOptions<InferAttributes<Game>>,
-        order: [['start_date', 'DESC']]
-    });
-}

@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-    async up(queryInterface, Sequelize) {
+    async up(queryInterface) {
         await queryInterface.bulkInsert('Players', [
             {
                 email: 'prova@prova.it',
@@ -29,7 +29,7 @@ module.exports = {
 
         await queryInterface.bulkInsert('Games', [
             {
-                game_status: 'IN_PROGRESS',
+                game_status: 'ACTIVE',
                 game_configuration: JSON.stringify({
                     board: {
                         a: ['b', 'w', 'b', 'w', 'b', 'w', 'b', 'w'],
@@ -38,6 +38,7 @@ module.exports = {
                         d: ['w', 'b', 'w', 'b', 'w', 'b', 'w', 'b']
                     }
                 }),
+                number_of_moves: 0,
                 start_date: new Date(),
                 end_date: null,
                 player_1_id: 1,
@@ -46,7 +47,7 @@ module.exports = {
                 winner_id: null
             },
             {
-                game_status: 'IN_PROGRESS',
+                game_status: 'FINISHED',
                 game_configuration: JSON.stringify({
                     board: {
                         a: ['b', 'w', 'b', 'w', 'b', 'w', 'b', 'w'],
@@ -55,12 +56,13 @@ module.exports = {
                         d: ['w', 'b', 'w', 'b', 'w', 'b', 'w', 'b']
                     }
                 }),
+                number_of_moves: 15,
                 start_date: new Date(),
                 end_date: null,
                 player_1_id: 1,
                 player_2_id: null,
                 AI_difficulty: "prova",
-                winner_id: null
+                winner_id: 1
             }], {});
 
         await queryInterface.bulkInsert('Moves', [
@@ -96,7 +98,7 @@ module.exports = {
             }], {});
     },
 
-    async down(queryInterface, Sequelize) {
+    async down(queryInterface) {
         await queryInterface.bulkDelete('Players', null, {});
         await queryInterface.bulkDelete('Games', null, {});
         await queryInterface.bulkDelete('Moves', null, {});

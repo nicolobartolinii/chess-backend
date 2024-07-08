@@ -1,10 +1,12 @@
 import express from 'express';
 import * as gameController from '../controllers/gameController';
 import {authenticateJWT} from "../middlewares/authMiddleware";
+import {dateValidationMiddleware} from "../middlewares/dateValidationMiddleware";
 const router = express.Router();
 
-router.use(authenticateJWT); // This middleware will be executed before the route handlers
-router.post('/create',gameController.newGame);
-router.get('/history',gameController.getGames);
+router.use(authenticateJWT); // Authentication middleware
+
+router.post('/create', gameController.createGame);
+router.get('/history', dateValidationMiddleware, gameController.gamesHistory);
 
 export default router;

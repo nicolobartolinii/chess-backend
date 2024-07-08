@@ -1,25 +1,24 @@
-import { Request, Response, NextFunction } from 'express';
-import { StatusCodes } from 'http-status-codes';
-import { rechargePlayerTokensmodel } from "../models/player";
+import {NextFunction, Request, Response} from 'express';
+import * as playerService from '../services/playerService';
+import {StatusCodes} from 'http-status-codes';
 import ResponseFactory from "../factories/responseFactory";
-import { ErrorFactory } from "../factories/errorFactory";
+import {ErrorFactory} from "../factories/errorFactory";
 
-export const rechargePlayerTokens = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const { email, tokens } = req.body;
-
+export const updatePlayerTokens = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        if (!email || tokens == null || tokens <= 0) {
-            throw ErrorFactory.badRequest('Invalid email or token amount');
+        const {email, tokens} = req.body;
+
+        if (!email || !tokens) {
+            return next(ErrorFactory.badRequest('Email and tokens are required'));
         }
 
-        const success = await rechargePlayerTokensmodel(email, tokens);
-
-        if (success) {
-            res.status(StatusCodes.OK).json(ResponseFactory.success('Tokens updated successfully'));
-        } else {
-            throw ErrorFactory.notFound('Player not found or error occurred');
+        if (typeof email !== 'string' || typeof tokens !== 'number' || tokens <= 0) {
+            return next(ErrorFactory.badRequest('Invalid email or token amount'));
         }
-    } catch (error) {
-        next(error);
+
+        const updatedPlayer = await playerService.updatePlayerTokens(email, tokens);
+        res.status(StatusCodes.OK).json(ResponseFactory.success('Player tokens updated successfully', updatedPlayer));
+    } catch (err) {
+        next(err);
     }
 };
