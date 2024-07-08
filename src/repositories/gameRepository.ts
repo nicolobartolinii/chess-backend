@@ -47,7 +47,7 @@ export class GameRepository implements IGameRepository {
         };
 
         if (filterField && filterValue !== undefined) {
-            // Utilizzo corretto della variabile filterField
+
             whereClause[filterField] = {
                 [Op.gte]: filterValue
             };
@@ -58,7 +58,7 @@ export class GameRepository implements IGameRepository {
                 where: whereClause
             });
         } catch (error) {
-            console.error('Error finding games:', error);
+
             throw error;
         }
     }
