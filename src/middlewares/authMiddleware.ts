@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from 'express';
 import {verifyToken} from '../services/authService';
-import {StatusCodes} from 'http-status-codes';
 import {JwtPayload} from "../utils/jwt";
+import {ErrorFactory} from "../factories/errorFactory";
 
 declare global {
     namespace Express {
@@ -19,11 +19,11 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
         try {
             req.player = verifyToken(token) as JwtPayload;
             next();
-        } catch (err) {
-            return res.status(StatusCodes.FORBIDDEN).json({message: 'Invalid or expired token'});
+        } catch {
+            return next(ErrorFactory.forbidden('Invalid or expired token'));
         }
     } else {
-        res.status(StatusCodes.UNAUTHORIZED).json({message: 'Authentication token is missing'});
+        return next(ErrorFactory.forbidden('Token not provided'));
     }
 }
 
@@ -36,6 +36,6 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
     if (typeof role === 'number' && role === 0) {
         next();
     } else {
-        res.status(StatusCodes.FORBIDDEN).json({ message: 'You do not have the necessary permissions' });
+        return next(ErrorFactory.forbidden());
     }
 };

@@ -53,3 +53,24 @@ export const gamesHistory = async (req: Request, res: Response, next: NextFuncti
         next(err);
     }
 }
+
+export const gameStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try{
+        if (!req.player) {
+            return next(ErrorFactory.unauthorized('Not logged in'));
+        }
+
+        const player_id = req.player.id;
+        const gameId = req.params.gameId;
+
+        if (typeof gameId !== "string") {
+            return next(ErrorFactory.badRequest('Invalid game id'));
+        }
+
+        const gameStatus = await gameService.getGameStatus(player_id, parseInt(gameId));
+
+        res.status(StatusCodes.OK).json(ResponseFactory.success("Game status retrieved successfully", gameStatus));
+    } catch (err) {
+        next(err);
+    }
+}

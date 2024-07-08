@@ -27,7 +27,7 @@ export async function createGame(player_1_id: number, player_2_email?: string, A
 
     await repositories.game.create({
         game_status: Statuses.ACTIVE,
-        game_configuration: JSON.stringify(gameConfiguration),
+        game_configuration: gameConfiguration,
         number_of_moves: 0,
         start_date: new Date(),
         player_1_id,
@@ -47,5 +47,22 @@ export async function getGamesHistory(player_id: number, startDate?: Date) {
         start_date: game.start_date,
         winner_id: game.winner_id
     }));
+}
 
+export async function getGameStatus(playerId: number, gameId: number) {
+    const game = await repositories.game.findById(gameId);
+    if (!game) {
+        throw ErrorFactory.notFound('Game not found');
+    }
+
+    if (game.player_1_id !== playerId && game.player_2_id !== playerId) {
+        throw ErrorFactory.forbidden('You are not part of the game');
+    }
+
+    return {
+        status: game.game_status,
+        current_configuration: game.game_configuration,
+        opponent: game.player_2_id ? (game.player_1_id === playerId ? game.player_2_id : game.player_1_id) : `AI-${game.AI_difficulty}`,
+        turn: game.game_configuration.turn === "white" ? game.player_1_id : game.player_2_id
+    };
 }

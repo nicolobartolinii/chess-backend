@@ -126,7 +126,7 @@ module.exports = {
                 allowNull: false
             },
             configuration_after: {
-                type: Sequelize.JSON,
+                type: Sequelize.JSONB,
                 allowNull: false
             }
         });

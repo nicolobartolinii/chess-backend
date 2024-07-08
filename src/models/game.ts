@@ -29,7 +29,7 @@ Game.init({
         allowNull: false
     },
     game_configuration: {
-        type: DataTypes.JSON,
+        type: DataTypes.JSONB,
         allowNull: false
     },
     number_of_moves: {
