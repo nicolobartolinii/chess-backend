@@ -38,7 +38,14 @@ export async function createGame(player_1_id: number, player_2_email?: string, A
     await playerService.decrementTokens(player_1_id, constants.GAME_CREATE_COST);
 }
 
-export async function getGamesHistory(player_id: number, startDate?: Date) { // TODO: implement filtering by startDate
-    const games = await repositories.game.findByPlayer(player_id);
-    return games;
+export async function getGamesHistory(player_id: number, startDate?: Date) {
+    const filter_fild = 'start_date';
+    const games = await repositories.game.findByPlayer(player_id,filter_fild,startDate);
+    return games.map(game => ({
+        game_status: game.game_status,
+        number_of_moves: game.number_of_moves,
+        start_date: game.start_date,
+        winner_id: game.winner_id
+    }));
+
 }

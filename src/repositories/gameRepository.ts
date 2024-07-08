@@ -8,7 +8,7 @@ export interface IGameRepository extends IBaseRepository<Game> {
 
     findActiveGames(): Promise<Game[]>;
 
-    findByPlayer(playerId: number): Promise<Game[]>;
+    findByPlayer(playerId: number, filterField?: string, filterValue?: any): Promise<Game[]>;
 
     updateGameStatus(gameId: number, status: string): Promise<[number, Game[]]>;
 }
@@ -38,12 +38,29 @@ export class GameRepository implements IGameRepository {
         return Game.findAll({where: {game_status: Statuses.ACTIVE} as any});
     }
 
-    async findByPlayer(playerId: number): Promise<Game[]> {
-        return Game.findAll({
-            where: {
-                [Op.or]: [{player_1_id: playerId}, {player_2_id: playerId}]
-            } as any
-        });
+    async findByPlayer(playerId: number, filterField?: string, filterValue?: any): Promise<Game[]> {
+        const whereClause: any = {
+            [Op.or]: [
+                { player_1_id: playerId },
+                { player_2_id: playerId }
+            ]
+        };
+
+        if (filterField && filterValue !== undefined) {
+            // Utilizzo corretto della variabile filterField
+            whereClause[filterField] = {
+                [Op.gte]: filterValue
+            };
+        }
+
+        try {
+            return await Game.findAll({
+                where: whereClause
+            });
+        } catch (error) {
+            console.error('Error finding games:', error);
+            throw error;
+        }
     }
 
     async updateGameStatus(gameId: number, status: Statuses): Promise<[number, Game[]]> {

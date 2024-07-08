@@ -45,7 +45,6 @@ export const gamesHistory = async (req: Request, res: Response, next: NextFuncti
         const player_id = req.player.id;
         const startDate = req.startDate;
 
-        // TODO: Add ordering for games history by start_date or end_date
 
         const games = await gameService.getGamesHistory(player_id, startDate);
 
