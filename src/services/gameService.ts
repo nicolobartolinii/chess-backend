@@ -170,7 +170,7 @@ export async function move(from: string, to: string, playerId: number, gameId: n
         number_of_moves: game.number_of_moves + 1
     });
 
-    const hasEnoughTokens = await playerService.checkSufficientTokens(player_1_id, constants.GAME_MOVE_COST);
+    const hasEnoughTokens = await playerService.checkSufficientTokens(playerId, constants.GAME_MOVE_COST);
     if (!hasEnoughTokens) {
         throw ErrorFactory.unauthorized('Insufficient tokens');
     }
