@@ -99,8 +99,8 @@ module.exports = {
         await queryInterface.createTable('Moves', {
             player_id: {
                 type: Sequelize.INTEGER,
-                allowNull: false,
-                references: {
+                allowNull: true,
+                references:{
                     model: "Players",
                     key: 'player_id'
                 }
@@ -108,7 +108,7 @@ module.exports = {
             game_id: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
-                references: {
+                references:{
                     model: "Games",
                     key: 'game_id'
                 }
@@ -128,6 +128,21 @@ module.exports = {
             configuration_after: {
                 type: Sequelize.JSONB,
                 allowNull: false
+            },
+            is_ai_move: {
+                type: Sequelize.BOOLEAN,
+                allowNull: false,
+                defaultValue: false
+            },
+            createdAt: {
+                allowNull: false,
+                type: Sequelize.DATE,
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+            },
+            updatedAt: {
+                allowNull: false,
+                type: Sequelize.DATE,
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             }
         });
     },

@@ -28,7 +28,7 @@ export async function createGame(player_1_id: number, player_2_email?: string, A
 
     await repositories.game.create({
         game_status: Statuses.ACTIVE,
-        game_configuration: JSON.stringify(gameConfiguration),
+        game_configuration: gameConfiguration,
         number_of_moves: 0,
         start_date: new Date(),
         player_1_id,
@@ -67,6 +67,7 @@ export async function getGameStatus(playerId: number, gameId: number) {
         turn: game.game_configuration.turn === "white" ? game.player_1_id : game.player_2_id
     };
 }
+
 export async function winnerGame(player_id: number, game_id: number): Promise<Buffer> { // TODO put the name of the winner and looser, add attributes in database
     const games = await repositories.game.WinnerGame(player_id, game_id);
 
@@ -115,5 +116,130 @@ export async function winnerGame(player_id: number, game_id: number): Promise<Bu
     });
 }
 
+export async function move(from: string, to: string, playerId: number, gameId: number): Promise<string> {
+    const game = await repositories.game.findById(gameId);
+    if (!game) {
+        throw ErrorFactory.notFound('Game not found');
+    }
 
+    if (game.game_status !== Statuses.ACTIVE) {
+        throw ErrorFactory.badRequest('Game is finished');
+    }
 
+    if (game.player_1_id !== playerId && game.player_2_id !== playerId) {
+        throw ErrorFactory.forbidden('You are not part of the game');
+    }
+
+    if ((game.player_1_id == playerId && game.game_configuration.turn == "black") || (game.player_2_id == playerId && game.game_configuration.turn == "white")) {
+        throw ErrorFactory.forbidden('Not your turn');
+    }
+
+    if (!constants.AVAILABLE_LOCATIONS.includes(from) || !constants.AVAILABLE_LOCATIONS.includes(to)) {
+        throw ErrorFactory.badRequest('Invalid start or end location');
+    }
+
+    const chessGame = new jsChessEngine.Game(game.game_configuration);
+
+    const possibleMoves = chessGame.moves(from);
+
+    if (!possibleMoves.includes(to)) {
+        throw ErrorFactory.badRequest('Invalid move. ' + (possibleMoves.length > 0 ? 'Available end locations: ' + possibleMoves.join(', ') : 'No available moves from start position provided.'));
+    }
+
+    const move = chessGame.move(from, to);
+    if (!move) {
+        throw ErrorFactory.internalServerError('Move failed');
+    }
+
+    chessGame.printToConsole(); // TODO: Remove this line after testing
+
+    const newConfiguration: JSON = chessGame.exportJson();
+
+    await repositories.move.create({
+        player_id: playerId,
+        game_id: gameId,
+        move_number: game.number_of_moves + 1,
+        from_position: from,
+        to_position: to,
+        configuration_after: newConfiguration,
+        is_ai_move: false
+    })
+
+    await repositories.game.update(gameId, {
+        game_configuration: newConfiguration,
+        number_of_moves: game.number_of_moves + 1
+    });
+
+    const hasEnoughTokens = await playerService.checkSufficientTokens(player_1_id, constants.GAME_MOVE_COST);
+    if (!hasEnoughTokens) {
+        throw ErrorFactory.unauthorized('Insufficient tokens');
+    }
+
+    await playerService.decrementTokens(playerId, constants.GAME_MOVE_COST);
+
+    let returnString = `You moved from ${from} to ${to}. `;
+
+    if (isGameFinished(newConfiguration)) {
+        const winnerId = getWinnerId(newConfiguration, game.player_1_id, game.player_2_id ? game.player_2_id : 0);
+        await repositories.game.update(gameId, {
+            game_status: Statuses.FINISHED,
+            winner_id: winnerId,
+            end_date: new Date()
+        });
+        return returnString + `Game finished. You won!`;
+    }
+
+    if (game.AI_difficulty) {
+        const aiMove = chessGame.aiMove(game.AI_difficulty);
+        if (!aiMove) {
+            throw ErrorFactory.internalServerError('AI move failed');
+        }
+
+        chessGame.printToConsole(); // TODO: Remove this line after testing
+
+        const newConfiguration: JSON = chessGame.exportJson();
+
+        const [from, to]: [string, string] = Object.entries(aiMove)[0] as [string, string];
+
+        await repositories.move.create({
+            game_id: gameId,
+            move_number: game.number_of_moves + 1,
+            from_position: from,
+            to_position: to,
+            configuration_after: newConfiguration,
+            is_ai_move: true
+        })
+
+        await repositories.game.update(gameId, {
+            game_configuration: newConfiguration,
+            number_of_moves: game.number_of_moves + 1
+        });
+
+        await playerService.decrementTokens(playerId, constants.GAME_MOVE_COST);
+
+        returnString += `AI moved from ${from} to ${to}. `;
+    }
+
+    if (isGameFinished(newConfiguration)) {
+        const winnerId = getWinnerId(newConfiguration, game.player_1_id, game.player_2_id ? game.player_2_id : 0);
+        await repositories.game.update(gameId, {
+            game_status: Statuses.FINISHED,
+            winner_id: winnerId,
+            end_date: new Date()
+        });
+        return returnString + 'Game finished. ' + (game.player_1_id === winnerId ? 'You won!' : 'You lost.');
+    } else {
+        return returnString;
+    }
+}
+
+function isGameFinished(gameConfiguration: any) {
+    return gameConfiguration.checkMate || gameConfiguration.isFinished;
+}
+
+function getWinnerId(gameConfiguration: any, player1Id: number, player2Id: number) {
+    // Player 1 is always the creator of the game, so the white. Player 2, instead, is the black. If the game
+    // is vs AI, AI is black. (Player2Id, if AI, is 0)
+    return gameConfiguration.turn === "white" ? player2Id : player1Id;
+    // TODO: assign points to the winner
+}

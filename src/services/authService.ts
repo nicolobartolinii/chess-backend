@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken';
 import {JwtPayload, PRIVATE_KEY, PUBLIC_KEY} from "../utils/jwt";
-import {findPlayerByEmail} from "../models/player";
 import {ErrorFactory} from "../factories/errorFactory";
+import {repositories} from "../repositories";
 
 export const loginPlayer = async (email: string, password: string) => {
-    const player = await findPlayerByEmail(email);
+    const player = await repositories.player.findByEmail(email);
     if (!player) {
         throw ErrorFactory.notFound('Invalid email or password')
     }

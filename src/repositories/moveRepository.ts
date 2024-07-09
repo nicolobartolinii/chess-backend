@@ -1,7 +1,10 @@
 import {IBaseRepository} from './baseRepository';
 import {Move} from '../models/move';
+import {CreationAttributes} from "sequelize";
 
 export interface IMoveRepository extends IBaseRepository<Move> {
+    create(item: CreationAttributes<Move>): Promise<Move>;
+
     findByGame(gameId: number): Promise<Move[]>;
 
     findLastMoveByGame(gameId: number): Promise<Move | null>;
@@ -16,7 +19,7 @@ export class MoveRepository implements IMoveRepository {
         return Move.findByPk(id);
     }
 
-    async create(item: Move): Promise<Move> {
+    async create(item: CreationAttributes<Move>): Promise<Move> {
         return Move.create(item);
     }
 

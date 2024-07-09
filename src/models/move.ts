@@ -1,23 +1,24 @@
 import { SingletonDBConnection } from '../db/sequelizeConnection';
-import { Sequelize, Model, DataTypes, InferAttributes, InferCreationAttributes } from 'sequelize';
+import { Sequelize, Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import { Player } from './player';
 import { Game } from './game';
 
 const db_connection: Sequelize = SingletonDBConnection.getInstance();
 
 class Move extends Model<InferAttributes<Move>, InferCreationAttributes<Move>> {
-    declare player_id: number; // foreign key
+    declare player_id: CreationOptional<number | null>;
+    declare game_id: number; // foreign key
     declare move_number: number; // number of the move in the match
     declare from_position: string; // position of the piece before the move
     declare to_position: string; // position of the piece after the move
     declare configuration_after: any;  // JSON
-    declare game_id: number; // foreign key
+    declare is_ai_move: boolean;
 }
 
 Move.init({
     player_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references:{
             model: Player,
             key: 'player_id'
@@ -44,12 +45,25 @@ Move.init({
         allowNull: false
     },
     configuration_after: {
-        type: DataTypes.JSON,
+        type: DataTypes.JSONB,
         allowNull: false
+    },
+    is_ai_move: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
     }
 }, {
     sequelize: db_connection,
-    modelName: 'Move'
+    modelName: 'Move',
+    indexes: [
+        {
+            unique: true,
+            fields: ['player_id', 'game_id', 'move_number']
+        }
+    ]
 });
+
+Move.removeAttribute('id');
 
 export { Move };

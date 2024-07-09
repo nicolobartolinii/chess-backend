@@ -20,7 +20,7 @@ export const createGame = async (req: Request, res: Response, next: NextFunction
             return next(ErrorFactory.badRequest('Player 2 email or AI difficulty is required'));
         }
 
-        if (typeof player_2_email !== 'string' && typeof AI_difficulty !== "number") {
+        if (typeof player_2_email !== 'string' && typeof AI_difficulty !== "string") {
             return next(ErrorFactory.badRequest('Invalid player 2 email or AI difficulty'));
         }
 
@@ -63,7 +63,7 @@ export const getGameWinner = async (req: Request, res: Response, next: NextFunct
         }
 
         const player_id = req.player.id;
-        const game_id = req.params.game_id;
+        const game_id = req.params.gameId;
         const numericGameId = parseInt(game_id, 10);
         if (isNaN(numericGameId)) {
             return next(ErrorFactory.badRequest('Invalid game ID'));
@@ -95,6 +95,37 @@ export const gameStatus = async (req: Request, res: Response, next: NextFunction
         const gameStatus = await gameService.getGameStatus(player_id, parseInt(gameId));
 
         res.status(StatusCodes.OK).json(ResponseFactory.success("Game status retrieved successfully", gameStatus));
+    } catch (err) {
+        next(err);
+    }
+}
+
+export const makeMove = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try{
+        if (!req.player) {
+            return next(ErrorFactory.unauthorized('Not logged in'));
+        }
+
+        const playerId = req.player.id;
+        const gameId = req.params.gameId;
+        const from = req.body.from;
+        const to = req.body.to;
+
+        if (typeof gameId !== "string") {
+            return next(ErrorFactory.badRequest('Invalid game id'));
+        }
+
+        if (!from || !to) {
+            return next(ErrorFactory.badRequest('Move parameters are required'));
+        }
+
+        if (typeof from !== "string" || typeof to !== "string") {
+            return next(ErrorFactory.badRequest('Invalid move'));
+        }
+
+        await gameService.move(from, to, playerId, parseInt(gameId));
+
+        res.status(StatusCodes.OK).json(ResponseFactory.success("Move made successfully"));
     } catch (err) {
         next(err);
     }

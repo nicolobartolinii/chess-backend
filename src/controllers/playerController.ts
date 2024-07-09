@@ -11,13 +11,13 @@ export const getPlayerRanking = async (req: Request, res: Response, next: NextFu
     try {
         // input parameters validation
         if (!['points', 'gamesPlayed', 'gamesWon'].includes(field)) {
-            throw ErrorFactory.badRequest('Invalid field for ordering');
+            return next(ErrorFactory.badRequest('Invalid field for ordering'));
         }
         if (!['ASC', 'DESC'].includes(order.toUpperCase())) {
-            throw ErrorFactory.badRequest('Invalid order direction');
+            return next(ErrorFactory.badRequest('Invalid order direction'));
         }
 
-        const players = await orderPlayers(field, order);
+        const players = await orderPlayers(field, order); // TODO: stop using this function, instead use the repository
 
         res.status(StatusCodes.OK).json(ResponseFactory.success('Players retrieved successfully', players));
     } catch (error) {

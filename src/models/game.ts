@@ -15,7 +15,7 @@ class Game extends Model<InferAttributes<Game>, InferCreationAttributes<Game>> {
     declare player_1_id: number;
     declare player_2_id: CreationOptional<number | null>;
     declare AI_difficulty: CreationOptional<string | null>;
-    declare winner_id: CreationOptional<string | null>;
+    declare winner_id: CreationOptional<number | null>;
 }
 
 Game.init({
