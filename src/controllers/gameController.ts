@@ -54,15 +54,6 @@ export const gamesHistory = async (req: Request, res: Response, next: NextFuncti
     }
 }
 
-
-
-
-
-
-
-
-
-
 // create a pdf about the winnery of the match
 export const getGameWinner = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try{
@@ -71,15 +62,13 @@ export const getGameWinner = async (req: Request, res: Response, next: NextFunct
         }
 
         const player_id = req.player.id;
-        console.log(player_id);
         const game_id = req.params.game_id;
         const numericGameId = parseInt(game_id, 10);
-        console.log(numericGameId);
         if (isNaN(numericGameId)) {
             return next(ErrorFactory.badRequest('Invalid game ID'));
         }
 
-        const game = await gameService.WinnerGame(player_id, numericGameId);
+        const game = await gameService.winnerGame(player_id, numericGameId);
 
         res.status(StatusCodes.OK).json(ResponseFactory.success("Game winner retrieved successfully", game));
     } catch (err) {

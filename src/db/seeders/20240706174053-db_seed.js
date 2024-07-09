@@ -57,11 +57,11 @@ module.exports = {
                     }
                 }),
                 number_of_moves: 15,
-                start_date: new Date(),
-                end_date: null,
+                start_date: '2024-01-01T12:00:00Z', // Data di inizio fissa
+                end_date: '2024-01-02T11:00:00Z',
                 player_1_id: 1,
                 player_2_id: null,
-                AI_difficulty: "prova",
+                AI_difficulty:"EASY",
                 winner_id: 1
             }], {});
 

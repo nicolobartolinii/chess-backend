@@ -2,6 +2,7 @@ import {IBaseRepository} from './baseRepository';
 import {Game} from '../models/game';
 import {Statuses} from "../utils/statuses";
 import {Op, CreationAttributes} from "sequelize";
+import {ErrorFactory} from "../factories/errorFactory";
 
 export interface IGameRepository extends IBaseRepository<Game> {
     create(item: CreationAttributes<Game>): Promise<Game>;
@@ -67,10 +68,23 @@ export class GameRepository implements IGameRepository {
         return Game.update({game_status: status}, {where: {game_id: gameId} as any, returning: true});
     }
 
-    async WinnerGame(winnerid:number,game_id:number):Promise<Game[]>{
-        console.log(winnerid);
-        console.log("prova")
-        console.log(game_id);
-        return Game.findAll({where:{winner_id:winnerid,game_id:game_id} as any});
+    async WinnerGame(winnerId: number, gameId: number): Promise<Game[]> {
+        const games = await Game.findAll({
+            where: {
+                game_id: gameId
+            }
+        });
+
+        if (games.length === 0) {
+            throw ErrorFactory.notFound('Game not found');
+        }
+
+        const game = games.find(game => Number(game.winner_id) === winnerId);
+        if (!game) {
+            throw ErrorFactory.badRequest('Game not found with the specified winner');
+        }
+
+        return games;
     }
+
 }

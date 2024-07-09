@@ -66,13 +66,40 @@ export async function getGameStatus(playerId: number, gameId: number) {
         turn: game.game_configuration.turn === "white" ? game.player_1_id : game.player_2_id
     };
 }
-export async function WinnerGame(player_id: number, game_id: number) {
+export async function winnerGame(player_id: number, game_id: number) {
+    const games = await repositories.game.WinnerGame(player_id, game_id); // get the game
 
-    const games = await repositories.game.WinnerGame(player_id, game_id);
-    return games.map(game => ({
-        game_status: game.game_status,
-        number_of_moves: game.number_of_moves,
-        start_date: game.start_date,
-        winner_id: game.winner_id
+    const gameDetails = await Promise.all(games.map(async (game) => {
+        let contactInfo; // contains the email of the loser or the AI difficulty
+        // check if the game was played against AI
+        if (game.player_2_id === null) {
+            contactInfo = `AI Difficulty: ${game.AI_difficulty || 'Not specified'}`;
+        } else {
+            let loserId = (Number(game.winner_id) !== Number(game.player_1_id)) ? game.player_1_id : game.player_2_id;
+            const loser = await repositories.player.findById(loserId);
+            contactInfo = loser ? loser.email : 'Email not available';
+        }
+        // take email of the winner
+        const winner = await repositories.player.findById(player_id);
+        const winnerEmail = winner ? winner.email : 'Email of the winner not available';
+
+        // calculate the time elapsed
+        const startTime = new Date(game.start_date);
+        const endTime = game.end_date ? new Date(game.end_date) : new Date();
+        const timeElapsed = endTime.getTime() - startTime.getTime();
+        const hoursElapsed = Math.floor(timeElapsed / (1000 * 60 * 60));
+        const minutesElapsed = Math.floor((timeElapsed % (1000 * 60 * 60)) / (1000 * 60));
+
+        return {
+            game_status: game.game_status,
+            number_of_moves: game.number_of_moves,
+            time_elapsed: `${hoursElapsed} hours and ${minutesElapsed} minutes`,
+            winner_email: winnerEmail,
+            loser_contact_info: contactInfo
+        };
     }));
+    return gameDetails;
 }
+
+
+
