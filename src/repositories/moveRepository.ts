@@ -41,4 +41,7 @@ export class MoveRepository implements IMoveRepository {
             order: [['move_number', 'DESC']]
         } as any);
     }
+    async findMovebyGameID(gameId: number): Promise<Move | null> {
+        return Move.findOne({where: {game_id: gameId}} as any);
+    }
 }

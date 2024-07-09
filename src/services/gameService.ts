@@ -311,3 +311,27 @@ function generateChessboardSVG(configuration: { pieces: Record<string, string> }
     svg += '</svg>';
     return svg;
 }
+
+export async function getGameMoves(playerId: number, gameId: number) {
+    const match = await repositories.game.findById(gameId)
+    if (!match) {
+        throw ErrorFactory.notFound('Game not found');
+    }
+    if (match.player_1_id !== playerId && match.player_2_id !== playerId) {
+        throw ErrorFactory.forbidden('You are not part of the game');
+    }
+    const game = await repositories.move.findMovebyGameID(gameId);
+
+    if (!game) {
+        throw ErrorFactory.notFound('Game not found');
+    }
+
+    const moves = await repositories.move.findByGame(gameId);
+
+    return moves.map(move => ({
+        move_number: move.move_number,
+        from_position: move.from_position,
+        to_position: move.to_position,
+        player_id: move.player_id
+    }));
+}

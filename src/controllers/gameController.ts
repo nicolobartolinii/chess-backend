@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import ResponseFactory from "../factories/responseFactory";
 import { ErrorFactory } from "../factories/errorFactory";
 import * as gameService from "../services/gameService";
+import {ExportStrategy, JSONExportStrategy, PdfExportStrategy} from "../strategy/exportStrategies";
 import {AiLevel, AI_LEVELS} from "../utils/aiLevels";
 
 
@@ -159,3 +160,34 @@ export const getChessboard = async (req: Request, res: Response, next: NextFunct
         next(err);
     }
 }
+
+export const getGameHistoryController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        if (!req.player) {
+            return next(ErrorFactory.unauthorized('Not logged in'));
+        }
+        const gameId = req.params.gameId;
+        const player_id = req.player.id;
+        const format = req.params.format || 'json'; // Default to JSON
+        const moves = await gameService.getGameMoves(player_id, parseInt(gameId)); // Get the moves of the game
+        let exportStrategy: ExportStrategy;
+
+        if (format === 'pdf') {
+            exportStrategy = new PdfExportStrategy();
+        } else {
+            exportStrategy = new JSONExportStrategy();
+        }
+
+        const exportedData = await exportStrategy.export(moves);
+
+        if (format === 'pdf') {
+            res.setHeader('Content-Type', 'application/pdf');
+            res.send(exportedData);
+        } else {
+            res.setHeader('Content-Type', 'application/json');
+            res.send(exportedData);
+        }
+    } catch (error) {
+        next(error);
+    }
+};
