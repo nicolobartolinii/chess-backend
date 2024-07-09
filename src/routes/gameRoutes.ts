@@ -11,5 +11,6 @@ router.get('/history', dateValidationMiddleware, gameController.gamesHistory);
 router.get('/status/:gameId', gameController.gameStatus);
 router.get('/winner/:gameId', gameController.getGameWinner);
 router.post('/move/:gameId', gameController.makeMove);
+router.get('/chessboard/:gameId', gameController.getChessboard);
 
 export default router;

@@ -3,7 +3,7 @@ import {Player} from "../models/player";
 
 export interface IPlayerRepository extends IBaseRepository<Player> {
     findByEmail(email: string): Promise<Player | null>;
-    updateTokens(id: number, tokens: number): Promise<[number, Player[]]>;
+    updatePlayerField(player_id: number, field: string, value: any): Promise<[number, Player[]]>;
 }
 
 export class PlayerRepository implements IPlayerRepository {
@@ -27,8 +27,8 @@ export class PlayerRepository implements IPlayerRepository {
         return Player.update(item, { where: { player_id }, returning: true } as any);
     }
 
-    async updateTokens(player_id: number, tokens: number): Promise<[number, Player[]]> {
-        return Player.update({ tokens }, { where: { player_id }, returning: true } as any);
+    async updatePlayerField(player_id: number, field: string, value: any): Promise<[number, Player[]]> {
+        return Player.update({ [field]: value }, { where: { player_id }, returning: true } as any);
     }
 
     async delete(player_id: number): Promise<number> {

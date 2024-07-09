@@ -12,3 +12,18 @@ export const AVAILABLE_LOCATIONS = [
     "G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8",
     "H1", "H2", "H3", "H4", "H5", "H6", "H7", "H8"
 ];
+export type PieceKey = 'P' | 'N' | 'B' | 'R' | 'Q' | 'K' | 'p' | 'n' | 'b' | 'r' | 'q' | 'k';
+export const PIECES: Record<PieceKey, string> = {
+    "P": "White Pawn",
+    "N": "White Knight",
+    "B": "White Bishop",
+    "R": "White Rook",
+    "Q": "White Queen",
+    "K": "White King",
+    "p": "Black Pawn",
+    "n": "Black Knight",
+    "b": "Black Bishop",
+    "r": "Black Rook",
+    "q": "Black Queen",
+    "k": "Black King"
+};

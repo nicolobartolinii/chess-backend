@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import ResponseFactory from "../factories/responseFactory";
 import { ErrorFactory } from "../factories/errorFactory";
 import * as gameService from "../services/gameService";
+import {AiLevel, AI_LEVELS} from "../utils/aiLevels";
 
 
 export const createGame = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -14,14 +15,18 @@ export const createGame = async (req: Request, res: Response, next: NextFunction
         const player_1_id = req.player.id;
 
         const player_2_email = req.body.player_2_email;
-        const AI_difficulty = req.body.AI_difficulty;
+        const AI_difficulty: AiLevel | undefined = req.body.AI_difficulty as AiLevel | undefined;
 
         if (!player_2_email && !AI_difficulty) {
             return next(ErrorFactory.badRequest('Player 2 email or AI difficulty is required'));
         }
 
-        if (typeof player_2_email !== 'string' && typeof AI_difficulty !== "string") {
-            return next(ErrorFactory.badRequest('Invalid player 2 email or AI difficulty'));
+        if (typeof player_2_email !== 'string' && player_2_email !== undefined) {
+            return next(ErrorFactory.badRequest('Invalid player 2 email'));
+        }
+
+        if (AI_difficulty !== undefined && !(AI_LEVELS.includes(AI_difficulty))) {
+            return next(ErrorFactory.badRequest('Invalid AI difficulty'));
         }
 
         await gameService.createGame(player_1_id, player_2_email, AI_difficulty);
@@ -123,9 +128,33 @@ export const makeMove = async (req: Request, res: Response, next: NextFunction):
             return next(ErrorFactory.badRequest('Invalid move'));
         }
 
-        await gameService.move(from, to, playerId, parseInt(gameId));
+        const moveString = await gameService.move(from, to, playerId, parseInt(gameId));
 
-        res.status(StatusCodes.OK).json(ResponseFactory.success("Move made successfully"));
+        res.status(StatusCodes.OK).json(ResponseFactory.success('Move made successfully', {move: moveString}));
+    } catch (err) {
+        next(err);
+    }
+}
+
+export const getChessboard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try{
+        if (!req.player) {
+            return next(ErrorFactory.unauthorized('Not logged in'));
+        }
+
+        const playerId = req.player.id;
+        const gameId = req.params.gameId;
+
+        if (typeof gameId !== "string") {
+            return next(ErrorFactory.badRequest('Invalid game id'));
+        }
+
+        const chessboard = await gameService.getChessboard(parseInt(gameId)); // TODO: Add player ID to check if player is part of the game
+
+        res.setHeader('Content-Type', 'image/svg+xml');
+        res.setHeader('Content-Disposition', 'attachment; filename=chessboard.svg');
+
+        res.send(chessboard);
     } catch (err) {
         next(err);
     }

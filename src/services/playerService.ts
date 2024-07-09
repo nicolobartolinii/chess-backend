@@ -8,7 +8,7 @@ export const updatePlayerTokens = async (email: string, tokens: number):Promise<
         throw ErrorFactory.notFound('Player not found');
     }
 
-    const [, [updatedPlayer]] = await repositories.player.updateTokens(player.player_id, tokens);
+    const [, [updatedPlayer]] = await repositories.player.updatePlayerField(player.player_id, "tokens", tokens);
     return updatedPlayer;
 }
 
@@ -28,5 +28,5 @@ export const decrementTokens = async (playerId: number, amount: number): Promise
     if (!await checkSufficientTokens(playerId, amount)){
         throw ErrorFactory.paymentRequired('Insufficient tokens');
     }
-    await repositories.player.updateTokens(playerId, player.tokens - amount);
+    await repositories.player.updatePlayerField(playerId, "tokens", player.tokens - amount);
 };
