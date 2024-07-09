@@ -55,8 +55,9 @@ export const gamesHistory = async (req: Request, res: Response, next: NextFuncti
 }
 
 // create a pdf about the winnery of the match
+
 export const getGameWinner = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try{
+    try {
         if (!req.player) {
             return next(ErrorFactory.unauthorized('Not logged in'));
         }
@@ -68,13 +69,15 @@ export const getGameWinner = async (req: Request, res: Response, next: NextFunct
             return next(ErrorFactory.badRequest('Invalid game ID'));
         }
 
-        const game = await gameService.winnerGame(player_id, numericGameId);
+        const pdfBuffer = await gameService.winnerGame(player_id, numericGameId);
 
-        res.status(StatusCodes.OK).json(ResponseFactory.success("Game winner retrieved successfully", game));
+        res.setHeader('Content-Disposition', 'attachment; filename=gameDetails.pdf');
+        res.setHeader('Content-Type', 'application/pdf');
+        res.status(StatusCodes.OK).send(pdfBuffer);
     } catch (err) {
         next(err);
     }
-}
+};
 
 export const gameStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try{

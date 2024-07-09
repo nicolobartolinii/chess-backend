@@ -3,6 +3,7 @@ import {Statuses} from "../utils/statuses";
 import {repositories} from "../repositories";
 import * as constants from "../utils/constants";
 import * as playerService from "./playerService";
+import PDFDocument from 'pdfkit';
 
 const jsChessEngine = require('js-chess-engine')
 
@@ -66,12 +67,17 @@ export async function getGameStatus(playerId: number, gameId: number) {
         turn: game.game_configuration.turn === "white" ? game.player_1_id : game.player_2_id
     };
 }
-export async function winnerGame(player_id: number, game_id: number) {
-    const games = await repositories.game.WinnerGame(player_id, game_id); // get the game
+export async function winnerGame(player_id: number, game_id: number): Promise<Buffer> { // TODO put the name of the winner and looser, add attributes in database
+    const games = await repositories.game.WinnerGame(player_id, game_id);
 
-    const gameDetails = await Promise.all(games.map(async (game) => {
-        let contactInfo; // contains the email of the loser or the AI difficulty
-        // check if the game was played against AI
+    const doc = new PDFDocument();
+    const buffers: Buffer[] = [];
+
+    doc.on('data', buffers.push.bind(buffers));
+    doc.on('end', () => {});
+
+    for (const game of games) {
+        let contactInfo;
         if (game.player_2_id === null) {
             contactInfo = `AI Difficulty: ${game.AI_difficulty || 'Not specified'}`;
         } else {
@@ -79,26 +85,34 @@ export async function winnerGame(player_id: number, game_id: number) {
             const loser = await repositories.player.findById(loserId);
             contactInfo = loser ? loser.email : 'Email not available';
         }
-        // take email of the winner
+
         const winner = await repositories.player.findById(player_id);
         const winnerEmail = winner ? winner.email : 'Email of the winner not available';
 
-        // calculate the time elapsed
         const startTime = new Date(game.start_date);
         const endTime = game.end_date ? new Date(game.end_date) : new Date();
         const timeElapsed = endTime.getTime() - startTime.getTime();
         const hoursElapsed = Math.floor(timeElapsed / (1000 * 60 * 60));
         const minutesElapsed = Math.floor((timeElapsed % (1000 * 60 * 60)) / (1000 * 60));
+        doc.fontSize(12).text(`Victory for the match: ${game.game_id}`);
+        doc.moveDown();
 
-        return {
-            game_status: game.game_status,
-            number_of_moves: game.number_of_moves,
-            time_elapsed: `${hoursElapsed} hours and ${minutesElapsed} minutes`,
-            winner_email: winnerEmail,
-            loser_contact_info: contactInfo
-        };
-    }));
-    return gameDetails;
+        doc.text(`Number of mouve: ${game.number_of_moves}`);
+        doc.text(`Time for win: ${hoursElapsed} houres e ${minutesElapsed} minutes`);
+        doc.text(`name of winner: ${winnerEmail}`);
+        doc.text(`looser:: ${contactInfo}`);
+        doc.moveDown();
+    }
+
+    doc.end();
+
+    return new Promise((resolve, reject) => {
+        doc.on('end', () => {
+            const pdfData = Buffer.concat(buffers);
+            resolve(pdfData);
+        });
+        doc.on('error', reject);
+    });
 }
 
 
