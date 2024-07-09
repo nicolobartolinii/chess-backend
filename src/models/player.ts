@@ -60,13 +60,3 @@ Player.init({
 useBcrypt(Player, {rounds: 10, field: 'password', method: 'authenticate'});
 
 export {Player};
-
-export async function findPlayerByEmail(email: string): Promise<Player | null> {
-    return Player.findOne({where: {email}});
-}
-
-export async function orderPlayers(field: string, order: string): Promise<Player[]> {
-    return Player.findAll({
-        order: [[field, order]]
-    });
-}

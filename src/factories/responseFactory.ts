@@ -7,6 +7,12 @@ interface IAPIResponse {
     data?: any
 }
 
+interface ISVGResponse {
+    statusCode: number,
+    content: string,
+    filename: string
+}
+
 class ResponseFactory {
     static success(message: string = ReasonPhrases.OK, data?: any, statusCode: number = StatusCodes.OK): IAPIResponse {
         return {
@@ -22,6 +28,14 @@ class ResponseFactory {
             success: false,
             statusCode,
             message
+        }
+    }
+
+    static svg(content: string, filename: string, statusCode: number = StatusCodes.OK): ISVGResponse {
+        return {
+            statusCode,
+            content,
+            filename
         }
     }
 }

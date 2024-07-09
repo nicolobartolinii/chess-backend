@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { orderPlayers } from '../models/player';
 import { StatusCodes } from 'http-status-codes';
 import ResponseFactory from "../factories/responseFactory";
 import { ErrorFactory } from "../factories/errorFactory";
+import {repositories} from "../repositories";
 
 export const getPlayerRanking = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const field = req.query.field as string || 'points';
@@ -17,7 +17,7 @@ export const getPlayerRanking = async (req: Request, res: Response, next: NextFu
             return next(ErrorFactory.badRequest('Invalid order direction'));
         }
 
-        const players = await orderPlayers(field, order); // TODO: stop using this function, instead use the repository
+        const players = await repositories.player.findAllOrdering(field, order);
 
         res.status(StatusCodes.OK).json(ResponseFactory.success('Players retrieved successfully', players));
     } catch (error) {

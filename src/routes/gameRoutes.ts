@@ -12,6 +12,6 @@ router.get('/status/:gameId', gameController.gameStatus);
 router.get('/winner/:gameId', gameController.getGameWinner);
 router.post('/move/:gameId', gameController.makeMove);
 router.get('/chessboard/:gameId', gameController.getChessboard);
-router.get('/history_game/:gameId/:format?',gameController.getGameHistoryController );
+router.get('/history_game/:gameId/:format?',gameController.getGameHistory );
 
 export default router;

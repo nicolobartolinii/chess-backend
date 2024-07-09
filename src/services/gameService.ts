@@ -192,13 +192,13 @@ export async function move(from: string, to: string, playerId: number, gameId: n
     let returnString = `You moved a ${pieceMoved} from ${from} to ${to}. `;
 
     if (isGameFinished(newConfiguration)) {
-        const winnerId = await winGame(newConfiguration, game.player_1_id, game.player_2_id ? game.player_2_id : 0);
+        const winnerId = isStalemate(newConfiguration) ? null : await winGame(newConfiguration, game.player_1_id, game.player_2_id ? game.player_2_id : 0)
         await repositories.game.update(gameId, {
             game_status: Statuses.FINISHED,
-            winner_id: winnerId,
+            winner_id: winnerId || null,
             end_date: new Date()
         });
-        return returnString + `Game finished. You won!`;
+        return returnString + 'Game finished. ' + (isStalemate(newConfiguration) ? 'Stalemate!' : 'You won!');
     }
 
     if (game.AI_difficulty) {
@@ -241,27 +241,33 @@ export async function move(from: string, to: string, playerId: number, gameId: n
     }
 
     if (isGameFinished(newConfiguration)) {
-        const winnerId = await winGame(newConfiguration, game.player_1_id, game.player_2_id ? game.player_2_id : 0);
+        const winnerId = isStalemate(newConfiguration) ? null : await winGame(newConfiguration, game.player_1_id, game.player_2_id ? game.player_2_id : 0)
         await repositories.game.update(gameId, {
             game_status: Statuses.FINISHED,
-            winner_id: winnerId,
+            winner_id: winnerId || null,
             end_date: new Date()
         });
-        return returnString + 'Game finished. ' + (game.player_1_id === winnerId ? 'You won!' : 'You lost.');
+        return returnString + 'Game finished. ' + (isStalemate(newConfiguration) ? 'Stalemate!' : (game.player_1_id === winnerId ? 'You won!' : 'You lost.'));
     } else {
         return returnString;
     }
 }
 
 function isGameFinished(gameConfiguration: any) {
-    return gameConfiguration.checkMate || gameConfiguration.isFinished;
+    return gameConfiguration.isFinished;
+}
+
+function isStalemate(gameConfiguration: any) {
+    return !gameConfiguration.check && !gameConfiguration.checkMate;
 }
 
 async function winGame(gameConfiguration: any, player1Id: number, player2Id: number) {
     // Player 1 is always the creator of the game, so the white. Player 2, instead, is the black. If the game
     // is vs AI, AI is black. (Player2Id, if AI game, is 0)
     const winnerId = gameConfiguration.turn === "white" ? player2Id : player1Id;
-    await repositories.player.updatePlayerField(winnerId, "points", constants.GAME_WIN_PRIZE);
+    if (winnerId !== 0) {
+        await repositories.player.updatePlayerField(winnerId, "points", constants.GAME_WIN_PRIZE);
+    }
     return winnerId;
 }
 
@@ -269,14 +275,18 @@ function getAiLevelValue(level: AiLevel): number {
     return AiLevels[level];
 }
 
-export async function getChessboard (gameId: number): Promise<string> {
+export async function getChessboard(playerId: number, gameId: number): Promise<string> {
     const game = await repositories.game.findById(gameId);
     if (!game) {
         throw ErrorFactory.notFound('Game not found');
     }
 
+    if (game.player_1_id !== playerId && game.player_2_id !== playerId) {
+        throw ErrorFactory.forbidden('You are not part of the game');
+    }
+
     const configuration = game.game_configuration;
-    return generateChessboardSVG({ pieces: configuration.pieces });
+    return generateChessboardSVG({pieces: configuration.pieces});
 }
 
 function generateChessboardSVG(configuration: { pieces: Record<string, string> }): string {

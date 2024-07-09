@@ -1,4 +1,3 @@
-// src/strategies/exportStrategies.ts
 import PDFDocument from 'pdfkit';
 
 interface ExportStrategy {

@@ -1,14 +1,14 @@
-import { Request, Response, NextFunction } from 'express';
-import { StatusCodes } from 'http-status-codes';
+import {Request, Response, NextFunction} from 'express';
+import {StatusCodes} from 'http-status-codes';
 import ResponseFactory from "../factories/responseFactory";
-import { ErrorFactory } from "../factories/errorFactory";
+import {ErrorFactory} from "../factories/errorFactory";
 import * as gameService from "../services/gameService";
-import {ExportStrategy, JSONExportStrategy, PdfExportStrategy} from "../strategy/exportStrategies";
+import {ExportStrategy, JSONExportStrategy, PdfExportStrategy} from "../strategies/exportStrategies";
 import {AiLevel, AI_LEVELS} from "../utils/aiLevels";
 
 
 export const createGame = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try{
+    try {
         if (!req.player) {
             return next(ErrorFactory.unauthorized('Not logged in'));
         }
@@ -39,7 +39,7 @@ export const createGame = async (req: Request, res: Response, next: NextFunction
 }
 
 export const gamesHistory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try{
+    try {
         if (!req.player) {
             return next(ErrorFactory.unauthorized('Not logged in'));
         }
@@ -86,7 +86,7 @@ export const getGameWinner = async (req: Request, res: Response, next: NextFunct
 };
 
 export const gameStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try{
+    try {
         if (!req.player) {
             return next(ErrorFactory.unauthorized('Not logged in'));
         }
@@ -107,7 +107,7 @@ export const gameStatus = async (req: Request, res: Response, next: NextFunction
 }
 
 export const makeMove = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try{
+    try {
         if (!req.player) {
             return next(ErrorFactory.unauthorized('Not logged in'));
         }
@@ -138,7 +138,7 @@ export const makeMove = async (req: Request, res: Response, next: NextFunction):
 }
 
 export const getChessboard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try{
+    try {
         if (!req.player) {
             return next(ErrorFactory.unauthorized('Not logged in'));
         }
@@ -150,18 +150,20 @@ export const getChessboard = async (req: Request, res: Response, next: NextFunct
             return next(ErrorFactory.badRequest('Invalid game id'));
         }
 
-        const chessboard = await gameService.getChessboard(parseInt(gameId)); // TODO: Add player ID to check if player is part of the game
+        const chessboard = await gameService.getChessboard(playerId, parseInt(gameId));
 
-        res.setHeader('Content-Type', 'image/svg+xml');
-        res.setHeader('Content-Disposition', 'attachment; filename=chessboard.svg');
+        const svgResponse = ResponseFactory.svg(chessboard, 'chessboard.svg');
 
-        res.send(chessboard);
+        res.status(svgResponse.statusCode)
+            .setHeader('Content-Type', 'image/svg+xml')
+            .setHeader('Content-Disposition', `attachment; filename=${svgResponse.filename}`)
+            .send(svgResponse.content);
     } catch (err) {
         next(err);
     }
 }
 
-export const getGameHistoryController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getGameHistory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         if (!req.player) {
             return next(ErrorFactory.unauthorized('Not logged in'));
