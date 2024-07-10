@@ -381,6 +381,11 @@ export async function getGameMoves(playerId: number, gameId: number) {
     const player2 = game.player_2_id ? await repositories.player.findById(game.player_2_id) : null;
 
     return moves.map(move => {
+        let moveEffect = '';
+        if(moves[moves.length - 1].move_number ===move.move_number && game.game_status === Statuses.FINISHED) {
+            if(move.piece === null) { moveEffect = 'ABANDON';}
+            if (move.configuration_after.checkMate) { moveEffect = 'CHECKMATE';}
+        }
         const player_name = move.player_id === game.player_1_id ? player1?.username : player2?.username;
         return {
             player_name: player_name ? player_name : 'AI',
@@ -390,7 +395,8 @@ export async function getGameMoves(playerId: number, gameId: number) {
             to_position: move.to_position,
             player_id: move.player_id,
             configuration_after: move.configuration_after,
-            piece: move.piece
+            piece: move.piece,
+            moveEffect: moveEffect
         }
     });
 }
