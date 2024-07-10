@@ -8,6 +8,21 @@ import PDFDocument from 'pdfkit';
 
 const jsChessEngine = require('js-chess-engine')
 
+/**
+ * This function creates a new game. It checks if the player has enough tokens to create a game.
+ * If the player has enough tokens, it creates a new game with the provided player_1_id, player_2_email or AI_difficulty.
+ *
+ * If the player_2_email is provided, it checks if the player_2_email exists in the database.
+ * If the player_2_email exists, it creates a new game with the provided player_1_id and player_2_id.
+ * If the player_2_email does not exist, it throws an error.
+ *
+ * If the player_2_email is not provided, it creates a new game with the provided player_1_id and AI_difficulty.
+ *
+ *
+ * @param player_1_id
+ * @param player_2_email
+ * @param AI_difficulty
+ */
 export async function createGame(player_1_id: number, player_2_email?: string, AI_difficulty?: AiLevel): Promise<void> {
     const hasEnoughTokens = await playerService.checkSufficientTokens(player_1_id, constants.GAME_CREATE_COST);
     if (!hasEnoughTokens) {
