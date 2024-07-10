@@ -6,17 +6,56 @@ import {promisify} from 'util';
 
 const svg2imgAsync = promisify(svg2img);
 
+/**
+ * This interface represents the ExportStrategy class.
+ */
 interface ExportStrategy {
     export(moves: any[]): Promise<any>;
 }
 
+/**
+ * This class represents the JSONExportStrategy class.
+ *
+ * JSONExportStrategy is responsible for exporting game moves into a JSON string.
+ * It implements the ExportStrategy interface and provides the export method
+ * which converts the array of game moves into a JSON formatted string.
+ */
 class JSONExportStrategy implements ExportStrategy {
+    /**
+     * Exports the game moves as a JSON string.
+     *
+     * This method converts the array of moves into a JSON formatted string
+     * using the JSON.stringify method.
+     *
+     * @param {any[]} moves - An array of move objects containing information about each move in the game.
+     * @returns {Promise<string>} - A promise that resolves with a string containing the JSON data.
+     */
     export(moves: any[]): Promise<string> {
         return Promise.resolve(JSON.stringify(moves));
     }
 }
 
+/**
+ * This class represents the PdfExportStrategy class.
+ *
+ * PdfExportStrategy is responsible for exporting game moves into a PDF document.
+ * It implements the ExportStrategy interface and provides the export method
+ * which processes the game moves, generates a PDF with detailed move information,
+ * and embeds images of the game state after each move.
+ */
 class PdfExportStrategy implements ExportStrategy {
+    /**
+     * Exports the game moves as a PDF document.
+     *
+     * This method creates a PDF document using the PDFKit library. It iterates over
+     * the array of moves, adding detailed text for each move to the document. If the
+     * move indicates a player has abandoned the game, it adds a specific message.
+     * Additionally, it generates an image of the game state after each move using
+     * the svg2img and sharp libraries to convert SVG to PNG and resize it for the PDF.
+     *
+     * @param {any[]} moves - An array of move objects containing information about each move in the game.
+     * @returns {Promise<Buffer>} - A promise that resolves with a Buffer containing the PDF data.
+     */
     async export(moves: any[]): Promise<Buffer> {
         const doc = new PDFDocument();
         const buffers: Buffer[] = [];

@@ -9,9 +9,22 @@ declare global {
     }
 }
 
+/**
+ * Middleware to validate and parse a start date provided in the query parameters.
+ *
+ * This middleware checks if a start date is provided in the request's query parameters.
+ * If no start date is provided, it defaults to January 1, 1970. It validates the format
+ * of the provided date string (YYYY-MM-DD) and parses it to a Date object, storing it in
+ * req.startDate. If any validations fail, a bad request error is generated.
+ *
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next function
+ *
+ * @returns {void} - Calls the next middleware or error handler
+ */
 export const dateValidationMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const start_date = req.query.start_date;
-
     if (!start_date) {
         req.startDate = new Date("1970-01-01");
         return next();
@@ -32,6 +45,5 @@ export const dateValidationMiddleware = (req: Request, res: Response, next: Next
     }
 
     req.startDate = parsedDate;
-
     next();
 }

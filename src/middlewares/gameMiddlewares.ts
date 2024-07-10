@@ -2,6 +2,19 @@ import {Request, Response, NextFunction} from 'express';
 import {ErrorFactory} from "../factories/errorFactory";
 import {AI_LEVELS} from "../utils/aiLevels";
 
+/**
+ * Middleware to validate the presence and correctness of player 2's email or AI difficulty level.
+ *
+ * Checks if either 'player_2_email' or 'AI_difficulty' is provided in the request body.
+ * Validates that 'player_2_email' is a string if provided, and 'AI_difficulty' is a valid
+ * difficulty level defined in AI_LEVELS array. Returns a bad request error if validations fail.
+ *
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next function
+ *
+ * @returns {void} - Calls the next middleware or error handler
+ */
 export const gameValidationMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     const {player_2_email, AI_difficulty} = req.body;
 
@@ -20,6 +33,19 @@ export const gameValidationMiddleware = (req: Request, res: Response, next: Next
     next();
 }
 
+/**
+ * Middleware to validate the format of the game ID parameter in the URL.
+ *
+ * Ensures the 'gameId' is a string. If not, it generates a bad request error.
+ * This is important for routing parameters to conform to expected formats
+ * for subsequent database queries or logic.
+ *
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next function
+ *
+ * @returns {void} - Calls the next middleware or error handler.
+ */
 export const gameIdValidationMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     const gameId = req.params.gameId;
     if (typeof gameId !== "string") {
@@ -28,8 +54,20 @@ export const gameIdValidationMiddleware = (req: Request, res: Response, next: Ne
 
     next();
 }
-
-export const moveValidationMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+/**
+ * Middleware to validate the parameters for a game move.
+ *
+ * Checks that 'from' and 'to' parameters are present and are strings.
+ * These parameters are crucial for game logic to process moves correctly.
+ * If validations fail, a bad request error is returned.
+ *
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next function
+ *
+ * @returns {void} - Calls the next middleware or error handler
+ */
+ export const moveValidationMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     const from = req.body.from;
     const to = req.body.to;
 
@@ -44,6 +82,19 @@ export const moveValidationMiddleware = (req: Request, res: Response, next: Next
     next();
 }
 
+/**
+ * Middleware to validate the export format parameter in the URL.
+ *
+ * Ensures the 'format' parameter matches allowed values ('pdf' or 'json').
+ * This validation is essential for generating the correct file type in response.
+ * If the format is not valid, a bad request error is generated.
+ *
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next function
+ *
+ * @returns {void} - Calls the next middleware or error handler
+ */
 export const exportFormatValidationMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     const format = req.params.format;
 

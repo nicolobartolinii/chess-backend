@@ -5,6 +5,32 @@ import { Game } from './game';
 
 const db_connection: Sequelize = SingletonDBConnection.getInstance();
 
+/**
+ * Sequelize model representing a move made in a game.
+ *
+ * This model defines the schema for the 'Move' table in the database, tracking each move's details within a game.
+ * It includes fields for linking to the player and the game, the move number, positions before and after the move,
+ * the configuration of the game after the move, and the specific piece moved. If certain fields are null, it indicates
+ * that the player abandoned the match at this move.
+ *
+ * Fields:
+ *  - player_id: Foreign key to the 'Player' model. Nullable if the move was automatically generated.
+ *  - game_id: Foreign key to the 'Game' model, linking the move to a specific game.
+ *  - move_number: The sequence number of the move within the game.
+ *  - from_position: The starting position of the piece; null if the player abandoned the game.
+ *  - to_position: The ending position of the piece; null if the player abandoned the game.
+ *  - configuration_after: JSON object describing the game configuration after the move.
+ *  - piece: The type of piece moved; null if the player abandoned the game.
+ *
+ * Configuration:
+ *  - The model is linked to the singleton Sequelize database connection instance.
+ *  - It is indexed on the combination of player_id, game_id, and move_number to ensure uniqueness.
+ *  - The default 'id' attribute provided by Sequelize is removed to use a composite key instead.
+ *
+ * @param {Model} - Extends Sequelize Model to type and instance methods.
+ *
+ * @exports Move - A Sequelize model for game moves.
+ */
 class Move extends Model<InferAttributes<Move>, InferCreationAttributes<Move>> {
     declare player_id: CreationOptional<number | null>;
     declare game_id: number; // foreign key
