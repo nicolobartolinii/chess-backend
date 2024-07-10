@@ -194,3 +194,24 @@ export const getGameHistory = async (req: Request, res: Response, next: NextFunc
         next(error);
     }
 };
+
+export const abandonGame = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        if (!req.player) {
+            return next(ErrorFactory.unauthorized('Not logged in'));
+        }
+
+        const playerId = req.player.id;
+        const gameId = req.params.gameId;
+
+        if (typeof gameId !== "string") {
+            return next(ErrorFactory.badRequest('Invalid game id'));
+        }
+
+        await gameService.abandon(playerId, parseInt(gameId));
+
+        res.status(StatusCodes.OK).json(ResponseFactory.success('Game abandoned. You lost!'));
+    } catch (err) {
+        next(err);
+    }
+}

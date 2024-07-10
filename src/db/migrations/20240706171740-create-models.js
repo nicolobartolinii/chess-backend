@@ -28,7 +28,7 @@ module.exports = {
                 allowNull: false
             },
             points: {
-                type: Sequelize.DECIMAL(10, 3),
+                type: Sequelize.DECIMAL(10, 4),
                 allowNull: false,
                 defaultValue: 0
             },
@@ -124,20 +124,15 @@ module.exports = {
             },
             from_position: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: true
             },
             to_position: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: true
             },
             configuration_after: {
                 type: Sequelize.JSONB,
                 allowNull: false
-            },
-            is_ai_move: {
-                type: Sequelize.BOOLEAN,
-                allowNull: false,
-                defaultValue: false
             },
             piece: {
                 type: Sequelize.STRING,

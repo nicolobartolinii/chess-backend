@@ -28,5 +28,15 @@ export const decrementTokens = async (playerId: number, amount: number): Promise
     if (!await checkSufficientTokens(playerId, amount)){
         throw ErrorFactory.paymentRequired('Insufficient tokens');
     }
+
     await repositories.player.updatePlayerField(playerId, "tokens", player.tokens - amount);
 };
+
+export const incrementPoints = async (playerId: number, amount: number): Promise<void> => {
+    const player = await repositories.player.findById(playerId);
+    if (!player) {
+        throw ErrorFactory.notFound('Player not found');
+    }
+
+    await repositories.player.updatePlayerField(playerId, "points", player.points - ((-1) * amount)); // Nonsense: works with "-" but not with "+". "+" creates a string concatenation even using "as number" or "parseFloat()".
+}

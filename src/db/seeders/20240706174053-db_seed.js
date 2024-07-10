@@ -29,7 +29,6 @@ module.exports = {
 
         await queryInterface.bulkInsert('Games', [
             {
-                game_id: 1,
                 game_status: 'ACTIVE',
                 game_configuration: JSON.stringify({
                     "moves": {
@@ -99,7 +98,6 @@ module.exports = {
                 winner_id: null
             },
             {
-                game_id: 2,
                 game_status: 'FINISHED',
                 game_configuration: JSON.stringify({
                     "moves": {},
@@ -253,7 +251,7 @@ module.exports = {
                     "enPassant": "E3",
                     "isFinished": false
                 }),
-                is_ai_move: false,
+
                 piece: 'White Pawn',
                 createdAt: new Date('2024-07-10T07:56:37.736Z'),
                 updatedAt: new Date('2024-07-10T07:56:37.736Z')
@@ -371,7 +369,7 @@ module.exports = {
                     "enPassant": null,
                     "isFinished": false
                 }),
-                is_ai_move: true,
+
                 piece: 'Black Knight',
                 createdAt: new Date('2024-07-10T07:56:37.745Z'),
                 updatedAt: new Date('2024-07-10T07:56:37.745Z')
@@ -473,7 +471,7 @@ module.exports = {
                     "enPassant": "E3",
                     "isFinished": false
                 }),
-                is_ai_move: false,
+
                 piece: 'White Pawn',
                 createdAt: new Date('2024-07-10T08:28:18.071Z'),
                 updatedAt: new Date('2024-07-10T08:28:18.071Z')
@@ -588,7 +586,7 @@ module.exports = {
                     "enPassant": "E6",
                     "isFinished": false
                 }),
-                is_ai_move: false,
+
                 piece: 'Black Pawn',
                 createdAt: new Date('2024-07-10T08:28:45.252Z'),
                 updatedAt: new Date('2024-07-10T08:28:45.252Z')
@@ -703,7 +701,7 @@ module.exports = {
                     "enPassant": null,
                     "isFinished": false
                 }),
-                is_ai_move: false,
+
                 piece: 'White Bishop',
                 createdAt: new Date('2024-07-10T08:29:12.441Z'),
                 updatedAt: new Date('2024-07-10T08:29:12.441Z')
@@ -822,7 +820,7 @@ module.exports = {
                     "enPassant": null,
                     "isFinished": false
                 }),
-                is_ai_move: false,
+
                 piece: 'Black Bishop',
                 createdAt: new Date('2024-07-10T08:29:31.323Z'),
                 updatedAt: new Date('2024-07-10T08:29:31.323Z')
@@ -936,7 +934,7 @@ module.exports = {
                     "enPassant": null,
                     "isFinished": false
                 }),
-                is_ai_move: false,
+
                 piece: 'White Queen',
                 createdAt: new Date('2024-07-10T08:29:52.062Z'),
                 updatedAt: new Date('2024-07-10T08:29:52.062Z')
@@ -1059,7 +1057,7 @@ module.exports = {
                     "enPassant": null,
                     "isFinished": false
                 }),
-                is_ai_move: false,
+
                 piece: 'Black Queen',
                 createdAt: new Date('2024-07-10T08:31:02.231Z'),
                 updatedAt: new Date('2024-07-10T08:31:02.231Z')
@@ -1123,7 +1121,7 @@ module.exports = {
                     "enPassant": null,
                     "isFinished": false
                 }),
-                is_ai_move: false,
+
                 piece: 'White Queen',
                 createdAt: new Date('2024-07-10T08:32:31.976Z'),
                 updatedAt: new Date('2024-07-10T08:32:31.976Z')
@@ -1246,7 +1244,7 @@ module.exports = {
                     "enPassant": null,
                     "isFinished": false
                 }),
-                is_ai_move: false,
+
                 piece: 'Black King',
                 createdAt: new Date('2024-07-10T08:33:23.165Z'),
                 updatedAt: new Date('2024-07-10T08:33:23.165Z')
@@ -1364,7 +1362,6 @@ module.exports = {
                     "enPassant": null,
                     "isFinished": false
                 }),
-                is_ai_move: false,
                 piece: 'White Knight',
                 createdAt: new Date('2024-07-10T08:33:41.872Z'),
                 updatedAt: new Date('2024-07-10T08:33:41.872Z')
@@ -1493,7 +1490,6 @@ module.exports = {
                     "enPassant": null,
                     "isFinished": false
                 }),
-                is_ai_move: false,
                 piece: 'Black Bishop',
                 createdAt: new Date('2024-07-10T08:34:19.174Z'),
                 updatedAt: new Date('2024-07-10T08:34:19.174Z')
@@ -1553,7 +1549,6 @@ module.exports = {
                     "enPassant": null,
                     "isFinished": true
                 }),
-                is_ai_move: false,
                 piece: 'White Queen',
                 createdAt: new Date('2024-07-10T08:34:40.083Z'),
                 updatedAt: new Date('2024-07-10T08:34:40.083Z')

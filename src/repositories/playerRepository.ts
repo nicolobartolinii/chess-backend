@@ -3,7 +3,7 @@ import {Player} from "../models/player";
 
 export interface IPlayerRepository extends IBaseRepository<Player> {
     findByEmail(email: string): Promise<Player | null>;
-    updatePlayerField(player_id: number, field: string, value: any): Promise<[number, Player[]]>;
+    updatePlayerField(player_id: number, field: keyof Player, value: any): Promise<[number, Player[]]>;
     findAllOrdering(field: string, order: string): Promise<Player[]>;
 }
 
@@ -28,7 +28,7 @@ export class PlayerRepository implements IPlayerRepository {
         return Player.update(item, { where: { player_id }, returning: true } as any);
     }
 
-    async updatePlayerField(player_id: number, field: string, value: any): Promise<[number, Player[]]> {
+    async updatePlayerField(player_id: number, field: keyof Player, value: any): Promise<[number, Player[]]> {
         return Player.update({ [field]: value }, { where: { player_id }, returning: true } as any);
     }
 

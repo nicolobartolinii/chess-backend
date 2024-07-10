@@ -173,7 +173,6 @@ export async function move(from: string, to: string, playerId: number, gameId: n
         from_position: from,
         to_position: to,
         configuration_after: newConfiguration,
-        is_ai_move: false,
         piece: pieceMoved
     })
 
@@ -226,7 +225,6 @@ export async function move(from: string, to: string, playerId: number, gameId: n
             from_position: from,
             to_position: to,
             configuration_after: newConfiguration,
-            is_ai_move: true,
             piece: pieceMoved
         })
 
@@ -266,7 +264,7 @@ async function winGame(gameConfiguration: any, player1Id: number, player2Id: num
     // is vs AI, AI is black. (Player2Id, if AI game, is 0)
     const winnerId = gameConfiguration.turn === "white" ? player2Id : player1Id;
     if (winnerId !== 0) {
-        await repositories.player.updatePlayerField(winnerId, "points", constants.GAME_WIN_PRIZE);
+        await playerService.incrementPoints(winnerId, constants.GAME_WIN_PRIZE);
     }
     return winnerId;
 }
@@ -380,4 +378,47 @@ export async function getGameMoves(playerId: number, gameId: number) {
             piece: move.piece
         }
     });
+}
+
+export async function abandon(playerId: number, gameId: number): Promise<void> {
+    const game = await repositories.game.findById(gameId);
+    if (!game) {
+        throw ErrorFactory.notFound('Game not found');
+    }
+
+    if (game.player_1_id !== playerId && game.player_2_id !== playerId) {
+        throw ErrorFactory.forbidden('You are not part of the game');
+    }
+
+    if (game.game_status !== Statuses.ACTIVE) {
+        throw ErrorFactory.badRequest('Game is already finished');
+    }
+
+    if ((game.player_1_id == playerId && game.game_configuration.turn == "black") || (game.player_2_id == playerId && game.game_configuration.turn == "white")) {
+        throw ErrorFactory.forbidden('Not your turn');
+    }
+
+    const winnerId = game.player_1_id === playerId ? game.player_2_id : game.player_1_id;
+
+    await repositories.game.update(gameId, {
+        game_status: Statuses.FINISHED,
+        number_of_moves: game.number_of_moves + 1,
+        winner_id: winnerId,
+        end_date: new Date()
+    });
+
+    await repositories.move.create({
+        player_id: playerId,
+        game_id: gameId,
+        move_number: game.number_of_moves + 1,
+        from_position: null,
+        to_position: null,
+        configuration_after: game.game_configuration,
+        piece: null
+    });
+
+    if (winnerId) {
+        await playerService.incrementPoints(winnerId, constants.GAME_WIN_PRIZE);
+    }
+    await playerService.incrementPoints(playerId, constants.GAME_ABANDON_PENALTY);
 }
