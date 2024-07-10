@@ -19,7 +19,7 @@ router.get('/status/:gameId', gameIdValidationMiddleware, gameController.gameSta
 router.get('/win-certificate/:gameId', gameIdValidationMiddleware, gameController.getWinCertificate);
 router.post('/move/:gameId', gameIdValidationMiddleware, moveValidationMiddleware, gameController.makeMove);
 router.get('/chessboard/:gameId', gameIdValidationMiddleware, gameController.getChessboard);
-router.get('/history_game/:gameId/:format?', gameIdValidationMiddleware, exportFormatValidationMiddleware, gameController.getGameHistory);
+router.get('/details/:gameId/:format?', gameIdValidationMiddleware, exportFormatValidationMiddleware, gameController.getGameHistory);
 router.post('/abandon/:gameId', gameIdValidationMiddleware, gameController.abandonGame);
 
 export default router;

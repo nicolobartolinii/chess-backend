@@ -4,6 +4,6 @@ import {validatePlayerRanking} from "../middlewares/playerMiddlewares";
 
 const router = express.Router();
 
-router.get('/rank',validatePlayerRanking,playerController.getPlayerRanking);
+router.get('/ranking',validatePlayerRanking,playerController.getPlayerRanking);
 
 export default router;

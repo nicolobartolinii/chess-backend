@@ -5,7 +5,18 @@ import * as gameService from "../services/gameService";
 import {ExportStrategy, JSONExportStrategy, PdfExportStrategy} from "../strategies/exportStrategies";
 import {AiLevel} from "../utils/aiLevels";
 
-
+/**
+ * This function is used in the /games/create route.
+ * It creates a new game between two players. The first player is the one who is logged in.
+ * The second player can be another player or an AI. Either the email of the second player or the AI difficulty
+ * must be provided in the request body.
+ *
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next function
+ *
+ * @returns {Promise<void>} - A promise that resolves when the game is created. The response contains a success message.
+ */
 export const createGame = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const player_1_id = req.player!.id; // The player is guaranteed to be logged in because of the middleware
@@ -21,6 +32,17 @@ export const createGame = async (req: Request, res: Response, next: NextFunction
     }
 }
 
+/**
+ * This function is used in the /games/history route.
+ * It retrieves the games history of the player who is logged in.
+ * The games history is returned in the response.
+ *
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next function
+ *
+ * @returns {Promise<void>} - A promise that resolves when the games history is retrieved. The response contains the games history.
+ */
 export const gamesHistory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const player_id = req.player!.id;
@@ -34,6 +56,18 @@ export const gamesHistory = async (req: Request, res: Response, next: NextFuncti
     }
 }
 
+/**
+ * This function is used in the /games/win-certificate/:gameId route.
+ * It generates a win certificate for the player who is logged in.
+ * The win certificate is generated for the game with the ID provided in the request parameters.
+ * The win certificate is returned in the response as a PDF file.
+ *
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next function
+ *
+ * @returns {Promise<void>} - A promise that resolves when the win certificate is generated. The response contains the win certificate as a PDF file.
+ */
 export const getWinCertificate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const playerId = req.player!.id;
@@ -52,6 +86,17 @@ export const getWinCertificate = async (req: Request, res: Response, next: NextF
     }
 };
 
+/**
+ * This function is used in the /games/status/:gameId route.
+ * It retrieves the status of the game with the ID provided in the request parameters.
+ * The status of the game is returned in the response.
+ *
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next function
+ *
+ * @returns {Promise<void>} - A promise that resolves when the game status is retrieved. The response contains the game status.
+ */
 export const gameStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const playerId = req.player!.id;
@@ -65,6 +110,20 @@ export const gameStatus = async (req: Request, res: Response, next: NextFunction
     }
 }
 
+/**
+ * This function is used in the /games/move/:gameId route.
+ * It makes a move in the game with the ID provided in the request parameters.
+ * The move is made by the player who is logged in. The move is made from the position provided in the request body
+ * to the position provided in the request body. The move details is returned in the response.
+ *
+ * If the opponent is an AI, the AI will make a move after the player makes a move and the response will contain also the AI's move.
+ *
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next function
+ *
+ * @returns {Promise<void>} - A promise that resolves when the move is made. The response contains the move.
+ */
 export const makeMove = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const playerId = req.player!.id;
@@ -80,6 +139,17 @@ export const makeMove = async (req: Request, res: Response, next: NextFunction):
     }
 }
 
+/**
+ * This function is used in the /games/chessboard/:gameId route.
+ * It retrieves the chessboard of the game with the ID provided in the request parameters.
+ * The chessboard is returned in the response as an SVG file.
+ *
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next function
+ *
+ * @returns {Promise<void>} - A promise that resolves when the chessboard is retrieved. The response contains the chessboard as an SVG file.
+ */
 export const getChessboard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const playerId = req.player!.id;
@@ -98,6 +168,21 @@ export const getChessboard = async (req: Request, res: Response, next: NextFunct
     }
 }
 
+/**
+ * This function is used in the /games/details/:gameId/:format? route.
+ * It retrieves the game history of the game with the ID provided in the request parameters.
+ * The game history is returned in the response. The format of the response can be either JSON or PDF.
+ * If the format is PDF, the game history is returned as a PDF file. If the format is JSON, the game history is returned as a JSON object.
+ *
+ * The game history is the list of moves made in the game. Each move contains the move number,
+ * the position the piece moved from, the position the piece moved to, the player who made the move and more.
+ *
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next function
+ *
+ * @returns {Promise<void>} - A promise that resolves when the game history is retrieved. The response contains the game history.
+ */
 export const getGameHistory = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const gameId = req.params.gameId;
@@ -126,6 +211,22 @@ export const getGameHistory = async (req: Request, res: Response, next: NextFunc
     }
 };
 
+/**
+ * This function is used in the /games/abandon/:gameId route.
+ * It abandons the game with the ID provided in the request parameters.
+ * The player who is logged in abandons the game. The response contains a success message.
+ *
+ * Abandoning a game means that the player who abandons the game loses the game.
+ * The opponent wins the game.
+ *
+ * If the player abandons the game, they lose 0.5 points.
+ *
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next function
+ *
+ * @returns {Promise<void>} - A promise that resolves when the game is abandoned. The response contains a success message.
+ */
 export const abandonGame = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const playerId = req.player!.id;
