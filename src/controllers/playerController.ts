@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import { StatusCodes } from 'http-status-codes';
+import {Request, Response, NextFunction} from 'express';
+import {StatusCodes} from 'http-status-codes';
 import ResponseFactory from "../factories/responseFactory";
 import {repositories} from "../repositories";
 
@@ -11,7 +11,6 @@ export const getPlayerRanking = async (req: Request, res: Response, next: NextFu
         const players = await repositories.player.findAllOrdering(field, order);
         res.status(StatusCodes.OK).json(ResponseFactory.success('Players retrieved successfully', players));
     } catch (error) {
-        // error handling middleware will catch this error
         next(error);
     }
 }

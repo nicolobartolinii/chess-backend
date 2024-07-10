@@ -1,15 +1,22 @@
 import {StatusCodes, ReasonPhrases} from 'http-status-codes';
 
-interface IAPIResponse {
+interface IBaseResponse {
     success: boolean,
     statusCode: number,
-    message: string,
     data?: any
 }
 
-interface ISVGResponse {
-    statusCode: number,
-    content: string,
+interface IAPIResponse extends IBaseResponse {
+    message: string,
+}
+
+interface ISVGResponse extends IBaseResponse {
+    data: string,
+    filename: string
+}
+
+interface IPDFResponse extends IBaseResponse {
+    data: Buffer,
     filename: string
 }
 
@@ -31,10 +38,20 @@ class ResponseFactory {
         }
     }
 
-    static svg(content: string, filename: string, statusCode: number = StatusCodes.OK): ISVGResponse {
+    static svg(data: string, filename: string, statusCode: number = StatusCodes.OK): ISVGResponse {
         return {
+            success: true,
             statusCode,
-            content,
+            data,
+            filename
+        }
+    }
+
+    static pdf(data: Buffer, filename: string, statusCode: number = StatusCodes.OK): IPDFResponse {
+        return {
+            success: true,
+            statusCode,
+            data,
             filename
         }
     }

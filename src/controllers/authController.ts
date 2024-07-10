@@ -8,10 +8,6 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
     try {
         const {email, password} = req.body;
 
-        if (!email || !password) {
-            return next(ErrorFactory.badRequest('Email and password are required'));
-        }
-
         const token = await authService.loginPlayer(email, password);
 
         if (!token) {
