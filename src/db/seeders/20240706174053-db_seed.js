@@ -21,8 +21,8 @@ module.exports = {
                 email: 'franco@giovanni.it',
                 password: await bcrypt.hash('franco', 10),
                 role: 0,
-                points: 5,
-                tokens: 10,
+                points: 1,
+                tokens: 8.1,
                 createdAt: new Date(),
                 updatedAt: new Date()
             }], {});
