@@ -177,7 +177,7 @@ export async function move(from: string, to: string, playerId: number, gameId: n
         piece: pieceMoved
     })
 
-    await repositories.game.update(gameId, {
+    const [, [updatedGame]] = await repositories.game.update(gameId, {
         game_configuration: newConfiguration,
         number_of_moves: game.number_of_moves + 1
     });
@@ -222,7 +222,7 @@ export async function move(from: string, to: string, playerId: number, gameId: n
 
         await repositories.move.create({
             game_id: gameId,
-            move_number: game.number_of_moves + 1,
+            move_number: updatedGame.number_of_moves + 1,
             from_position: from,
             to_position: to,
             configuration_after: newConfiguration,
@@ -232,7 +232,7 @@ export async function move(from: string, to: string, playerId: number, gameId: n
 
         await repositories.game.update(gameId, {
             game_configuration: newConfiguration,
-            number_of_moves: game.number_of_moves + 1
+            number_of_moves: updatedGame.number_of_moves + 1
         });
 
         await playerService.decrementTokens(playerId, constants.GAME_MOVE_COST);
@@ -289,19 +289,38 @@ export async function getChessboard(playerId: number, gameId: number): Promise<s
     return generateChessboardSVG({pieces: configuration.pieces});
 }
 
-function generateChessboardSVG(configuration: { pieces: Record<string, string> }): string {
+export function generateChessboardSVG(configuration: { pieces: Record<string, string> }): string {
     const squareSize = 50;
+    const labelSize = 20;
     const boardSize = 8 * squareSize;
+    const totalSize = boardSize + labelSize;
+    const pieceSize = squareSize * 0.8;
 
-    let svg = `<svg width="${boardSize}" height="${boardSize}" xmlns="http://www.w3.org/2000/svg">`;
+    let svg = `<svg width="${totalSize}" height="${totalSize}" xmlns="http://www.w3.org/2000/svg">`;
+
+    svg += `<rect x="0" y="0" width="${totalSize}" height="${totalSize}" fill="#f0d9b5" />`;
 
     for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
-            const x = col * squareSize;
+            const x = col * squareSize + labelSize;
             const y = row * squareSize;
             const fill = (row + col) % 2 === 0 ? '#ffce9e' : '#d18b47';
             svg += `<rect x="${x}" y="${y}" width="${squareSize}" height="${squareSize}" fill="${fill}" />`;
         }
+    }
+
+    for (let row = 0; row < 8; row++) {
+        const y = row * squareSize + squareSize / 2;
+        svg += `<text x="${labelSize/2}" y="${y}" font-size="14" text-anchor="middle" dominant-baseline="central" fill="black">
+            ${8 - row}
+        </text>`;
+    }
+
+    for (let col = 0; col < 8; col++) {
+        const x = col * squareSize + labelSize + squareSize / 2;
+        svg += `<text x="${x}" y="${boardSize + labelSize/2}" font-size="14" text-anchor="middle" dominant-baseline="central" fill="black">
+            ${String.fromCharCode(65 + col)}
+        </text>`;
     }
 
     const pieceSymbols: Record<string, string> = {
@@ -312,10 +331,17 @@ function generateChessboardSVG(configuration: { pieces: Record<string, string> }
     for (const [position, piece] of Object.entries(configuration.pieces)) {
         const col = position.charCodeAt(0) - 'A'.charCodeAt(0);
         const row = 8 - parseInt(position[1]);
-        const x = col * squareSize + squareSize / 2;
+        const x = col * squareSize + labelSize + squareSize / 2;
         const y = row * squareSize + squareSize / 2;
         const color = piece.toUpperCase() === piece ? 'white' : 'black';
-        svg += `<text x="${x}" y="${y}" font-size="40" text-anchor="middle" dominant-baseline="central" fill="${color}">${pieceSymbols[piece]}</text>`;
+
+        svg += `
+        <g transform="translate(${x},${y})">
+            <circle r="${pieceSize/2}" fill="transparent" />
+            <text font-size="${pieceSize}" text-anchor="middle" dominant-baseline="central" fill="${color}">
+                ${pieceSymbols[piece]}
+            </text>
+        </g>`;
     }
 
     svg += '</svg>';
@@ -342,6 +368,7 @@ export async function getGameMoves(playerId: number, gameId: number) {
         move_number: move.move_number,
         from_position: move.from_position,
         to_position: move.to_position,
-        player_id: move.player_id
+        player_id: move.player_id,
+        configuration_after: move.configuration_after
     }));
 }
