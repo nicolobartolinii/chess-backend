@@ -19,14 +19,16 @@ const jsChessEngine = require('js-chess-engine')
  * If the player_2_email is not provided, it creates a new game with the provided player_1_id and AI_difficulty.
  *
  *
- * @param player_1_id
- * @param player_2_email
- * @param AI_difficulty
+ * @param {number} player_1_id - The id of the player who creates the game
+ * @param {string} player_2_email - The email of the player who joins the game. If not provided, the game is vs AI.
+ * @param {AiLevel} AI_difficulty - The difficulty of the AI. If not provided, the game is vs AI.
+ *
+ * @returns {Promise<void>} - A promise that resolves when the game is created.
  */
 export async function createGame(player_1_id: number, player_2_email?: string, AI_difficulty?: AiLevel): Promise<void> {
     const hasEnoughTokens = await playerService.checkSufficientTokens(player_1_id, constants.GAME_CREATE_COST);
     if (!hasEnoughTokens) {
-        throw ErrorFactory.paymentRequired('Insufficient tokens');
+        throw ErrorFactory.unauthorized('Insufficient tokens');
     }
 
     let player2 = null;
@@ -55,6 +57,14 @@ export async function createGame(player_1_id: number, player_2_email?: string, A
     await playerService.decrementTokens(player_1_id, constants.GAME_CREATE_COST);
 }
 
+/**
+ * This function retrieves the game history of a player. It returns the game_status, number_of_moves, start_date and winner_id of each game.
+ *
+ * @param {number} player_id - The id of the player whose game history is retrieved
+ * @param {Date} startDate - The start date of the game history. If not provided, it retrieves the entire game history.
+ *
+ * @returns A promise that resolves to an array of information about each game.
+ */
 export async function getGamesHistory(player_id: number, startDate?: Date) {
     const filter_field = 'start_date';
     const games = await repositories.game.findByPlayer(player_id, filter_field, startDate);
@@ -66,6 +76,15 @@ export async function getGamesHistory(player_id: number, startDate?: Date) {
     }));
 }
 
+/**
+ * This function retrieves the game status of a player in a specific game.
+ * It returns the game_status, current_configuration, opponent and turn of the game.
+ *
+ * @param {number} playerId - The id of the player whose game status is retrieved
+ * @param {number} gameId - The id of the game whose status is retrieved
+ *
+ * @returns A promise that resolves to the game status.
+ */
 export async function getGameStatus(playerId: number, gameId: number) {
     const game = await repositories.game.findById(gameId);
     if (!game) {
@@ -84,8 +103,17 @@ export async function getGameStatus(playerId: number, gameId: number) {
     };
 }
 
+/**
+ * This function retrieves the win certificate of a player in a specific game.
+ * It returns a PDF document with the number of moves, time elapsed, name of the winner and loser of the game.
+ *
+ * @param {number} player_id - The id of the player whose win certificate is retrieved
+ * @param {number} game_id - The id of the game whose win certificate is retrieved
+ *
+ * @returns {Promise<Buffer>} - A promise that resolves to the win certificate.
+ */
 export async function getWinCertificate(player_id: number, game_id: number): Promise<Buffer> { // TODO: Improve PDF aesthetics
-    const games = await repositories.game.WinnerGame(player_id, game_id);
+    const games = await repositories.game.findWonGameByIds(player_id, game_id);
 
     const doc = new PDFDocument();
     const buffers: Buffer[] = [];
@@ -133,6 +161,21 @@ export async function getWinCertificate(player_id: number, game_id: number): Pro
     });
 }
 
+/**
+ * This function makes a move in a specific game. It checks if the game is active and if it is the player's turn.
+ * It checks if the start and end locations are valid and if the move is valid.
+ * If the move is valid, it makes the move and updates the game configuration.
+ * After the player move, it checks if the game is finished and in case it is, it updates the game status and winner.
+ * If the game is vs AI, it makes a move for the AI.
+ * After the AI move, it checks if the game is finished and in case it is, it updates the game status and winner.
+ *
+ * @param {string} from - The start location of the move
+ * @param {string} to - The end location of the move
+ * @param {number} playerId - The id of the player who makes the move
+ * @param {number} gameId - The id of the game where the move is made
+ *
+ * @returns {Promise<string>} - A promise that resolves to a string with the move information.
+ */
 export async function move(from: string, to: string, playerId: number, gameId: number): Promise<string> {
     const game = await repositories.game.findById(gameId);
     if (!game) {
@@ -266,15 +309,39 @@ export async function move(from: string, to: string, playerId: number, gameId: n
     }
 }
 
+/**
+ * This function checks if a game is finished.
+ *
+ * @param {any} gameConfiguration - A JSON object representing the game configuration (provided by the js-chess-engine library)
+ *
+ * @returns {boolean} - A boolean indicating if the game is finished.
+ */
 function isGameFinished(gameConfiguration: any) {
     return gameConfiguration.isFinished;
 }
 
+/**
+ * This function checks if a game is a stalemate.
+ *
+ * @param {any} gameConfiguration - A JSON object representing the game configuration (provided by the js-chess-engine library)
+ *
+ * @returns {boolean} - A boolean indicating if the game is a stalemate.
+ */
 function isStalemate(gameConfiguration: any) {
     return !gameConfiguration.check && !gameConfiguration.checkMate;
 }
 
-async function winGame(gameConfiguration: any, player1Id: number, player2Id: number) {
+/**
+ * This function increments the points of the winner of a game.
+ * If the winner is the AI, it does not increment the points because the AI is not a player in the database.
+ *
+ * @param {any} gameConfiguration - A JSON object representing the game configuration (provided by the js-chess-engine library)
+ * @param {number} player1Id - The id of the player who created the game
+ * @param {number} player2Id - The id of the player who joined the game. If the game is vs AI, it is 0.
+ *
+ * @returns {Promise<number>} - A promise that resolves to the id of the winner.
+ */
+async function winGame(gameConfiguration: any, player1Id: number, player2Id: number): Promise<number> {
     // Player 1 is always the creator of the game, so the white. Player 2, instead, is the black. If the game
     // is vs AI, AI is black. (Player2Id, if AI game, is 0)
     const winnerId = gameConfiguration.turn === "white" ? player2Id : player1Id;
@@ -284,10 +351,26 @@ async function winGame(gameConfiguration: any, player1Id: number, player2Id: num
     return winnerId;
 }
 
+/**
+ * This function returns the numerical value of the AI level.
+ *
+ * @param {AiLevel} level - The AI level in string format (using a custom enum)
+ *
+ * @returns {number} - The numerical value of the AI level to be used in the js-chess-engine library.
+ */
 function getAiLevelValue(level: AiLevel): number {
     return AiLevels[level];
 }
 
+/**
+ * This function retrieves the SVG string of the chessboard of a specific game.
+ * Specifically, it uses the generateChessboardSVG function to generate the SVG string for the specific game configuration.
+ *
+ * @param {number} playerId - The id of the player who requests the chessboard
+ * @param {number} gameId - The id of the game whose chessboard is retrieved
+ *
+ * @returns {Promise<string>} - A promise that resolves to the SVG string of the chessboard.
+ */
 export async function getChessboard(playerId: number, gameId: number): Promise<string> {
     const game = await repositories.game.findById(gameId);
     if (!game) {
@@ -302,6 +385,15 @@ export async function getChessboard(playerId: number, gameId: number): Promise<s
     return generateChessboardSVG({pieces: configuration.pieces});
 }
 
+/**
+ * This function generates the SVG string of a chessboard based on a specific configuration.
+ * The configuration is provided as a JSON object with the pieces and their positions.
+ * The SVG string is generated by creating the board, the pieces and the labels of the chessboard.
+ *
+ * @param {any} configuration - A JSON object representing the game configuration (provided by the js-chess-engine library)
+ *
+ * @returns {string} - The SVG string of the chessboard.
+ */
 export function generateChessboardSVG(configuration: { pieces: Record<string, string> }): string {
     const squareSize = 50;
     const labelSize = 20;
@@ -361,6 +453,17 @@ export function generateChessboardSVG(configuration: { pieces: Record<string, st
     return svg;
 }
 
+/**
+ * This function retrieves all the moves of a specific game.
+ * It returns an array of objects with the player name, game id, move number, start and end locations,
+ * player id, configuration after the move, piece moved and move effect.
+ * The move effect is a string indicating if the move resulted in a check, checkmate or abandonment.
+ *
+ * @param {number} playerId - The id of the player who requests the moves
+ * @param {number} gameId - The id of the game whose moves are retrieved
+ *
+ * @returns {Promise<{ player_name: string, game_id: number, move_number: number, from_position: string, to_position: string, player_id: number, configuration_after: any, piece: string, moveEffect: string }[]>} - A promise that resolves to an array of information about each move.
+ */
 export async function getGameMoves(playerId: number, gameId: number) {
     const game = await repositories.game.findById(gameId)
     if (!game) {
@@ -382,9 +485,16 @@ export async function getGameMoves(playerId: number, gameId: number) {
 
     return moves.map(move => {
         let moveEffect = '';
-        if(moves[moves.length - 1].move_number ===move.move_number && game.game_status === Statuses.FINISHED) {
-            if(move.piece === null) { moveEffect = 'ABANDON';}
-            if (move.configuration_after.checkMate) { moveEffect = 'CHECKMATE';}
+        if (move.configuration_after.check) {
+            moveEffect = 'Check';
+        }
+        if (moves[moves.length - 1].move_number === move.move_number && game.game_status === Statuses.FINISHED) {
+            if (move.piece === null) {
+                moveEffect = 'ABANDON';
+            }
+            if (move.configuration_after.checkMate) {
+                moveEffect = 'Checkmate';
+            }
         }
         const player_name = move.player_id === game.player_1_id ? player1?.username : player2?.username;
         return {
@@ -401,6 +511,16 @@ export async function getGameMoves(playerId: number, gameId: number) {
     });
 }
 
+/**
+ * This function makes a player abandon a specific game.
+ * It checks if the game is active and if it is the player's turn.
+ * If the player abandons the game, the game status is updated to finished and the winner is the other player.
+ *
+ * @param {number} playerId - The id of the player who abandons the game
+ * @param {number} gameId - The id of the game that is abandoned
+ *
+ * @returns {Promise<void>} - A promise that resolves when the game is abandoned.
+ */
 export async function abandon(playerId: number, gameId: number): Promise<void> {
     const game = await repositories.game.findById(gameId);
     if (!game) {

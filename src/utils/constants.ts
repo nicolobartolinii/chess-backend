@@ -1,7 +1,12 @@
+/** Game creation cost */
 export const GAME_CREATE_COST: number = 0.45;
+/** Game move cost */
 export const GAME_MOVE_COST: number = 0.0125;
+/** Game win prize if the win is by checkmate */
 export const GAME_WIN_PRIZE: number = 1;
+/** Game abandon penalty */
 export const GAME_ABANDON_PENALTY: number = -0.5;
+/** Possible locations on the board */
 export const AVAILABLE_LOCATIONS: string[] = [
     "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8",
     "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8",
@@ -12,7 +17,9 @@ export const AVAILABLE_LOCATIONS: string[] = [
     "G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8",
     "H1", "H2", "H3", "H4", "H5", "H6", "H7", "H8"
 ];
+/** Possible pieces on the board */
 export type PieceKey = 'P' | 'N' | 'B' | 'R' | 'Q' | 'K' | 'p' | 'n' | 'b' | 'r' | 'q' | 'k';
+/** Object that maps piece keys to piece names */
 export const PIECES: Record<PieceKey, string> = {
     "P": "White Pawn",
     "N": "White Knight",
