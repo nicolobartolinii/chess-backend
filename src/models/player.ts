@@ -42,7 +42,7 @@ Player.init({
         allowNull: false
     },
     points: {
-        type: DataTypes.DECIMAL(10, 3),
+        type: DataTypes.DECIMAL(10, 4),
         allowNull: false,
         defaultValue: 0
     },

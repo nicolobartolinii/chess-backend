@@ -9,10 +9,9 @@ class Move extends Model<InferAttributes<Move>, InferCreationAttributes<Move>> {
     declare player_id: CreationOptional<number | null>;
     declare game_id: number; // foreign key
     declare move_number: number; // number of the move in the match
-    declare from_position: string; // position of the piece before the move
-    declare to_position: string; // position of the piece after the move
+    declare from_position: CreationOptional<string | null>; // position of the piece before the move. If null, the player abandoned the match
+    declare to_position: CreationOptional<string | null>; // position of the piece after the move. If null, the player abandoned the match
     declare configuration_after: any;  // JSON
-    declare is_ai_move: boolean;
     declare piece: CreationOptional<string | null>; // piece moved. If null, the player abandoned the match
 }
 
@@ -39,20 +38,15 @@ Move.init({
     },
     from_position: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     to_position: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     configuration_after: {
         type: DataTypes.JSONB,
         allowNull: false
-    },
-    is_ai_move: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
     },
     piece: {
         type: DataTypes.STRING,

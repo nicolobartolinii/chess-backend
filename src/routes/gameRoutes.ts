@@ -2,6 +2,7 @@ import express from 'express';
 import * as gameController from '../controllers/gameController';
 import {authenticateJWT} from "../middlewares/authMiddleware";
 import {dateValidationMiddleware} from "../middlewares/dateValidationMiddleware";
+
 const router = express.Router();
 
 router.use(authenticateJWT); // Authentication middleware
@@ -12,6 +13,7 @@ router.get('/status/:gameId', gameController.gameStatus);
 router.get('/winner/:gameId', gameController.getGameWinner);
 router.post('/move/:gameId', gameController.makeMove);
 router.get('/chessboard/:gameId', gameController.getChessboard);
-router.get('/history_game/:gameId/:format?',gameController.getGameHistory );
+router.get('/history_game/:gameId/:format?', gameController.getGameHistory);
+router.post('/abandon/:gameId', gameController.abandonGame);
 
 export default router;
