@@ -69,7 +69,7 @@ export async function getGameStatus(playerId: number, gameId: number) {
     };
 }
 
-export async function winnerGame(player_id: number, game_id: number): Promise<Buffer> { // TODO: Improve PDF aesthetics
+export async function getWinCertificate(player_id: number, game_id: number): Promise<Buffer> { // TODO: Improve PDF aesthetics
     const games = await repositories.game.WinnerGame(player_id, game_id);
 
     const doc = new PDFDocument();
