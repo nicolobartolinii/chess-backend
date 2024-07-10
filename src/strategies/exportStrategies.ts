@@ -4,7 +4,7 @@ import svg2img from 'svg2img';
 import {generateChessboardSVG} from '../services/gameService';
 import {promisify} from 'util';
 
-const svg2imgAsync = promisify(svg2img);
+export const svg2imgAsync = promisify(svg2img);
 
 /**
  * This interface represents the ExportStrategy class.
@@ -68,18 +68,35 @@ class PdfExportStrategy implements ExportStrategy {
             .text(`Game ${moves[0].game_id} moves`, { align: 'center' });
         doc.moveDown(2);
 
-        for (const move of moves) { // TODO: manage win and abandon
+        for (const move of moves) {
             if (move.moveEffect !== 'ABANDON') {
-                doc
-                    .font('Helvetica')
-                    .fontSize(12)
-                    .text(`Player ${move.player_name} moved a ${move.piece} from ${move.from_position} to ${move.to_position}. ${move.moveEffect}`, {continued: true})
-                    .text(`Move number: ${move.move_number}`, {align: 'right'})
+                if (move.moveEffect === 'CHECKMATE') {
+                    doc
+                        .font('Helvetica-Bold')
+                        .fontSize(12)
+                        .text(`Player ${move.player_name} moved a ${move.piece} from ${move.from_position} to ${move.to_position}. Checkmate!`, {continued: false})
+                        .text(`Player ${move.player_name} won the game and gained 1 point.`, {continued: true})
+                        .text(`Move number: ${move.move_number}`, {align: 'right'})
+                } else if (move.moveEffect === 'CHECK') {
+                    doc
+                        .font('Helvetica')
+                        .fontSize(12)
+                        .text(`Player ${move.player_name} moved a ${move.piece} from ${move.from_position} to ${move.to_position}. Check!`, {continued: true})
+                        .text(`Move number: ${move.move_number}`, {align: 'right'})
+                } else {
+                    doc
+                        .font('Helvetica')
+                        .fontSize(12)
+                        .text(`Player ${move.player_name} moved a ${move.piece} from ${move.from_position} to ${move.to_position}.`, {continued: false})
+                        .text(`Move number: ${move.move_number}`, {align: 'right'})
+                }
             } else {
+                const opponent_name = moves.find(m => m.move_number === move.move_number - 1).player_name;
                 doc
-                    .font('Helvetica')
+                    .font('Helvetica-Bold')
                     .fontSize(12)
-                    .text(`Player ${move.player_name} abandoned the game.`, {continued: true})
+                    .text(`Player ${move.player_name} abandoned the game and lost 0.5 points.`, {continued: false})
+                    .text(`Player ${opponent_name} won the game and gained 1 point.`, {continued: true})
                     .text(`Move number: ${move.move_number}`, {align: 'right'})
             }
             doc

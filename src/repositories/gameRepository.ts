@@ -148,23 +148,18 @@ export class GameRepository implements IGameRepository {
      *
      * @returns {Promise<Game[]>} - A promise that resolves with the game if found, otherwise an error is thrown.
      */
-    async findWonGameByIds(winnerId: number, gameId: number): Promise<Game[]> {
-        const games = await Game.findAll({
-            where: {
-                game_id: gameId
-            }
-        });
+    async findWonGameByIds(winnerId: number, gameId: number): Promise<Game> {
+        const game = await Game.findByPk(gameId);
 
-        if (games.length === 0) {
-            throw ErrorFactory.notFound('Game not found');
+        if (!game) {
+            throw ErrorFactory.badRequest('Game not found');
         }
 
-        const game = games.find(game => Number(game.winner_id) === winnerId);
-        if (!game) {
+        if (game.winner_id !== winnerId) {
             throw ErrorFactory.badRequest('Game not found with the specified winner');
         }
 
-        return games;
+        return game;
     }
 
 }

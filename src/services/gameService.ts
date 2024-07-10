@@ -5,6 +5,8 @@ import * as constants from "../utils/constants";
 import * as playerService from "./playerService";
 import {AiLevel, AiLevels} from "../utils/aiLevels";
 import PDFDocument from 'pdfkit';
+import {svg2imgAsync} from "../strategies/exportStrategies";
+import sharp from 'sharp';
 
 const jsChessEngine = require('js-chess-engine')
 
@@ -112,8 +114,8 @@ export async function getGameStatus(playerId: number, gameId: number) {
  *
  * @returns {Promise<Buffer>} - A promise that resolves to the win certificate.
  */
-export async function getWinCertificate(player_id: number, game_id: number): Promise<Buffer> { // TODO: Improve PDF aesthetics
-    const games = await repositories.game.findWonGameByIds(player_id, game_id);
+export async function getWinCertificate(player_id: number, game_id: number): Promise<Buffer> {
+    const game = await repositories.game.findWonGameByIds(player_id, game_id);
 
     const doc = new PDFDocument();
     const buffers: Buffer[] = [];
@@ -122,33 +124,87 @@ export async function getWinCertificate(player_id: number, game_id: number): Pro
     doc.on('end', () => {
     });
 
-    for (const game of games) {
-        let contactInfo;
-        if (game.player_2_id === null) {
-            contactInfo = `AI Difficulty: ${game.AI_difficulty || 'Not specified'}`;
-        } else {
-            let loserId = (Number(game.winner_id) !== Number(game.player_1_id)) ? game.player_1_id : game.player_2_id;
-            const loser = await repositories.player.findById(loserId);
-            contactInfo = loser ? loser.username : 'Username not available';
-        }
+    doc
+        .font('Times-Bold')
+        .fontSize(20)
+        .text(`Win certificate for game ${game.game_id}`, {align: 'center'});
+    doc.moveDown(1);
 
-        const winner = await repositories.player.findById(player_id);
-        const winnerEmail = winner ? winner.username : 'Username of the winner not available';
+    const player1 = await repositories.player.findById(game.player_1_id);
+    const player2 = game.player_2_id ? await repositories.player.findById(game.player_2_id) : null;
 
-        const startTime = new Date(game.start_date);
-        const endTime = game.end_date ? new Date(game.end_date) : new Date();
-        const timeElapsed = endTime.getTime() - startTime.getTime();
-        const hoursElapsed = Math.floor(timeElapsed / (1000 * 60 * 60));
-        const minutesElapsed = Math.floor((timeElapsed % (1000 * 60 * 60)) / (1000 * 60));
-        doc.fontSize(12).text(`Victory for the match: ${game.game_id}`);
-        doc.moveDown();
+    const winner = await repositories.player.findById(player_id);
+    const loser = game.player_1_id === player_id ? player2 : player1;
 
-        doc.text(`Number of moves: ${game.number_of_moves}`);
-        doc.text(`Time elapsed: ${hoursElapsed} hours e ${minutesElapsed} minutes`);
-        doc.text(`Name of winner: ${winnerEmail}`);
-        doc.text(`Loser: ${contactInfo}`);
-        doc.moveDown();
-    }
+    const startTime = new Date(game.start_date);
+    const endTime = game.end_date ? new Date(game.end_date) : new Date();
+    const timeElapsed = endTime.getTime() - startTime.getTime();
+    const hoursElapsed = Math.floor(timeElapsed / (1000 * 60 * 60));
+    const minutesElapsed = Math.floor((timeElapsed % (1000 * 60 * 60)) / (1000 * 60));
+
+    doc
+        .font('Times-Italic')
+        .fontSize(14)
+        .text(`${player1!.username} (White) vs ${player2 ? player2.username : `AI [${game.AI_difficulty}]`} (Black)`, {align: 'center'});
+
+    doc.moveDown();
+
+    doc
+        .font('Times-Roman')
+        .text(`Number of moves: ${game.number_of_moves}`, {continued: true});
+    doc
+        .text(`  Time elapsed: ${hoursElapsed > 0 ? (hoursElapsed > 1 ? `${hoursElapsed} hours and` : `${hoursElapsed} hour and`) : ``} ${minutesElapsed > 1 ? `${minutesElapsed} minutes` : `${minutesElapsed} minute`}`, {align: 'right'});
+
+    doc.moveDown();
+
+    const winnerPoints = Math.round(winner!.points * 10) / 10.0;
+
+    doc
+        .font('Times-Bold')
+        .text(`Winner: ${winner!.username} - ${winner!.email} (currently ${winnerPoints} points in total)`, {align: 'center'});
+
+    doc
+        .font('Times-Roman')
+        .text(`Win by ${game.game_status === Statuses.FINISHED && game.game_configuration.checkMate ? 'checkmate' : 'abandonment'}`, {align: 'center'});
+
+    doc.moveDown();
+
+    const loserPoints = Math.round(loser!.points * 10) / 10.0;
+
+    doc
+        .font('Times-Bold')
+        .fontSize(12)
+        .text(`Loser: ${loser!.username} - ${loser!.email} (currently ${loserPoints} points in total)`, {align: 'center'});
+
+    doc.moveDown(2);
+
+    doc
+        .font('Times-BoldItalic')
+        .fontSize(16)
+        .text('Final game configuration', {align: 'center'});
+
+    doc.moveDown();
+
+    const svgString = generateChessboardSVG(game.game_configuration);
+
+    const pngBuffer = await svg2imgAsync(svgString);
+
+    const resizedPngBuffer = await sharp(pngBuffer)
+        .resize(750, 750, {
+            kernel: sharp.kernel.lanczos3,
+            fit: 'contain',
+            background: { r: 255, g: 255, b: 255, alpha: 0 }
+        })
+        .png({ quality: 100 })
+        .toBuffer();
+
+    const x = (doc.page.width - 300) / 2;
+
+    doc.image(resizedPngBuffer, x, doc.y, {
+        fit: [300, 300],
+        align: 'center',
+        valign: 'center'
+    });
 
     doc.end();
 
@@ -328,7 +384,7 @@ function isGameFinished(gameConfiguration: any) {
  * @returns {boolean} - A boolean indicating if the game is a stalemate.
  */
 function isStalemate(gameConfiguration: any) {
-    return !gameConfiguration.check && !gameConfiguration.checkMate;
+    return !gameConfiguration.check && !gameConfiguration.checkMate && gameConfiguration.isFinished;
 }
 
 /**
@@ -486,14 +542,14 @@ export async function getGameMoves(playerId: number, gameId: number) {
     return moves.map(move => {
         let moveEffect = '';
         if (move.configuration_after.check) {
-            moveEffect = 'Check';
+            moveEffect = 'CHECK';
         }
         if (moves[moves.length - 1].move_number === move.move_number && game.game_status === Statuses.FINISHED) {
             if (move.piece === null) {
                 moveEffect = 'ABANDON';
             }
             if (move.configuration_after.checkMate) {
-                moveEffect = 'Checkmate';
+                moveEffect = 'CHECKMATE';
             }
         }
         const player_name = move.player_id === game.player_1_id ? player1?.username : player2?.username;
