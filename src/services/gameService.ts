@@ -69,7 +69,7 @@ export async function getGameStatus(playerId: number, gameId: number) {
     };
 }
 
-export async function winnerGame(player_id: number, game_id: number): Promise<Buffer> { // TODO put the name of the winner and looser, add attributes in database
+export async function winnerGame(player_id: number, game_id: number): Promise<Buffer> { // TODO: Improve PDF aesthetics
     const games = await repositories.game.WinnerGame(player_id, game_id);
 
     const doc = new PDFDocument();
@@ -86,11 +86,11 @@ export async function winnerGame(player_id: number, game_id: number): Promise<Bu
         } else {
             let loserId = (Number(game.winner_id) !== Number(game.player_1_id)) ? game.player_1_id : game.player_2_id;
             const loser = await repositories.player.findById(loserId);
-            contactInfo = loser ? loser.email : 'Email not available';
+            contactInfo = loser ? loser.username : 'Username not available';
         }
 
         const winner = await repositories.player.findById(player_id);
-        const winnerEmail = winner ? winner.email : 'Email of the winner not available';
+        const winnerEmail = winner ? winner.username : 'Username of the winner not available';
 
         const startTime = new Date(game.start_date);
         const endTime = game.end_date ? new Date(game.end_date) : new Date();
@@ -100,10 +100,10 @@ export async function winnerGame(player_id: number, game_id: number): Promise<Bu
         doc.fontSize(12).text(`Victory for the match: ${game.game_id}`);
         doc.moveDown();
 
-        doc.text(`Number of mouve: ${game.number_of_moves}`);
-        doc.text(`Time for win: ${hoursElapsed} houres e ${minutesElapsed} minutes`);
-        doc.text(`name of winner: ${winnerEmail}`);
-        doc.text(`looser:: ${contactInfo}`);
+        doc.text(`Number of moves: ${game.number_of_moves}`);
+        doc.text(`Time elapsed: ${hoursElapsed} hours e ${minutesElapsed} minutes`);
+        doc.text(`Name of winner: ${winnerEmail}`);
+        doc.text(`Loser: ${contactInfo}`);
         doc.moveDown();
     }
 
@@ -311,14 +311,14 @@ export function generateChessboardSVG(configuration: { pieces: Record<string, st
 
     for (let row = 0; row < 8; row++) {
         const y = row * squareSize + squareSize / 2;
-        svg += `<text x="${labelSize/2}" y="${y}" font-size="14" text-anchor="middle" dominant-baseline="central" fill="black">
+        svg += `<text x="${labelSize / 2}" y="${y}" font-size="14" text-anchor="middle" dominant-baseline="central" fill="black">
             ${8 - row}
         </text>`;
     }
 
     for (let col = 0; col < 8; col++) {
         const x = col * squareSize + labelSize + squareSize / 2;
-        svg += `<text x="${x}" y="${boardSize + labelSize/2}" font-size="14" text-anchor="middle" dominant-baseline="central" fill="black">
+        svg += `<text x="${x}" y="${boardSize + labelSize / 2}" font-size="14" text-anchor="middle" dominant-baseline="central" fill="black">
             ${String.fromCharCode(65 + col)}
         </text>`;
     }
@@ -337,7 +337,7 @@ export function generateChessboardSVG(configuration: { pieces: Record<string, st
 
         svg += `
         <g transform="translate(${x},${y})">
-            <circle r="${pieceSize/2}" fill="transparent" />
+            <circle r="${pieceSize / 2}" fill="transparent" />
             <text font-size="${pieceSize}" text-anchor="middle" dominant-baseline="central" fill="${color}">
                 ${pieceSymbols[piece]}
             </text>
@@ -349,14 +349,13 @@ export function generateChessboardSVG(configuration: { pieces: Record<string, st
 }
 
 export async function getGameMoves(playerId: number, gameId: number) {
-    const match = await repositories.game.findById(gameId)
-    if (!match) {
+    const game = await repositories.game.findById(gameId)
+    if (!game) {
         throw ErrorFactory.notFound('Game not found');
     }
-    if (match.player_1_id !== playerId && match.player_2_id !== playerId) {
+    if (game.player_1_id !== playerId && game.player_2_id !== playerId) {
         throw ErrorFactory.forbidden('You are not part of the game');
     }
-    const game = await repositories.move.findMovebyGameID(gameId);
 
     if (!game) {
         throw ErrorFactory.notFound('Game not found');
@@ -364,11 +363,21 @@ export async function getGameMoves(playerId: number, gameId: number) {
 
     const moves = await repositories.move.findByGame(gameId);
 
-    return moves.map(move => ({
-        move_number: move.move_number,
-        from_position: move.from_position,
-        to_position: move.to_position,
-        player_id: move.player_id,
-        configuration_after: move.configuration_after
-    }));
+    const player1 = await repositories.player.findById(game.player_1_id);
+
+    const player2 = game.player_2_id ? await repositories.player.findById(game.player_2_id) : null;
+
+    return moves.map(move => {
+        const player_name = move.player_id === game.player_1_id ? player1?.username : player2?.username;
+        return {
+            player_name: player_name ? player_name : 'AI',
+            game_id: move.game_id,
+            move_number: move.move_number,
+            from_position: move.from_position,
+            to_position: move.to_position,
+            player_id: move.player_id,
+            configuration_after: move.configuration_after,
+            piece: move.piece
+        }
+    });
 }

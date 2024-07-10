@@ -23,20 +23,33 @@ class PdfExportStrategy implements ExportStrategy {
         doc.on('data', buffers.push.bind(buffers));
         doc.on('end', () => {});
 
-        doc.fontSize(14).text('Game moves', { align: 'center' });
+        doc
+            .font('Helvetica-Bold')
+            .fontSize(14)
+            .text(`Game ${moves[0].game_id} moves`, { align: 'center' });
         doc.moveDown(2);
 
-        for (const move of moves) {
-            doc.fontSize(12).text(`Move number: ${move.move_number}`, { continued: true })
-                .text(`   Player ID: ${move.player_id || 'AI'}`, { align: 'right' });
-            doc.text(`From: ${move.from_position}  To: ${move.to_position}`);
+        for (const move of moves) { // TODO: manage win and abandon
+            doc
+                .font('Helvetica')
+                .fontSize(12)
+                .text(`Player ${move.player_name} moved a ${move.piece} from ${move.from_position} to ${move.to_position}`, { continued: true })
+                .text(`Move number: ${move.move_number}`, { align: 'right' })
+            doc
+                .fontSize(12)
+                .text(`   Player ID: ${move.player_id || 'AI'}`, { align: 'right' })
 
             const svgString = generateChessboardSVG(move.configuration_after);
 
             const pngBuffer = await svg2imgAsync(svgString);
 
             const resizedPngBuffer = await sharp(pngBuffer)
-                .resize(250, 250)
+                .resize(750, 750, {
+                    kernel: sharp.kernel.lanczos3, // Increases image quality, I think
+                    fit: 'contain',
+                    background: { r: 255, g: 255, b: 255, alpha: 0 }
+                })
+                .png({ quality: 100 })
                 .toBuffer();
 
             doc.image(resizedPngBuffer, {
@@ -45,7 +58,7 @@ class PdfExportStrategy implements ExportStrategy {
                 valign: 'center'
             });
 
-            doc.moveDown(20);
+            doc.moveDown(25);
         }
 
         doc.end();
