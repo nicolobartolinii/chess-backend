@@ -105,7 +105,6 @@ export const getGameHistory = async (req: Request, res: Response, next: NextFunc
         const format = req.params.format;
 
         const moves = await gameService.getGameMoves(playerId, parseInt(gameId)); // Get the moves of the game
-
         let exportStrategy: ExportStrategy;
 
         if (format === 'pdf') {

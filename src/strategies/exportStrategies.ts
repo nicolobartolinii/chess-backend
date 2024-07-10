@@ -30,11 +30,19 @@ class PdfExportStrategy implements ExportStrategy {
         doc.moveDown(2);
 
         for (const move of moves) { // TODO: manage win and abandon
-            doc
-                .font('Helvetica')
-                .fontSize(12)
-                .text(`Player ${move.player_name} moved a ${move.piece} from ${move.from_position} to ${move.to_position}`, { continued: true })
-                .text(`Move number: ${move.move_number}`, { align: 'right' })
+            if (move.moveEffect !== 'ABANDON') {
+                doc
+                    .font('Helvetica')
+                    .fontSize(12)
+                    .text(`Player ${move.player_name} moved a ${move.piece} from ${move.from_position} to ${move.to_position}. ${move.moveEffect}`, {continued: true})
+                    .text(`Move number: ${move.move_number}`, {align: 'right'})
+            } else {
+                doc
+                    .font('Helvetica')
+                    .fontSize(12)
+                    .text(`Player ${move.player_name} abandoned the game.`, {continued: true})
+                    .text(`Move number: ${move.move_number}`, {align: 'right'})
+            }
             doc
                 .fontSize(12)
                 .text(`   Player ID: ${move.player_id || 'AI'}`, { align: 'right' })
