@@ -12,10 +12,10 @@ import {
 /** Express router to handle game-related actions and endpoints. */
 const router = express.Router();
 /** Authentication middleware. Checks for JWT in the request headers and verifies it */
-router.use(authenticateJWT); // Authentication middleware
+router.use(authenticateJWT);
 /** POST /create - Creates a new game */
 router.post('/create', gameValidationMiddleware, gameController.createGame);
-//** GET /history - Retrieves the game history */
+/** GET /history - Retrieves the game history */
 router.get('/history', dateValidationMiddleware, gameController.gamesHistory);
 /** GET /status/:gameId - Retrieves the status of a game */
 router.get('/status/:gameId', gameIdValidationMiddleware, gameController.gameStatus);
