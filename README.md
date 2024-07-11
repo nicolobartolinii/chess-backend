@@ -1,5 +1,63 @@
 
-Route login 
+
+<p align="center">
+  <img src="./img/logo.png" width="256">
+</p>
+
+---
+
+<p align="center">
+<img src="https://forthebadge.com/images/badges/built-with-love.svg">
+<img src="https://forthebadge.com/images/badges/made-with-typescript.svg">
+<img src="https://forthebadge.com/images/badges/cc-0.svg">
+<img src="https://forthebadge.com/images/badges/works-on-my-machine.svg">
+<br>
+<img src="https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB">
+<img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white">
+<img src="https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white">
+<img src="https://img.shields.io/badge/Sequelize-52B0E7?style=for-the-badge&logo=Sequelize&logoColor=white">
+<img src="https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white">
+<img src="https://img.shields.io/badge/webstorm-143?style=for-the-badge&logo=webstorm&logoColor=white&color=blue">
+<img src="https://img.shields.io/badge/mac%20os-000000?style=for-the-badge&logo=apple&logoColor=F0F0F0">
+<img src="https://img.shields.io/badge/Fedora-294172?style=for-the-badge&logo=fedora&logoColor=white">
+</p>
+
+## POST `/login`
+
+The login route is used to authenticate a user. The user must provide an email and a password in the request body. The email is used to find the player in the database and the password is used to authenticate the player. If the player is successfully authenticated, a JWT token is generated and returned to the player.
+
+[//]: # (### Request body example)
+
+[//]: # ()
+[//]: # (```json)
+
+[//]: # ({)
+
+[//]: # (  "email": "email@example.com",)
+
+[//]: # (  "password": "password")
+
+[//]: # (})
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (### Response example)
+
+[//]: # ()
+[//]: # (```json)
+
+[//]: # ({)
+
+[//]: # (  ")
+
+[//]: # (    token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiZm9vIiwiaWF0IjoxNjI5MzUwNzQ4LCJleHAiOjE2MjkzNTA3NDh9.7")
+
+[//]: # (})
+
+[//]: # (```)
+
+### Sequence diagram
 
 ```mermaid
 sequenceDiagram
@@ -23,48 +81,56 @@ sequenceDiagram
             App->>+Controller: login()
             Controller->>+Service: loginPlayer(email, password)
             Service->>+Repository: findByEmail(email)
-            Repository->>+DAO: findOne(email)
-            DAO-->>-Repository: Player data
-            Repository-->>-Service: Player data
+            Repository->>+DAO: findOne()
+            DAO-->>-Repository: Player
+            Repository-->>-Service: Player
             Service->>+DAO: authenticate(password)
             DAO-->>-Service: Authentication result
             alt Authentication successful
-                Service->>+Service: generateToken()
-                Service-->>-Controller: Token
-                Controller->>+ResponseFactory: createSuccessResponse(token)
-                ResponseFactory-->>-Controller: HTTP Response
+                Service->>+Service: generateToken(payload)
+                Service-->>-Controller: JWT Token
+                deactivate Service
+                Controller->>+ResponseFactory: success(token)
+                ResponseFactory-->>-Controller: JSON Response
                 Controller-->>-App: HTTP Response
-                App-->>-Client: HTTP Response with token
+                App-->>Client: HTTP Response with token
             else Authentication failed
-                Service->>+ErrorFactory: createError()
-                ErrorFactory-->>-Service: Error
-                Service-->>-Controller: Error
-                Controller->>+ErrorFactory: createError()
-                ErrorFactory->>+ResponseFactory: createErrorResponse()
-                ResponseFactory-->>+Controller: HTTP Error Response
-                Controller-->>+App: next(Error)
-                App-->>-Client: HTTP Error Response
+                activate Service
+                Service->>+ErrorFactory: throw unauthorized()
+                ErrorFactory-->>-Service: error
+                Service-->>+Controller: error
+                deactivate Service
+                Controller->>-Middleware: next(error)
+                activate Middleware
+                Middleware->>+ResponseFactory: error(error)
+                ResponseFactory-->>-Middleware: JSON Error Response
+                Middleware-->>-App: HTTP Error Response
+                App-->>Client: HTTP Error Response
             end
         else Not valid password
-            Middleware->>+ErrorFactory: createError()
-            ErrorFactory->>+ResponseFactory: createErrorResponse()
-            deactivate ErrorFactory
-            ResponseFactory-->>-Middleware: HTTP Error Response
-            Middleware->>+App: next(Error)
-            App-->>-Client: HTTP Error Response
+            activate Middleware
+            Middleware->>+ErrorFactory: badRequest()
+            ErrorFactory->>-Middleware: error
+            Middleware->>+Middleware: next(error)
+            Middleware->>+ResponseFactory: error(error)
+            ResponseFactory-->>-Middleware: JSON Error Response
+            Middleware->>-App: HTTP Error Response
+            deactivate Middleware
+            App-->>Client: HTTP Error Response
         end
     else Not valid email
-        Middleware->>+ErrorFactory: createError()
-        ErrorFactory->>+ResponseFactory: createErrorResponse()
-        deactivate ErrorFactory
-        ResponseFactory-->>-Middleware: HTTP Error Response
-        Middleware->>+App: next(Error)
+        activate Middleware
+        Middleware->>+ErrorFactory: badRequest()
+        ErrorFactory->>-Middleware: error
+        Middleware->>+Middleware: next(error)
+        Middleware->>+ResponseFactory: error(error)
+        ResponseFactory-->>-Middleware: JSON Error Response
+        Middleware->>-App: HTTP Error Response
+        deactivate Middleware
         App-->>-Client: HTTP Error Response
-        
-        deactivate ResponseFactory
     end
 ```
-Route /admin/update-token
+# POST `/admin/update-token`
 ```mermaid
 sequenceDiagram
     actor Client
@@ -81,7 +147,7 @@ sequenceDiagram
     App->>+Middleware: authenticateJWT()
     alt valid JWT
         Middleware-->>-App: next()
-        App->>+Middleware: valid admin()
+        App->>+Middleware: isAdmin()
         alt valid admin
             Middleware-->>-App: next()
             App->>+Middleware: emailValidationMiddleware()
@@ -93,73 +159,94 @@ sequenceDiagram
                     App->>+Controller: updatePlayerTokens(email, tokens)
                     Controller->>+Service: updatePlayerTokens(email, tokens)
                     Service->>+Repository: updatePlayerField(player_id, email, tokens)
-                    Repository->>+DAO: Player.update(player_id, tokens)
-                    DAO-->>-Repository: return(updatePlayer)
-                    Repository-->>-Service: return(updatePlayer)
-                    Service-->>-Controller: return(updatePlayer)
-                    Controller-->>-App: return(updatePlayer)
-                    App-->>-Client: return (response status, updatePlayer)
+                    Repository->>+DAO: update(player_id, tokens)
+                    DAO-->>-Repository: updated Player
+                    Repository-->>-Service: updated Player
+                    Service-->>-Controller: updated Player
+                    Controller->>+ResponseFactory: success(updatedPlayer)
+                    ResponseFactory-->>-Controller: JSON Response
+                    Controller-->>-App: HTTP Response
+                    App-->>Client: HTTP Response with updatedPlayer
                 else not valid token
-                    Middleware->>ErrorFactory: createError()
-                    ErrorFactory->>ResponseFactory: ErrorFactory.forbidden()
-                    ResponseFactory-->>Middleware: HTTP Error Response
-                    Middleware-->>App: next(Error)
+                    activate Middleware
+                    Middleware->>+ErrorFactory: badRequest()
+                    ErrorFactory->>-Middleware: error
+                    Middleware->>+Middleware: next(error)
+                    Middleware->>+ResponseFactory: error(error)
+                    ResponseFactory-->>-Middleware: JSON Error Response
+                    Middleware->>-App: HTTP Error Response
+                    deactivate Middleware
                     App-->>Client: HTTP Error Response
                 end
             else not valid email
-                Middleware->>ErrorFactory: createError()
-                ErrorFactory->>ResponseFactory: ErrorFactory.badRequest()
-                ResponseFactory-->>Middleware: HTTP Error Response
-                Middleware-->>App: next(Error)
+                activate Middleware
+                Middleware->>+ErrorFactory: badRequest()
+                ErrorFactory->>-Middleware: error
+                Middleware->>+Middleware: next(error)
+                Middleware->>+ResponseFactory: error(error)
+                ResponseFactory-->>-Middleware: JSON Error Response
+                Middleware->>-App: HTTP Error Response
+                deactivate Middleware
                 App-->>Client: HTTP Error Response
             end
         else not valid admin
-            Middleware->>ErrorFactory: createError()
-            ErrorFactory->>ResponseFactory: ErrorFactory.forbidden()
-            ResponseFactory-->>Middleware: HTTP Error Response
-            Middleware-->>App: next(Error)
+            activate Middleware
+            Middleware->>+ErrorFactory: forbidden()
+            ErrorFactory->>-Middleware: error
+            Middleware->>+Middleware: next(error)
+            Middleware->>+ResponseFactory: error(error)
+            ResponseFactory-->>-Middleware: JSON Error Response
+            Middleware->>-App: HTTP Error Response
+            deactivate Middleware
             App-->>Client: HTTP Error Response
         end
     else not valid JWT
-        Middleware->>ErrorFactory: createError()
-        ErrorFactory->>ResponseFactory: ErrorFactory.unauthorized()
-        ResponseFactory-->>Middleware: HTTP Error Response
-        Middleware-->>App: next(Error)
-        App-->>Client: HTTP Error Response
+        activate Middleware
+        Middleware->>+ErrorFactory: unauthorized()
+        ErrorFactory-->>-Middleware: error
+        Middleware->>+Middleware: next(error)
+        Middleware->>+ResponseFactory: error(error)
+        ResponseFactory-->>-Middleware: JSON Error Response
+        Middleware-->>App: HTTP Error Response
+        deactivate Middleware
+        App-->>-Client: HTTP Error Response
     end
 ```
-Route public ranking
-http://localhost:3000/players/ranking
+## GET `/players/ranking`
 ```mermaid
 sequenceDiagram
     actor Client
     participant App
     participant Middleware
     participant Controller
-    participant Service
     participant Repository
     participant DAO
     participant ErrorFactory
     participant ResponseFactory
-
-    Client->>+App: Get /players/ranking?<order>
-    App->>+Middleware: validatePlayerRanking()
+    
+    Client ->>+ App: Get /players/ranking?<order>
+    App ->>+ Middleware: validatePlayerRanking()
     alt Valid param
-        Middleware-->>-App: next()
-        App-->+Controller:getPlayerRanking(field,order)
-        Controller-->+Service:findAllOrdering(field,order)
-        Service-->+DAO: return Player[]
-        DAO-->-Service: return Player[]
-        Service-->-Controller: return (response,status,players)
+        Middleware -->>- App: next()
+        App ->>+ Controller: getPlayerRanking(field, order)
+        Controller -->>+ Repository: findAllOrdering(field, order)
+        Repository -->>+ DAO: findAll()
+        DAO -->>- Repository: Player[]
+        Repository -->>- Controller: Player[]
+        Controller ->>+ ResponseFactory: success(players)
+        ResponseFactory -->>- Controller: JSON Response
+        Controller -->>- App: HTTP Response
+        App -->> Client: HTTP Response with players
     else Not valid param
-        Middleware->>+ErrorFactory: createError()
-        ErrorFactory->>+ResponseFactory: createErrorResponse()
-        deactivate ErrorFactory
-        ResponseFactory-->>-Middleware: HTTP Error Response
-        Middleware->>+App: next(Error)
-        App-->>-Client: HTTP Error Response
-      
+        activate Middleware
+        Middleware ->>+ ErrorFactory: badRequest()
+        ErrorFactory -->>- Middleware: error
+        Middleware ->>+ Middleware: next(error)
+        Middleware ->>+ ResponseFactory: error(error)
+        ResponseFactory -->>- Middleware: JSON Error Response
+        Middleware -->>- App: HTTP Error Response
+        deactivate Middleware
+        App -->>- Client: HTTP Error Response
     end
-
 ```
 

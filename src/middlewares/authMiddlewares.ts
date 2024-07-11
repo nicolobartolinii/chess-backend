@@ -32,10 +32,10 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
             req.player = verifyToken(token) as JwtPayload;
             next();
         } catch {
-            return next(ErrorFactory.forbidden('Invalid or expired token'));
+            return next(ErrorFactory.unauthorized('Invalid or expired token'));
         }
     } else {
-        return next(ErrorFactory.forbidden('Token not provided'));
+        return next(ErrorFactory.unauthorized('Token not provided'));
     }
 }
 
@@ -57,7 +57,7 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
     if (typeof role === 'number' && role === 0) {
         next();
     } else {
-        return next(ErrorFactory.forbidden());
+        return next(ErrorFactory.forbidden('This route is only accessible to administrators'));
     }
 };
 

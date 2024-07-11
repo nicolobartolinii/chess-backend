@@ -16,13 +16,13 @@ import {repositories} from "../repositories";
 export const loginPlayer = async (email: string, password: string): Promise<string> => {
     const player = await repositories.player.findByEmail(email);
     if (!player) {
-        throw ErrorFactory.notFound('Invalid email or password')
+        throw ErrorFactory.badRequest('Player not found');
     }
 
     const isValidPassword = await player.authenticate(password);
 
     if (!isValidPassword) {
-        throw ErrorFactory.notFound('Invalid email or password')
+        throw ErrorFactory.unauthorized('Invalid credentials');
     }
 
     return generateToken({id: player.player_id, role: player.role});
