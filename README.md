@@ -148,8 +148,8 @@ sequenceDiagram
         Middleware-->>-App: next()
         App-->+Controller:getPlayerRanking(field,order)
         Controller-->+Service:findAllOrdering(field,order)
-        Service-->+Dao: return Player[]
-        Dao-->-Service: return Player[]
+        Service-->+DAO: return Player[]
+        DAO-->-Service: return Player[]
         Service-->-Controller: return (response,status,players)
     else Not valid param
         Middleware->>+ErrorFactory: createError()
