@@ -64,9 +64,7 @@ sequenceDiagram
         deactivate ResponseFactory
     end
 ```
-
 Route /admin/update-token
-    
 ```mermaid
 sequenceDiagram
     actor Client
@@ -80,27 +78,55 @@ sequenceDiagram
     participant ResponseFactory
 
     Client->>+App: POST /admin/recharge (email, token)
-    App->>+Middleware: valid admin()
-    alt valid admin
+    App->>+Middleware: authenticateJWT()
+    alt valid JWT
         Middleware-->>-App: next()
-        App->>+Controller: updatePlayerTokens(email, tokens)
-        Controller->>+Service: updatePlayerTokens(email, tokens)
-        Service->>+Repository: updatePlayerField(player_id, email, tokens)
-        Repository->>+DAO: Player.update(player_id, tokens)
-        DAO-->>-Repository: return(updatePlayer)
-        Repository-->>-Service: return(updatePlayer)
-        Service-->>-Controller: return(updatePlayer)
-        Controller-->>-Client: return (response status, updatePlayer)
-        
-  
-    else not valid admin
-        Middleware->>+ErrorFactory: createError()
-        ErrorFactory->>+ResponseFactory: ErrorFactory.forbidden()
-        ResponseFactory-->>-Middleware: HTTP Error Response
-        Middleware-->>+App: next(Error)
-        App-->>-Client: HTTP Error Response
+        App->>+Middleware: valid admin()
+        alt valid admin
+            Middleware-->>-App: next()
+            App->>+Middleware: emailValidationMiddleware()
+            alt valid email
+                Middleware-->>-App: next()
+                App->>+Middleware: adminTokensValidationMiddleware()
+                alt valid token
+                    Middleware-->>-App: next()
+                    App->>+Controller: updatePlayerTokens(email, tokens)
+                    Controller->>+Service: updatePlayerTokens(email, tokens)
+                    Service->>+Repository: updatePlayerField(player_id, email, tokens)
+                    Repository->>+DAO: Player.update(player_id, tokens)
+                    DAO-->>-Repository: return(updatePlayer)
+                    Repository-->>-Service: return(updatePlayer)
+                    Service-->>-Controller: return(updatePlayer)
+                    Controller-->>-App: return(updatePlayer)
+                    App-->>-Client: return (response status, updatePlayer)
+                else not valid token
+                    Middleware->>ErrorFactory: createError()
+                    ErrorFactory->>ResponseFactory: ErrorFactory.forbidden()
+                    ResponseFactory-->>Middleware: HTTP Error Response
+                    Middleware-->>App: next(Error)
+                    App-->>Client: HTTP Error Response
+                end
+            else not valid email
+                Middleware->>ErrorFactory: createError()
+                ErrorFactory->>ResponseFactory: ErrorFactory.badRequest()
+                ResponseFactory-->>Middleware: HTTP Error Response
+                Middleware-->>App: next(Error)
+                App-->>Client: HTTP Error Response
+            end
+        else not valid admin
+            Middleware->>ErrorFactory: createError()
+            ErrorFactory->>ResponseFactory: ErrorFactory.forbidden()
+            ResponseFactory-->>Middleware: HTTP Error Response
+            Middleware-->>App: next(Error)
+            App-->>Client: HTTP Error Response
+        end
+    else not valid JWT
+        Middleware->>ErrorFactory: createError()
+        ErrorFactory->>ResponseFactory: ErrorFactory.unauthorized()
+        ResponseFactory-->>Middleware: HTTP Error Response
+        Middleware-->>App: next(Error)
+        App-->>Client: HTTP Error Response
     end
-
 ```
 Route public ranking
 http://localhost:3000/players/ranking
