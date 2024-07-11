@@ -9,6 +9,6 @@ const router = express.Router();
  * This route applies middleware to validate the email and password provided in the request.
  * After validation, it passes control to the login controller which processes the login.
  */
-router.get('/login', emailValidationMiddleware, passwordValidationMiddleware, authController.login);
+router.post('/login', emailValidationMiddleware, passwordValidationMiddleware, authController.login);
 
 export default router;
