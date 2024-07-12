@@ -22,6 +22,10 @@
 <img src="https://img.shields.io/badge/Fedora-294172?style=for-the-badge&logo=fedora&logoColor=white">
 </p>
 
+# Use Case Diagram
+
+<img src="./img/usecase.png">
+
 ## POST `/login`
 
 The login route is used to authenticate a user. The user must provide an email and a password in the request body. The email is used to find the player in the database and the password is used to authenticate the player. If the player is successfully authenticated, a JWT token is generated and returned to the player.
