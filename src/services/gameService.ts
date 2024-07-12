@@ -7,6 +7,7 @@ import {AiLevel, AiLevels} from "../utils/aiLevels";
 import PDFDocument from 'pdfkit';
 import {svg2imgAsync} from "../strategies/exportStrategies";
 import sharp from 'sharp';
+import {StatusCodes} from "http-status-codes";
 
 const jsChessEngine = require('js-chess-engine')
 
@@ -33,11 +34,31 @@ export async function createGame(player_1_id: number, player_2_email?: string, A
         throw ErrorFactory.unauthorized('Insufficient tokens');
     }
 
+    const player1Games = await repositories.game.findByPlayer(player_1_id);
+
+    player1Games.forEach(game => {
+        if (game.game_status === Statuses.ACTIVE) {
+            throw ErrorFactory.customError('Player 1 is already playing a game', StatusCodes.FORBIDDEN);
+        }
+    })
+
     let player2 = null;
     if (player_2_email) {
         player2 = await repositories.player.findByEmail(player_2_email);
         if (!player2) {
             throw ErrorFactory.notFound('Player 2 not found');
+        }
+
+        const player2Games = await repositories.game.findByPlayer(player2.player_id);
+
+        player2Games.forEach(game => {
+            if (game.game_status === Statuses.ACTIVE) {
+                throw ErrorFactory.forbidden('Player 2 is already playing a game');
+            }
+        })
+
+        if (player2.player_id === player_1_id) {
+            throw ErrorFactory.badRequest('Player 1 and Player 2 cannot be the same');
         }
     }
 
@@ -246,6 +267,11 @@ export async function move(from: string, to: string, playerId: number, gameId: n
         throw ErrorFactory.forbidden('You are not part of the game');
     }
 
+    const hasEnoughTokens = await playerService.checkSufficientTokens(playerId, constants.GAME_MOVE_COST);
+    if (!hasEnoughTokens) {
+        throw ErrorFactory.unauthorized('Insufficient tokens');
+    }
+
     if ((game.player_1_id == playerId && game.game_configuration.turn == "black") || (game.player_2_id == playerId && game.game_configuration.turn == "white")) {
         throw ErrorFactory.forbidden('Not your turn');
     }
@@ -295,14 +321,9 @@ export async function move(from: string, to: string, playerId: number, gameId: n
         number_of_moves: game.number_of_moves + 1
     });
 
-    const hasEnoughTokens = await playerService.checkSufficientTokens(playerId, constants.GAME_MOVE_COST);
-    if (!hasEnoughTokens) {
-        throw ErrorFactory.unauthorized('Insufficient tokens');
-    }
-
     await playerService.decrementTokens(playerId, constants.GAME_MOVE_COST);
 
-    let returnString = `You moved a ${pieceMoved} from ${from} to ${to}. `;
+    let returnString = `You moved a ${pieceMoved} from ${from} to ${to}.`;
 
     if (isGameFinished(newConfiguration)) {
         const winnerId = isStalemate(newConfiguration) ? null : await winGame(newConfiguration, game.player_1_id, game.player_2_id ? game.player_2_id : 0)
@@ -311,7 +332,7 @@ export async function move(from: string, to: string, playerId: number, gameId: n
             winner_id: winnerId || null,
             end_date: new Date()
         });
-        return returnString + 'Game finished. ' + (isStalemate(newConfiguration) ? 'Stalemate!' : 'You won!');
+        return returnString + ' Game finished. ' + (isStalemate(newConfiguration) ? 'Stalemate!' : 'You won!');
     }
 
     if (game.AI_difficulty) {
@@ -349,7 +370,7 @@ export async function move(from: string, to: string, playerId: number, gameId: n
 
         await playerService.decrementTokens(playerId, constants.GAME_MOVE_COST);
 
-        returnString += `AI moved a ${pieceMoved} from ${from} to ${to}. `;
+        returnString += ` AI moved a ${pieceMoved} from ${from} to ${to}.`;
     }
 
     if (isGameFinished(newConfiguration)) {
@@ -359,7 +380,7 @@ export async function move(from: string, to: string, playerId: number, gameId: n
             winner_id: winnerId || null,
             end_date: new Date()
         });
-        return returnString + 'Game finished. ' + (isStalemate(newConfiguration) ? 'Stalemate!' : (game.player_1_id === winnerId ? 'You won!' : 'You lost.'));
+        return returnString + ' Game finished. ' + (isStalemate(newConfiguration) ? 'Stalemate!' : (game.player_1_id === winnerId ? 'You won!' : 'You lost.'));
     } else {
         return returnString;
     }
