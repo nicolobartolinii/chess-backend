@@ -80,6 +80,24 @@ class ResponseFactory {
     }
 
     /**
+     * Creates a successful response for a created resource.
+     *
+     * @param {string} [message=ReasonPhrases.CREATED] - The message of the response
+     * @param {any} [data] - The data to be returned
+     * @param {number} [statusCode=StatusCodes.CREATED] - The status code of the response
+     *
+     * @returns {IAPIResponse} - The successful response
+     */
+    static successCreated(message: string = ReasonPhrases.CREATED, data?: any, statusCode: number = StatusCodes.CREATED): IAPIResponse {
+        return {
+            success: true,
+            statusCode,
+            message,
+            data
+        }
+    }
+
+    /**
      * Creates an error response.
      *
      * @param {string} [message=ReasonPhrases.INTERNAL_SERVER_ERROR] - The message of the response

@@ -39,6 +39,7 @@ class Move extends Model<InferAttributes<Move>, InferCreationAttributes<Move>> {
     declare to_position: CreationOptional<string | null>; // position of the piece after the move. If null, the player abandoned the match
     declare configuration_after: any;  // JSON
     declare piece: CreationOptional<string | null>; // piece moved. If null, the player abandoned the match
+    declare createdAt: CreationOptional<Date>;
 }
 
 Move.init({
@@ -76,6 +77,10 @@ Move.init({
     },
     piece: {
         type: DataTypes.STRING,
+        allowNull: true
+    },
+    createdAt: {
+        type: DataTypes.DATE,
         allowNull: true
     }
 }, {

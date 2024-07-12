@@ -28,8 +28,6 @@ export const loginPlayer = async (email: string, password: string): Promise<stri
     return generateToken({id: player.player_id, role: player.role});
 }
 
-// TODO: Implement the registerUser function
-
 /**
  * This function generates a JWT token with the given payload.
  * The token is signed with the private key and expires in 48 hours.

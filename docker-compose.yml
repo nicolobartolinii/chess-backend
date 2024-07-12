@@ -6,8 +6,6 @@ services:
     container_name: chess-backend
     ports:
       - "3000:3000"
-    environment:
-        - NODE_ENV=development
     volumes:
       - ./src:/usr/src/app/src
     depends_on:

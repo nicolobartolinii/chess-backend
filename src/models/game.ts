@@ -42,6 +42,7 @@ class Game extends Model<InferAttributes<Game>, InferCreationAttributes<Game>> {
     declare player_2_id: CreationOptional<number | null>;
     declare AI_difficulty: CreationOptional<string | null>;
     declare winner_id: CreationOptional<number | null>;
+    declare createdAt: CreationOptional<Date>;
 }
 
 Game.init({
@@ -93,11 +94,15 @@ Game.init({
     winner_id: {
         type: DataTypes.INTEGER,
         allowNull: true
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: true
     }
 }, {
     sequelize: db_connection,
     modelName: 'Game',
-    timestamps: false
+    timestamps: true
 });
 
 export {Game};
