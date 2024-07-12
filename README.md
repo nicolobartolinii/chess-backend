@@ -229,8 +229,8 @@ sequenceDiagram
     alt Valid param
         Middleware -->>- App: next()
         App ->>+ Controller: getPlayerRanking(field, order)
-        Controller -->>+ Repository: findAllOrdering(field, order)
-        Repository -->>+ DAO: findAll()
+        Controller ->>+ Repository: findAllOrdering(field, order)
+        Repository ->>+ DAO: findAll()
         DAO -->>- Repository: Player[]
         Repository -->>- Controller: Player[]
         Controller ->>+ ResponseFactory: success(players)
@@ -249,8 +249,7 @@ sequenceDiagram
         App -->>- Client: HTTP Error Response
     end
 ```
-## GET /games/history
-
+## GET `/games/history`
 ```mermaid
 sequenceDiagram
     actor Client
@@ -304,5 +303,105 @@ sequenceDiagram
         App-->>-Client: HTTP Error Response
     end
 ```
-
+## POST `/games/create`
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant Repository
+    participant DAO
+    participant ErrorFactory
+    participant ResponseFactory
+    
+    Client ->>+ App: POST /games/create (player2, AI_difficulty)
+    App ->>+ Middleware: authenticateJWT()
+    alt valid JWT
+        Middleware -->>- App: next()
+        App ->>+ Middleware: gameValidationMiddleware()
+        alt valid game
+            Middleware -->>- App: next()
+            App ->>+ Controller: createGame(player2, AI_difficulty)
+            Controller ->>+ Service: createGame(player1, player2, AI_difficulty)
+            Service ->>+ Service: checkSufficientTokens(player1, tokens)
+            alt enough tokens
+                deactivate Service
+                Service ->>+ Repository: findByEmail(player2)
+                Repository ->>+ DAO: findOne()
+                alt player found
+                    DAO -->>- Repository: Player
+                    Repository -->>- Service: Player
+                    Service ->>+ Repository: create(game_details)
+                    Repository ->>+ DAO: create(game_details)
+                    DAO -->>- Repository: Game
+                    Repository -->>- Service: Game
+                    Service ->>+ Service: playerService.decrementTokens(player1, tokens)
+                    Service -->>- Controller: Game
+                    deactivate Service
+                    Controller ->>+ ResponseFactory: success(game)
+                    ResponseFactory -->>- Controller: JSON Response
+                    Controller -->>- App: HTTP Response
+                    App -->> Client: HTTP Response with game
+                else player not found
+                    activate Service
+                    Service ->>+ ErrorFactory: notFound()
+                    ErrorFactory -->>- Service: error
+                    Service -->>+ Controller: error
+                    deactivate Service
+                    Controller ->>+ Middleware: next(error)
+                    deactivate Controller
+                    Middleware ->>+ ResponseFactory: error(error)
+                    ResponseFactory -->>- Middleware: JSON Error Response
+                    Middleware -->>- App: HTTP Error Response
+                    App -->> Client: HTTP Error Response
+                end
+                else not enough tokens
+                    activate Service
+                    Service ->>+ ErrorFactory: notEnoughTokens()
+                    ErrorFactory -->>- Service: error
+                    Service -->>+ Controller: error
+                    deactivate Service
+                    Controller ->>+ Middleware: next(error)
+                    deactivate Controller
+                    Middleware ->>+ ResponseFactory: error(error)
+                    ResponseFactory -->>- Middleware: JSON Error Response
+                    Middleware -->>- App: HTTP Error Response
+                    App -->> Client: HTTP Error Response
+                end
+            activate Service
+            Service ->>+ Repository: createGame(player1, player2, AI_difficulty)
+            Repository ->>+ DAO: create(player1, player2, AI_difficulty)
+            DAO -->>- Repository: Game
+            Repository -->>- Service: Game
+            Service -->>+ Controller: Game
+            deactivate Service
+            Controller ->>+ ResponseFactory: success(game)
+            ResponseFactory -->>- Controller: JSON Response
+            Controller -->>- App: HTTP Response
+            App -->> Client: HTTP Response with game
+        else not valid game
+            activate Middleware
+            Middleware ->>+ ErrorFactory: badRequest()
+            ErrorFactory -->>- Middleware: error
+            Middleware ->>+ Middleware: next(error)
+            Middleware ->>+ ResponseFactory: error(error)
+            ResponseFactory -->>- Middleware: JSON Error Response
+            Middleware -->>- App: HTTP Error Response
+            deactivate Middleware
+            App -->>- Client: HTTP Error Response
+        end
+    else not valid JWT
+        activate Middleware
+        Middleware ->>+ ErrorFactory: unauthorized()
+        ErrorFactory -->>- Middleware: error
+        Middleware ->>+ Middleware: next(error)
+        Middleware ->>+ ResponseFactory: error(error)
+        ResponseFactory -->>- Middleware: JSON Error Response
+        Middleware -->>- App: HTTP Error Response
+        deactivate Middleware
+        App -->> Client: HTTP Error Response
+    end
+```
 
