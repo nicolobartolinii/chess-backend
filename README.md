@@ -249,4 +249,60 @@ sequenceDiagram
         App -->>- Client: HTTP Error Response
     end
 ```
+## GET /games/history
+
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant Repository
+    participant DAO
+    participant ErrorFactory
+    participant ResponseFactory
+
+    Client->>+App: GET games/history?start_date=<start_date>
+    App->>+Middleware: authenticateJWT()
+    alt valid JWT
+        Middleware-->>-App: next()
+            App->>+Middleware: dateValidationMiddleware()
+            alt valid date
+                Middleware-->>-App: next()
+                    App->>+Controller: gamesHistory(player_id, startDate)
+                    Controller->>+Service: getGamesHistory(player_id, startDate)
+                    Service->>+Repository: findByPlayer(player_id, filter_field, startDate)
+                    Repository->>+DAO: findAll(whereClause)
+                    DAO-->>-Repository: Game[]
+                    Repository-->>-Service: Game[]
+                    Service-->>-Controller: Game[]
+                    Controller->>+ResponseFactory: success(Game[])
+                    ResponseFactory-->>-Controller: JSON Response
+                    Controller-->>-App: HTTP Response
+                    App-->>Client: HTTP Response with Game[]
+            else not valid date
+                activate Middleware
+                Middleware->>+ErrorFactory: badRequest()
+                ErrorFactory->>-Middleware: error
+                Middleware->>+Middleware: next(error)
+                Middleware->>+ResponseFactory: error(error)
+                ResponseFactory-->>-Middleware: JSON Error Response
+                Middleware->>-App: HTTP Error Response
+                deactivate Middleware
+                App-->>Client: HTTP Error Response
+            end
+    else not valid JWT
+        activate Middleware
+        Middleware->>+ErrorFactory: unauthorized()
+        ErrorFactory-->>-Middleware: error
+        Middleware->>+Middleware: next(error)
+        Middleware->>+ResponseFactory: error(error)
+        ResponseFactory-->>-Middleware: JSON Error Response
+        Middleware-->>-App: HTTP Error Response
+        deactivate Middleware
+        App-->>-Client: HTTP Error Response
+    end
+```
+
 
