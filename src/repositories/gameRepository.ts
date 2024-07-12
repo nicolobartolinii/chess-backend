@@ -12,7 +12,7 @@ import {ErrorFactory} from "../factories/errorFactory";
  *
  * @function create - Creates a new game
  * @function findById - Retrieves a game by its ID
- * @function findActiveGames - Retrieves all active games
+ * @function findFinishGames - Retrieves all active games
  * @function findByPlayer - Retrieves all games where a player is involved
  * @function updateGameStatus - Updates the status of a game
  */
@@ -21,7 +21,7 @@ export interface IGameRepository extends IBaseRepository<Game> {
 
     findById(id: number): Promise<Game | null>;
 
-    findActiveGames(): Promise<Game[]>;
+    findFinishGames(): Promise<Game[]>;
 
     findByPlayer(playerId: number, filterField?: string, filterValue?: any): Promise<Game[]>;
 
@@ -90,12 +90,12 @@ export class GameRepository implements IGameRepository {
     }
 
     /**
-     * Retrieves all active games from the database.
+     * Retrieves all FinishGames games from the database.
      *
-     * @returns {Promise<Game[]>} - A promise that resolves with an array of all active games.
+     * @returns {Promise<Game[]>} - A promise that resolves with an array of all finish games.
      */
-    async findActiveGames(): Promise<Game[]> {
-        return Game.findAll({where: {game_status: Statuses.ACTIVE} as any});
+    async findFinishGames(): Promise<Game[]> {
+        return Game.findAll({where: {game_status: Statuses.FINISHED} as any});
     }
 
     /**

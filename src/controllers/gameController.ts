@@ -47,8 +47,8 @@ export const gamesHistory = async (req: Request, res: Response, next: NextFuncti
     try {
         const player_id = req.player!.id;
         const startDate = req.startDate!;
-
-        const games = await gameService.getGamesHistory(player_id, startDate);
+        const order = req.query.order as string;
+        const games = await gameService.getGamesHistory(player_id, startDate, order);
 
         res.status(StatusCodes.OK).json(ResponseFactory.success("Games history retrieved successfully", games));
     } catch (err) {

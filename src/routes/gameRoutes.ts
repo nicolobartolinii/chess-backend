@@ -1,7 +1,7 @@
 import express from 'express';
 import * as gameController from '../controllers/gameController';
 import {authenticateJWT} from "../middlewares/authMiddlewares";
-import {dateValidationMiddleware} from "../middlewares/dateValidationMiddleware";
+import {dateValidationMiddleware, orderValidationMiddleware} from "../middlewares/dateValidationMiddleware";
 import {
     exportFormatValidationMiddleware,
     gameIdValidationMiddleware,
@@ -16,7 +16,7 @@ router.use(authenticateJWT);
 /** POST /create - Creates a new game */
 router.post('/create', gameValidationMiddleware, gameController.createGame);
 /** GET /history - Retrieves the game history */
-router.get('/history', dateValidationMiddleware, gameController.gamesHistory);
+router.get('/history', dateValidationMiddleware, orderValidationMiddleware, gameController.gamesHistory);
 /** GET /status/:gameId - Retrieves the status of a game */
 router.get('/status/:gameId', gameIdValidationMiddleware, gameController.gameStatus);
 /** GET /win-certificate/:gameId - Retrieves a win certificate for a game */

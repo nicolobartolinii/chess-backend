@@ -85,17 +85,32 @@ export async function createGame(player_1_id: number, player_2_email?: string, A
  *
  * @param {number} player_id - The id of the player whose game history is retrieved
  * @param {Date} startDate - The start date of the game history. If not provided, it retrieves the entire game history.
- *
+ * @param {order} order - The order of the game history. It can be 'asc' or 'desc'.
  * @returns A promise that resolves to an array of information about each game.
  */
-export async function getGamesHistory(player_id: number, startDate?: Date) {
+export async function getGamesHistory(player_id: number, startDate: Date, order: string) {
     const filter_field = 'start_date';
+    const finishedGames = await repositories.game.findFinishGames();
+    const finishedGameId = new Set(finishedGames.map(game => game.game_id));
     const games = await repositories.game.findByPlayer(player_id, filter_field, startDate);
-    return games.map(game => ({
+    const filteredGames = games.filter(game => finishedGameId.has(game.game_id));
+
+    // order the games by start date
+    filteredGames.sort((a, b) => {
+        if (order === 'asc') {
+            return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+        } else {
+            return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
+        }
+    });
+
+    return filteredGames.map(game => ({
+        game_id: game.game_id,
         game_status: game.game_status,
         number_of_moves: game.number_of_moves,
         start_date: game.start_date,
-        winner_id: game.winner_id
+        winner_id: game.winner_id,
+        result: game.winner_id === player_id ? 'You are the winner' : ' you are the loser'
     }));
 }
 
