@@ -48,7 +48,7 @@ export const gameValidationMiddleware = (req: Request, res: Response, next: Next
  */
 export const gameIdValidationMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     const gameId = req.params.gameId;
-    if (typeof gameId !== "string") {
+    if (typeof gameId !== "string" || isNaN(parseInt(gameId))) {
         return next(ErrorFactory.badRequest('Invalid game ID'));
     }
 

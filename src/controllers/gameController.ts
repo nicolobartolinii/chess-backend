@@ -71,9 +71,9 @@ export const gamesHistory = async (req: Request, res: Response, next: NextFuncti
 export const getWinCertificate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const playerId = req.player!.id;
-        const gameId = req.params.gameId;
+        const game_id = req.params.gameId;
 
-        const pdfBuffer = await gameService.getWinCertificate(playerId, parseInt(gameId));
+        const pdfBuffer = await gameService.getWinCertificate(playerId, parseInt(game_id));
 
         const pdfResponse = ResponseFactory.pdf(pdfBuffer, 'winCertificate.pdf');
 

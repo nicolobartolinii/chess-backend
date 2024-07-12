@@ -273,8 +273,14 @@ sequenceDiagram
             App->>+Middleware: dateValidationMiddleware()
             alt valid date
                 Middleware-->>-App: next()
+                App->>+Middleware: orderValidationMiddleware()
+                alt valid order
                     App->>+Controller: gamesHistory(player_id, startDate)
-                    Controller->>+Service: getGamesHistory(player_id, startDate)
+                    Controller->>+Service: getGamesHistory(player_id, startDate,sort)
+                    Service->>+Repository:findFinishGames()
+                    Repository->>+DAO: findAll(whereClause)
+                    DAO-->>-Repository: Game[]
+                    Repository-->>-Service: Game[]
                     Service->>+Repository: findByPlayer(player_id, filter_field, startDate)
                     Repository->>+DAO: findAll(whereClause)
                     DAO-->>-Repository: Game[]
@@ -284,6 +290,17 @@ sequenceDiagram
                     ResponseFactory-->>-Controller: JSON Response
                     Controller-->>-App: HTTP Response
                     App-->>Client: HTTP Response with Game[]
+                else not valid query
+                    activate Middleware
+                    Middleware->>+ErrorFactory: badRequest()
+                    ErrorFactory->>-Middleware: error
+                    Middleware->>+Middleware: next(error)
+                    Middleware->>+ResponseFactory: error(error)
+                    ResponseFactory-->>-Middleware: JSON Error Response
+                    Middleware-->>-App: HTTP Error Response
+                    deactivate Middleware
+                    App-->>Client: HTTP Error Response
+                end
             else not valid date
                 activate Middleware
                 Middleware->>+ErrorFactory: badRequest()
@@ -409,3 +426,56 @@ sequenceDiagram
     end
 ```
 
+## GET /games/win-certificate/:gameId
+```mermaid
+sequenceDiagram
+actor Client
+participant App
+participant Middleware
+participant Controller
+participant Service
+participant Repository
+participant DAO
+participant ErrorFactory
+participant ResponseFactory
+
+    Client ->>+ App: GET /games/win-certificate/:gameId
+    App ->>+ Middleware: authenticateJWT()
+    alt valid JWT
+        Middleware -->>- App: next()
+        App ->>+ Middleware: gameIdValidationMiddleware()
+        alt valid gameID
+            Middleware -->>- App: next()
+            App ->>+ Controller: getWinCertificate(gameId)
+            Controller ->>+ Service: getWinCertificate(playerId, game_id)
+            Service ->>+ Repository: findWonGameByIds(player_id, game_id)
+            Repository ->>+ DAO: findOne(whereClause)
+            DAO -->>- Repository: Game
+            Repository -->>- Service: Game
+            Service -->>- Controller: Buffer
+            Controller ->>+ ResponseFactory: pdf(buffer)
+            ResponseFactory -->>- Controller: JSON Response
+            Controller -->>- App: HTTP Response
+        else not valid gameID
+            activate Middleware
+            Middleware ->>+ ErrorFactory: badRequest()
+            ErrorFactory -->>- Middleware: error
+            Middleware ->>+ Middleware: next(error)
+            Middleware ->>+ ResponseFactory: error(error)
+            ResponseFactory -->>- Middleware: JSON Error Response
+            Middleware -->>- App: HTTP Error Response
+            deactivate Middleware
+            App -->>- Client: HTTP Error Response
+        end
+    else not valid JWT
+        activate Middleware
+        Middleware ->>+ ErrorFactory: unauthorized()
+        ErrorFactory -->>- Middleware: error
+        Middleware ->>+ Middleware: next(error)
+        Middleware ->>+ ResponseFactory: error(error)
+        ResponseFactory -->>- Middleware: JSON Error Response
+        Middleware -->>- App: HTTP Error Response
+        deactivate Middleware
+        App -->> Client: HTTP Error Response
+    end
+```
