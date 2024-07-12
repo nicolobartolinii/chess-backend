@@ -207,7 +207,7 @@ sequenceDiagram
         Middleware->>+Middleware: next(error)
         Middleware->>+ResponseFactory: error(error)
         ResponseFactory-->>-Middleware: JSON Error Response
-        Middleware-->>App: HTTP Error Response
+        Middleware-->>-App: HTTP Error Response
         deactivate Middleware
         App-->>-Client: HTTP Error Response
     end
