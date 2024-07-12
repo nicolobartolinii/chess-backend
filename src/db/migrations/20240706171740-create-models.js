@@ -9,6 +9,11 @@ module.exports = {
                 autoIncrement: true,
                 primaryKey: true
             },
+            username: {
+                type: Sequelize.STRING,
+                allowNull: false,
+                unique: true
+            },
             email: {
                 type: Sequelize.STRING,
                 allowNull: false,
@@ -23,21 +28,21 @@ module.exports = {
                 allowNull: false
             },
             points: {
-                type: Sequelize.INTEGER,
+                type: Sequelize.DECIMAL(10, 4),
                 allowNull: false,
                 defaultValue: 0
             },
             tokens: {
-                type: Sequelize.INTEGER,
+                type: Sequelize.DECIMAL(10, 4),
                 allowNull: false,
                 defaultValue: 0
             },
-            createdAt: { 
+            createdAt: {
                 allowNull: false,
                 type: Sequelize.DATE,
                 defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             },
-            updatedAt: { 
+            updatedAt: {
                 allowNull: false,
                 type: Sequelize.DATE,
                 defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
@@ -56,6 +61,10 @@ module.exports = {
             },
             game_configuration: {
                 type: Sequelize.JSON,
+                allowNull: false
+            },
+            number_of_moves: {
+                type: Sequelize.INTEGER,
                 allowNull: false
             },
             start_date: {
@@ -87,7 +96,7 @@ module.exports = {
                 allowNull: true
             },
             winner_id: {
-                type: Sequelize.UUID,
+                type: Sequelize.INTEGER,
                 allowNull: true
             }
         });
@@ -95,8 +104,8 @@ module.exports = {
         await queryInterface.createTable('Moves', {
             player_id: {
                 type: Sequelize.INTEGER,
-                allowNull: false,
-                references: {
+                allowNull: true,
+                references:{
                     model: "Players",
                     key: 'player_id'
                 }
@@ -104,7 +113,7 @@ module.exports = {
             game_id: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
-                references: {
+                references:{
                     model: "Games",
                     key: 'game_id'
                 }
@@ -115,22 +124,36 @@ module.exports = {
             },
             from_position: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: true
             },
             to_position: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: true
             },
             configuration_after: {
-                type: Sequelize.JSON,
+                type: Sequelize.JSONB,
                 allowNull: false
+            },
+            piece: {
+                type: Sequelize.STRING,
+                allowNull: true
+            },
+            createdAt: {
+                allowNull: false,
+                type: Sequelize.DATE,
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+            },
+            updatedAt: {
+                allowNull: false,
+                type: Sequelize.DATE,
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             }
         });
     },
 
-    async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('Players', { force: true });
-        await queryInterface.dropTable('Games', { force: true });
-        await queryInterface.dropTable('Moves', { force: true });
+    async down(queryInterface) {
+        await queryInterface.dropTable('Players', {force: true});
+        await queryInterface.dropTable('Games', {force: true});
+        await queryInterface.dropTable('Moves', {force: true});
     }
 };

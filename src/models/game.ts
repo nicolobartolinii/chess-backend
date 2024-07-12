@@ -1,10 +1,48 @@
 import {SingletonDBConnection} from '../db/sequelizeConnection';
-import {Sequelize, Model, DataTypes, InferAttributes, InferCreationAttributes} from 'sequelize';
+import {Sequelize, Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional} from 'sequelize';
 import {Player} from './player';
-
+import {Statuses} from '../utils/statuses';
 const db_connection: Sequelize = SingletonDBConnection.getInstance();
 
-class Game extends Model<InferAttributes<Game>, InferCreationAttributes<Game>> {}
+/**
+ * Sequelize model representing a game.
+ *
+ * This model defines the schema for the 'Game' table in the database. It includes fields for
+ * game identification, game status, configuration details, number of moves, start and end dates,
+ * player identifiers, AI difficulty level, and winner identifier. The model does not include
+ * automatic timestamp fields (createdAt and updatedAt).
+ *
+ * Attributes:
+ *  - game_id: The primary key and auto-incrementing identifier for each game.
+ *  - game_status: Enumerated string representing the game's status (e.g., active, completed).
+ *  - game_configuration: JSONB field storing configuration settings for the game.
+ *  - number_of_moves: Integer count of the moves made in the game.
+ *  - start_date: The start date and time of the game.
+ *  - end_date: Optional end date and time of the game, null if not finished.
+ *  - player_1_id: Foreign key linking to the Player model for player one.
+ *  - player_2_id: Optional foreign key for player two, null if a single-player game.
+ *  - AI_difficulty: Optional string indicating the AI's difficulty level, null if no AI.
+ *  - winner_id: Optional identifier for the winner, null if the game has not concluded.
+ *
+ * The model uses a singleton pattern for its database connection to ensure only one instance
+ * of the connection is used.
+ *
+ * @param {Model} - Extends Sequelize Model to type and instance methods.
+ *
+ * @exports Game - A Sequelize model for games.
+ */
+class Game extends Model<InferAttributes<Game>, InferCreationAttributes<Game>> {
+    declare game_id: CreationOptional<number>;
+    declare game_status: Statuses;
+    declare game_configuration: any;
+    declare number_of_moves: number;
+    declare start_date: Date;
+    declare end_date: CreationOptional<Date | null>;
+    declare player_1_id: number;
+    declare player_2_id: CreationOptional<number | null>;
+    declare AI_difficulty: CreationOptional<string | null>;
+    declare winner_id: CreationOptional<number | null>;
+}
 
 Game.init({
     game_id: {
@@ -17,7 +55,11 @@ Game.init({
         allowNull: false
     },
     game_configuration: {
-        type: DataTypes.JSON,
+        type: DataTypes.JSONB,
+        allowNull: false
+    },
+    number_of_moves: {
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     start_date: {
@@ -49,7 +91,7 @@ Game.init({
         allowNull: true
     },
     winner_id: {
-        type: DataTypes.UUID,
+        type: DataTypes.INTEGER,
         allowNull: true
     }
 }, {

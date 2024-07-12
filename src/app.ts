@@ -1,17 +1,20 @@
-import express, { Request, Response } from 'express';
+import express, { Application } from 'express';
+import bodyParser from 'body-parser';
+import playerRoutes from "./routes/playerRoutes";
+import authRoutes from "./routes/authRoutes";
+import adminRoutes from "./routes/adminRoutes";
+import { errorHandler } from "./middlewares/errorMiddleware";
+import gameRoutes from "./routes/gameRoutes";
 
-const jsChessEngine = require('js-chess-engine');
-const app = express();
+const app: Application = express();
 
-app.use(express.json());
+app.use(bodyParser.json());
 
-app.get('/', (req: Request, res: Response) => {
-    res.send('Hello World with Express and TypeScript!');
-});
+app.use('', authRoutes);
+app.use('/players', playerRoutes);
+app.use('/admin', adminRoutes);
+app.use('/games', gameRoutes);
 
-app.get('/prova', (req: Request, res: Response) => {
-    const game = new jsChessEngine.Game();
-    res.send(game.exportJson());
-});
+app.use(errorHandler);
 
 export default app;
