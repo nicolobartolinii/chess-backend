@@ -1,6 +1,6 @@
 import {SingletonDBConnection} from '../db/sequelizeConnection';
 import {DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize} from 'sequelize';
-import {Role} from '../utils/roles';
+import {Roles} from '../utils/roles';
 
 const useBcrypt = require('sequelize-bcrypt');
 
@@ -35,7 +35,7 @@ class Player extends Model<InferAttributes<Player>, InferCreationAttributes<Play
     declare username: string;
     declare email: string;
     declare password: string;
-    declare role: Role;
+    declare role: Roles;
     declare points: number;
     declare tokens: number;
     declare authenticate: (password: string) => Promise<boolean>;

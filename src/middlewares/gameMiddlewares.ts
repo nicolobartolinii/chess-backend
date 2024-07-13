@@ -96,7 +96,7 @@ export const moveValidationMiddleware = (req: Request, res: Response, next: Next
  * @returns {void} - Calls the next middleware or error handler
  */
 export const exportFormatValidationMiddleware = (req: Request, res: Response, next: NextFunction): void => {
-    const format = req.params.format;
+    const format = req.query.format;
 
     if (format !== 'pdf' && format !== 'json') {
         return next(ErrorFactory.badRequest('Invalid format'));

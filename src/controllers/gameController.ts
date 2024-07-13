@@ -195,7 +195,7 @@ export const getGameHistory = async (req: Request, res: Response, next: NextFunc
     try {
         const gameId = req.params.gameId;
         const playerId = req.player!.id;
-        const format = req.params.format;
+        const format = req.query.format;
 
         const moves = await getGameMoves(playerId, parseInt(gameId)); // Get the moves of the game
         let exportStrategy: IExportStrategy;

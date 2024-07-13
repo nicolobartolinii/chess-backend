@@ -2,6 +2,7 @@ import {NextFunction, Request, Response} from 'express';
 import {verifyToken} from '../services/authService';
 import {JwtPayload} from "../utils/jwt";
 import {ErrorFactory} from "../factories/errorFactory";
+import {Roles} from "../utils/roles";
 
 declare global {
     namespace Express {
@@ -54,7 +55,7 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
 export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
     const role = req.player?.role;
 
-    if (typeof role === 'number' && role === 0) {
+    if (typeof role === 'number' && role === Roles.ADMIN) {
         next();
     } else {
         return next(ErrorFactory.forbidden('This route is only accessible to administrators'));

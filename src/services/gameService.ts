@@ -112,7 +112,7 @@ export async function getGamesHistory(player_id: number, startDate: Date, order:
         number_of_moves: game.number_of_moves,
         start_date: game.start_date,
         winner_id: game.winner_id,
-        result: game.winner_id === player_id ? 'You are the winner' : ' you are the loser'
+        result: game.winner_id === player_id ? 'You are the winner.' : 'You are the loser.'
     }));
 }
 

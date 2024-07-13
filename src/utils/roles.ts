@@ -1,5 +1,5 @@
 /** Enum for user roles */
-export enum Role {
+export enum Roles {
     ADMIN,
     PLAYER
 }
