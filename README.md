@@ -10,7 +10,6 @@
 <img src="https://forthebadge.com/images/badges/built-with-love.svg">
 <img src="https://forthebadge.com/images/badges/made-with-typescript.svg">
 <img src="https://forthebadge.com/images/badges/cc-0.svg">
-<img src="https://forthebadge.com/images/badges/works-on-my-machine.svg">
 <br>
 <img src="https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB">
 <img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white">
@@ -18,8 +17,6 @@
 <img src="https://img.shields.io/badge/Sequelize-52B0E7?style=for-the-badge&logo=Sequelize&logoColor=white">
 <img src="https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white">
 <img src="https://img.shields.io/badge/webstorm-143?style=for-the-badge&logo=webstorm&logoColor=white&color=blue">
-<img src="https://img.shields.io/badge/mac%20os-000000?style=for-the-badge&logo=apple&logoColor=F0F0F0">
-<img src="https://img.shields.io/badge/Fedora-294172?style=for-the-badge&logo=fedora&logoColor=white">
 </p>
 
 # Use Case Diagram
@@ -488,6 +485,7 @@ sequenceDiagram
     participant App
     participant Middleware
     participant Controller
+    participant Strategy
     participant Service
     participant Repository
     participant DAO
@@ -522,8 +520,10 @@ sequenceDiagram
                 Repository ->>+ DAO : findOne(whereClause)
                 DAO -->>- Repository : Player
                 Repository -->>- Service: Player
-                Service -->>- Controller: Buffer
-                Controller ->>+ ResponseFactory: pdf/Json(buffer)
+                Service -->>- Controller: Moves info
+                Controller ->>+ Strategy: export(Moves info)
+                Strategy -->>- Controller: buffer
+                Controller ->>+ ResponseFactory: pdf/success(buffer)
                 ResponseFactory -->>- Controller: JSON Response
                 Controller -->>- App: HTTP Response
             else not valid export Format
@@ -536,6 +536,7 @@ sequenceDiagram
                 deactivate Middleware
                 Middleware -->>- App: HTTP Error Response
             end
+            App -->> Client: HTTP Response with buffer
         else not valid gameID
             activate Middleware
             Middleware ->>+ ErrorFactory: unauthorized()
@@ -556,7 +557,7 @@ sequenceDiagram
         ResponseFactory -->>- Middleware: JSON Error Response
         Middleware -->>- App: HTTP Error Response
         deactivate Middleware
-        App -->> Client: HTTP Error Response
+        App -->>- Client: HTTP Error Response
     end
 
 ```

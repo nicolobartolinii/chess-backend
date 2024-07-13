@@ -27,7 +27,7 @@ router.post('/:gameId/move', gameIdValidationMiddleware, moveValidationMiddlewar
 /** GET /chessboard/:gameId - Retrieves the chessboard for a game */
 router.get('/:gameId/chessboard', gameIdValidationMiddleware, gameController.getChessboard);
 /** GET /details/:gameId - Retrieves the game history in a specific format */
-router.get('/:gameId/details/:format?', gameIdValidationMiddleware, exportFormatValidationMiddleware, gameController.getGameHistory);
+router.get('/:gameId/details/:format?', gameIdValidationMiddleware, exportFormatValidationMiddleware, gameController.getGameDetails);
 /** POST /abandon/:gameId - Abandons a game */
 router.post('/:gameId/abandon', gameIdValidationMiddleware, gameController.abandonGame);
 

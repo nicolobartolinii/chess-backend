@@ -191,7 +191,7 @@ export const getChessboard = async (req: Request, res: Response, next: NextFunct
  *
  * @returns {Promise<void>} - A promise that resolves when the game history is retrieved. The response contains the game history.
  */
-export const getGameHistory = async (req: Request, res: Response, next: NextFunction) => {
+export const getGameDetails = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const gameId = req.params.gameId;
         const playerId = req.player!.id;
