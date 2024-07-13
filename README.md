@@ -526,6 +526,7 @@ sequenceDiagram
                 Controller ->>+ ResponseFactory: pdf/success(buffer)
                 ResponseFactory -->>- Controller: JSON Response
                 Controller -->>- App: HTTP Response
+                App -->> Client: HTTP Response with buffer
             else not valid export Format
                 activate Middleware
                 Middleware ->>+ ErrorFactory: badRequest()
@@ -535,8 +536,8 @@ sequenceDiagram
                 ResponseFactory -->>- Middleware: JSON Error Response
                 deactivate Middleware
                 Middleware -->>- App: HTTP Error Response
+                App -->> Client: HTTP Error Response
             end
-            App -->> Client: HTTP Response with buffer
         else not valid gameID
             activate Middleware
             Middleware ->>+ ErrorFactory: unauthorized()
