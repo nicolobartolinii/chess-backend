@@ -19,8 +19,29 @@
 <img src="https://img.shields.io/badge/webstorm-143?style=for-the-badge&logo=webstorm&logoColor=white&color=blue">
 </p>
 
-# Use Case Diagram
+# Prograamazione -Avanzata UNIVPM 2023/24
+####  The Advanced Programming project for the Computer and Automation Engineering course 2023/24 at the Polytechnic University of Marche
 
+## Table of Contents
+- [Project goals](#Projectgoals)
+- [Used tools](#usedTools)
+- [Pattern used](#pattern)
+  - [Singleton](#singleton)
+  - [Sequalize](#sequelize)
+    - [DAO](#dao)
+  - [Repository](#repository)
+  - [Strategy](#strategy)
+  - [Factory](#factory)
+  - [ModelViewController](#modelViewController)
+  - [Middleware](#middleweare)
+- [UML diagrams](#umldiagrams)
+  - [uses case](#usecase)
+  - [sequenzadiagrams](#sequenzadiagrams)
+- [Installation](#installation)
+- [Contributing](#contributing)
+- [License](#license)
+- 
+# Use Case Diagram
 <img src="./img/usecase.png">
 
 ## POST `/login`
