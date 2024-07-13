@@ -479,3 +479,84 @@ participant ResponseFactory
         App -->> Client: HTTP Error Response
     end
 ```
+
+## GET /games/details/:gameId/:format?
+
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant Repository
+    participant DAO
+    participant ErrorFactory
+    participant ResponseFactory
+
+    Client ->>+ App: GET /details/:gameId/:format?
+    App ->>+ Middleware: authenticateJWT()
+    alt valid JWT
+        Middleware -->>- App: next()
+        App ->>+ Middleware: gameIdValidationMiddleware()
+        alt valid gameID
+            Middleware -->>- App: next()
+            App ->>+ Middleware: exportFormatValidationMiddleware()
+            alt valid export Format
+                Middleware -->>- App: next()
+                App ->>+ Controller: getGameHistory(gameId,format)
+                Controller ->>+ Service: getGameMoves(playerId, gameId)
+                Service ->>+ Repository: findById(gameId)
+                Repository ->>+ DAO: findAll(whereClause)
+                DAO -->>- Repository: Game
+                Repository -->>- Service: Game
+                Service ->>+ Repository : findByGame(gameId)
+                Repository ->>+ DAO: findAll(whereClause)
+                DAO -->>- Repository : Move
+                Repository -->>- Service: Move
+                Service ->>+ Repository : findById(player_1_id)
+                Repository ->>+ DAO : findOne(whereClause)
+                DAO -->>- Repository : Player
+                Repository -->>- Service: Player
+                Service ->>+ Repository : findById(player_2_id)
+                Repository ->>+ DAO : findOne(whereClause)
+                DAO -->>- Repository : Player
+                Repository -->>- Service: Player
+                Service -->>- Controller: Buffer
+                Controller ->>+ ResponseFactory: pdf/Json(buffer)
+                ResponseFactory -->>- Controller: JSON Response
+                Controller -->>- App: HTTP Response
+            else not valid export Format
+                activate Middleware
+                Middleware ->>+ ErrorFactory: badRequest()
+                ErrorFactory -->>- Middleware: error
+                Middleware ->>+ Middleware: next(error)
+                Middleware ->>+ ResponseFactory: error(error)
+                ResponseFactory -->>- Middleware: JSON Error Response
+                deactivate Middleware
+                Middleware -->>- App: HTTP Error Response
+            end
+        else not valid gameID
+            activate Middleware
+            Middleware ->>+ ErrorFactory: unauthorized()
+            ErrorFactory -->>- Middleware: error
+            Middleware ->>+ Middleware: next(error)
+            Middleware ->>+ ResponseFactory: error(error)
+            ResponseFactory -->>- Middleware: JSON Error Response
+            Middleware -->>- App: HTTP Error Response
+            deactivate Middleware
+            App -->> Client: HTTP Error Response
+        end
+    else not valid JWT
+        activate Middleware
+        Middleware ->>+ ErrorFactory: unauthorized()
+        ErrorFactory -->>- Middleware: error
+        Middleware ->>+ Middleware: next(error)
+        Middleware ->>+ ResponseFactory: error(error)
+        ResponseFactory -->>- Middleware: JSON Error Response
+        Middleware -->>- App: HTTP Error Response
+        deactivate Middleware
+        App -->> Client: HTTP Error Response
+    end
+
+```
