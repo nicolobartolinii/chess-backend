@@ -112,6 +112,11 @@ module.exports = {
         });
 
         await queryInterface.createTable('Moves', {
+            move_id: {
+                type: Sequelize.INTEGER,
+                primaryKey: true,
+                autoIncrement: true
+            },
             player_id: {
                 type: Sequelize.INTEGER,
                 allowNull: true,

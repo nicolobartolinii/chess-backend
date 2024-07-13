@@ -14,6 +14,8 @@ const db_connection: Sequelize = SingletonDBConnection.getInstance();
  * that the player abandoned the match at this move.
  *
  * Fields:
+ *  - move_id: The primary key and auto-incrementing identifier for each move, unique to each move.
+ *  This field is not use in the application, but it is a good pratice for RESTful APIs.
  *  - player_id: Foreign key to the 'Player' model. Nullable if the move was automatically generated.
  *  - game_id: Foreign key to the 'Game' model, linking the move to a specific game.
  *  - move_number: The sequence number of the move within the game.
@@ -32,6 +34,7 @@ const db_connection: Sequelize = SingletonDBConnection.getInstance();
  * @exports Move - A Sequelize model for game moves.
  */
 class Move extends Model<InferAttributes<Move>, InferCreationAttributes<Move>> {
+    declare move_id: CreationOptional<number>;
     declare player_id: CreationOptional<number | null>;
     declare game_id: number; // foreign key
     declare move_number: number; // number of the move in the match
@@ -43,6 +46,11 @@ class Move extends Model<InferAttributes<Move>, InferCreationAttributes<Move>> {
 }
 
 Move.init({
+    move_id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
     player_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
@@ -94,6 +102,5 @@ Move.init({
     ]
 });
 
-Move.removeAttribute('id');
 
 export {Move};
