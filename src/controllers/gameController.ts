@@ -242,7 +242,7 @@ export const abandonGame = async (req: Request, res: Response, next: NextFunctio
 
         await abandon(playerId, parseInt(gameId));
 
-        res.status(StatusCodes.CREATED).json(ResponseFactory.successCreated('Game abandoned. You lost!'));
+        res.status(StatusCodes.CREATED).json(ResponseFactory.successCreated(`Game ${gameId} abandoned. You lost!`));
     } catch (err) {
         next(err);
     }

@@ -13,6 +13,7 @@ import {
 const router = express.Router();
 /** Authentication middleware. Checks for JWT in the request headers and verifies it */
 router.use(authenticateJWT);
+
 /** POST /create - Creates a new game */
 router.post('/create', gameValidationMiddleware, gameController.createGame);
 /** GET /history - Retrieves the game history */

@@ -115,7 +115,7 @@ async function executePlayerMove(chessGame: any, from: string, to: string, playe
 
     await playerService.decrementTokens(playerId, constants.GAME_MOVE_COST);
 
-    return { newConfiguration, pieceMoved };
+    return {newConfiguration, pieceMoved};
 }
 
 /**
@@ -162,7 +162,7 @@ async function executeAIMove(chessGame: any, gameId: number, aiLevel: AiLevel, u
 
     await playerService.decrementTokens(playerId, constants.GAME_MOVE_COST);
 
-    return { from, to, pieceMoved, newConfiguration };
+    return {from, to, pieceMoved, newConfiguration};
 }
 
 /**
@@ -216,7 +216,7 @@ export async function move(from: string, to: string, playerId: number, gameId: n
     }
 
     const chessGame = new jsChessEngine.Game(game.game_configuration);
-    const { newConfiguration, pieceMoved } = await executePlayerMove(chessGame, from, to, playerId, gameId, game);
+    const {newConfiguration, pieceMoved} = await executePlayerMove(chessGame, from, to, playerId, gameId, game);
 
     let returnString = `You moved a ${pieceMoved} from ${from} to ${to}.`;
 

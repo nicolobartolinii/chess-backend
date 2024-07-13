@@ -1,4 +1,4 @@
-import {Request, Response, NextFunction} from 'express';
+import {NextFunction, Request, Response} from 'express';
 import {ErrorFactory} from "../factories/errorFactory";
 import {AI_LEVELS} from "../utils/aiLevels";
 
@@ -67,7 +67,7 @@ export const gameIdValidationMiddleware = (req: Request, res: Response, next: Ne
  *
  * @returns {void} - Calls the next middleware or error handler
  */
- export const moveValidationMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+export const moveValidationMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     const from = req.body.from;
     const to = req.body.to;
 

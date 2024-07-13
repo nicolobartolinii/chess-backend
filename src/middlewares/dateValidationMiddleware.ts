@@ -1,4 +1,4 @@
-import {Request, Response, NextFunction} from 'express';
+import {NextFunction, Request, Response} from 'express';
 import {ErrorFactory} from '../factories/errorFactory';
 
 declare global {
@@ -55,16 +55,16 @@ export const dateValidationMiddleware = (req: Request, res: Response, next: Next
  * is either 'ASC' or 'DESC', case-insensitively. If the order parameter is missing, not a string,
  * or not one of the specified valid values, a bad request error is generated and the processing
  * is halted.If the order parameter passes all checks, processing moves to the next middleware.
-* @param {Request} req - The request object
-* @param {Response} res - The response object
-* @param {NextFunction} next - The next function
-*
-* @returns {void} - Calls the next middleware or error handler
-*/
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next function
+ *
+ * @returns {void} - Calls the next middleware or error handler
+ */
 export const orderValidationMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const order = req.query.order;
 
-    if (typeof order !== 'string' ) {
+    if (typeof order !== 'string') {
         return next(ErrorFactory.badRequest('Order must be strings'));
     }
     if (!['ASC', 'DESC'].includes(order.toUpperCase())) {

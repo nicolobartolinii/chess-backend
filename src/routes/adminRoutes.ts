@@ -1,6 +1,11 @@
 import express from 'express';
 import * as adminController from '../controllers/adminController';
-import {authenticateJWT, emailValidationMiddleware, isAdmin, adminTokensValidationMiddleware} from "../middlewares/authMiddlewares";
+import {
+    adminTokensValidationMiddleware,
+    authenticateJWT,
+    emailValidationMiddleware,
+    isAdmin
+} from "../middlewares/authMiddlewares";
 
 /** Express router to mount admin related functions on. */
 const router = express.Router();

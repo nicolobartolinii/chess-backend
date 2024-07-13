@@ -136,6 +136,7 @@ export async function getGameStatus(playerId: number, gameId: number) {
     }
 
     return {
+        game_id: game.game_id,
         status: game.game_status,
         current_configuration: game.game_configuration,
         opponent: game.player_2_id ? (game.player_1_id === playerId ? game.player_2_id : game.player_1_id) : `AI-${game.AI_difficulty}`,
@@ -231,9 +232,9 @@ export async function getWinCertificate(player_id: number, game_id: number): Pro
         .resize(750, 750, {
             kernel: sharp.kernel.lanczos3,
             fit: 'contain',
-            background: { r: 255, g: 255, b: 255, alpha: 0 }
+            background: {r: 255, g: 255, b: 255, alpha: 0}
         })
-        .png({ quality: 100 })
+        .png({quality: 100})
         .toBuffer();
 
     const x = (doc.page.width - 300) / 2;

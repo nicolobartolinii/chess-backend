@@ -12,7 +12,7 @@ import {NextFunction, Request, Response} from "express";
  * @param {Request} req - The request object
  * @param {Response} res - The response object
  * @param {NextFunction} next - The next function
- * 
+ *
  * @returns {void} - It does not return a value but calls the next function with the created error.
  */
 export const invalidRouteMiddleware = (req: Request, res: Response, next: NextFunction): void => {

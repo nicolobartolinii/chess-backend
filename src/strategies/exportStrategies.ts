@@ -61,12 +61,13 @@ class PdfExportStrategy implements IExportStrategy {
         const doc = new PDFDocument();
         const buffers: Buffer[] = [];
         doc.on('data', buffers.push.bind(buffers));
-        doc.on('end', () => {});
+        doc.on('end', () => {
+        });
 
         doc
             .font('Helvetica-Bold')
             .fontSize(14)
-            .text(`Game ${moves[0].game_id} moves`, { align: 'center' });
+            .text(`Game ${moves[0].game_id} moves`, {align: 'center'});
         doc.moveDown(2);
 
         for (const move of moves) {
@@ -102,8 +103,8 @@ class PdfExportStrategy implements IExportStrategy {
             }
             doc
                 .fontSize(12)
-                .text(`   Time elapsed: ${move.time_elapsed}`, { align: 'right' })
-                .text(`   Player ID: ${move.player_id || 'AI'}`, { align: 'right' })
+                .text(`   Time elapsed: ${move.time_elapsed}`, {align: 'right'})
+                .text(`   Player ID: ${move.player_id || 'AI'}`, {align: 'right'})
 
             const svgString = generateChessboardSVG(move.configuration_after);
 
@@ -113,9 +114,9 @@ class PdfExportStrategy implements IExportStrategy {
                 .resize(750, 750, {
                     kernel: sharp.kernel.lanczos3, // Increases image quality, I think
                     fit: 'contain',
-                    background: { r: 255, g: 255, b: 255, alpha: 0 }
+                    background: {r: 255, g: 255, b: 255, alpha: 0}
                 })
-                .png({ quality: 100 })
+                .png({quality: 100})
                 .toBuffer();
 
             doc.image(resizedPngBuffer, {

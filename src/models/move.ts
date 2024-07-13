@@ -1,7 +1,7 @@
-import { SingletonDBConnection } from '../db/sequelizeConnection';
-import { Sequelize, Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
-import { Player } from './player';
-import { Game } from './game';
+import {SingletonDBConnection} from '../db/sequelizeConnection';
+import {CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize} from 'sequelize';
+import {Player} from './player';
+import {Game} from './game';
 
 const db_connection: Sequelize = SingletonDBConnection.getInstance();
 
@@ -46,7 +46,7 @@ Move.init({
     player_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        references:{
+        references: {
             model: Player,
             key: 'player_id'
         }
@@ -54,7 +54,7 @@ Move.init({
     game_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references:{
+        references: {
             model: Game,
             key: 'game_id'
         }
@@ -96,4 +96,4 @@ Move.init({
 
 Move.removeAttribute('id');
 
-export { Move };
+export {Move};

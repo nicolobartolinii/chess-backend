@@ -1,4 +1,4 @@
-import { IBaseRepository } from './baseRepository';
+import {IBaseRepository} from './baseRepository';
 import {Player} from "../models/player";
 
 /**
@@ -14,8 +14,11 @@ import {Player} from "../models/player";
  */
 export interface IPlayerRepository extends IBaseRepository<Player> {
     findByEmail(email: string): Promise<Player | null>;
+
     findById(id: number): Promise<Player | null>;
+
     updatePlayerField(player_id: number, field: keyof Player, value: any): Promise<[number, Player[]]>;
+
     findAllOrdering(field: string, order: string): Promise<Player[]>;
 }
 
@@ -54,7 +57,7 @@ export class PlayerRepository implements IPlayerRepository {
      * @returns {Promise<Player | null>} - A promise that resolves with the player if found, otherwise null.
      */
     async findByEmail(email: string): Promise<Player | null> {
-        return Player.findOne({ where: { email } } as any);
+        return Player.findOne({where: {email}} as any);
     }
 
     /**
@@ -77,7 +80,7 @@ export class PlayerRepository implements IPlayerRepository {
      * @returns {Promise<[number, Player[]]>} - A promise that resolves with an array containing the number of updated rows and the updated player.
      */
     async update(player_id: number, item: Partial<Player>): Promise<[number, Player[]]> {
-        return Player.update(item, { where: { player_id }, returning: true } as any);
+        return Player.update(item, {where: {player_id}, returning: true} as any);
     }
 
     /**
@@ -90,7 +93,7 @@ export class PlayerRepository implements IPlayerRepository {
      * @returns {Promise<[number, Player[]]>} - A promise that resolves with an array containing the number of updated rows and the updated player.
      */
     async updatePlayerField(player_id: number, field: keyof Player, value: any): Promise<[number, Player[]]> {
-        return Player.update({ [field]: value }, { where: { player_id }, returning: true } as any);
+        return Player.update({[field]: value}, {where: {player_id}, returning: true} as any);
     }
 
     /**
@@ -101,7 +104,7 @@ export class PlayerRepository implements IPlayerRepository {
      * @returns {Promise<number>} - A promise that resolves with the number of deleted rows.
      */
     async delete(player_id: number): Promise<number> {
-        return Player.destroy({ where: { player_id } } as any);
+        return Player.destroy({where: {player_id}} as any);
     }
 
     /**

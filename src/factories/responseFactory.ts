@@ -1,4 +1,4 @@
-import {StatusCodes, ReasonPhrases} from 'http-status-codes';
+import {ReasonPhrases, StatusCodes} from 'http-status-codes';
 
 /**
  * Interface for the base response.

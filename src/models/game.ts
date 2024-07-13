@@ -1,7 +1,8 @@
 import {SingletonDBConnection} from '../db/sequelizeConnection';
-import {Sequelize, Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional} from 'sequelize';
+import {CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize} from 'sequelize';
 import {Player} from './player';
 import {Statuses} from '../utils/statuses';
+
 const db_connection: Sequelize = SingletonDBConnection.getInstance();
 
 /**

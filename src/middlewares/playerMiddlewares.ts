@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import { ErrorFactory } from "../factories/errorFactory";
+import {NextFunction, Request, Response} from 'express';
+import {ErrorFactory} from "../factories/errorFactory";
 
 /**
  * Middleware to validate query parameters used for sorting player rankings.

@@ -1,4 +1,4 @@
-import {Request, Response, NextFunction} from 'express';
+import {NextFunction, Request, Response} from 'express';
 import {StatusCodes} from 'http-status-codes';
 import ResponseFactory from "../factories/responseFactory";
 import {repositories} from "../repositories";
@@ -17,8 +17,8 @@ import {Player} from "../models/player";
  * The response contains the ranking of all players.
  */
 export const getPlayerRanking = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const field = req.query.field as string ;
-    const order = req.query.order as string ;
+    const field = req.query.field as string;
+    const order = req.query.order as string;
 
     try {
         const players = await repositories.player.findAllOrdering(field, order);

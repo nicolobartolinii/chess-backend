@@ -1,5 +1,5 @@
 import {SingletonDBConnection} from '../db/sequelizeConnection';
-import {Sequelize, Model, DataTypes, InferAttributes, InferCreationAttributes} from 'sequelize';
+import {DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize} from 'sequelize';
 import {Role} from '../utils/roles';
 
 const useBcrypt = require('sequelize-bcrypt');

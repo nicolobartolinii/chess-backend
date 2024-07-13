@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize';
+import {Sequelize} from 'sequelize';
 
 /**
  * Singleton class to manage the connection to the database using Sequelize.
