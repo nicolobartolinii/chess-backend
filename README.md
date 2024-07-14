@@ -120,6 +120,168 @@ The login route is used to authenticate a user. The user must provide an email a
 
 ```
 
+### Response example
+
+
+```json
+
+{
+
+  "
+
+    token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiZm9vIiwiaWF0IjoxNjI5MzUwNzQ4LCJleHAiOjE2MjkzNTA3NDh9.7"
+
+}
+
+```
+
+## GET `/players/ranking?field=points&order=ASC`
+
+This endpoint retrieves the rankings of all players, sorted according to a specified field and order. Clients must provide both the sorting field and the direction of the sort.
+### Query Parameters
+
+- **field**: The field by which the ranking is to be ordered. This must be specified by the client, and must be points.
+- **order**: The direction of the sort. This must be specified by the client, and must be either ASC or DESC.
+
+
+### Response example
+
+
+```json
+
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Players retrieved successfully",
+  "data": [
+    {
+      "player_id": 1,
+      "username": "prova",
+      "email": "prova@prova.it",
+      "points": "0.0000",
+      "tokens": "10.0000"
+    },
+    {
+      "player_id": 2,
+      "username": "franco",
+      "email": "franco@giovanni.it",
+      "points": "1.0000",
+      "tokens": "8.1000"
+    }
+  ]
+}
+
+
+```
+## POST `/login`
+
+The login route is used to authenticate a user. The user must provide an email and a password in the request body. The email is used to find the player in the database and the password is used to authenticate the player. If the player is successfully authenticated, a JWT token is generated and returned to the player.
+
+### Request body example
+
+
+```json
+
+{
+
+  "email": "email@example.com",
+
+  "password": "password"
+
+}
+
+```
+## POST `/login`
+
+The login route is used to authenticate a user. The user must provide an email and a password in the request body. The email is used to find the player in the database and the password is used to authenticate the player. If the player is successfully authenticated, a JWT token is generated and returned to the player.
+
+### Request body example
+
+
+```json
+
+{
+
+  "email": "email@example.com",
+
+  "password": "password"
+
+}
+
+```
+## POST `/login`
+
+The login route is used to authenticate a user. The user must provide an email and a password in the request body. The email is used to find the player in the database and the password is used to authenticate the player. If the player is successfully authenticated, a JWT token is generated and returned to the player.
+
+### Request body example
+
+
+```json
+
+{
+
+  "email": "email@example.com",
+
+  "password": "password"
+
+}
+
+```
+## POST `/login`
+
+The login route is used to authenticate a user. The user must provide an email and a password in the request body. The email is used to find the player in the database and the password is used to authenticate the player. If the player is successfully authenticated, a JWT token is generated and returned to the player.
+
+### Request body example
+
+
+```json
+
+{
+
+  "email": "email@example.com",
+
+  "password": "password"
+
+}
+
+```
+## POST `/login`
+
+The login route is used to authenticate a user. The user must provide an email and a password in the request body. The email is used to find the player in the database and the password is used to authenticate the player. If the player is successfully authenticated, a JWT token is generated and returned to the player.
+
+### Request body example
+
+
+```json
+
+{
+
+  "email": "email@example.com",
+
+  "password": "password"
+
+}
+
+```
+## POST `/login`
+
+The login route is used to authenticate a user. The user must provide an email and a password in the request body. The email is used to find the player in the database and the password is used to authenticate the player. If the player is successfully authenticated, a JWT token is generated and returned to the player.
+
+### Request body example
+
+
+```json
+
+{
+
+  "email": "email@example.com",
+
+  "password": "password"
+
+}
+
+```
+
 
 ### Response example
 
