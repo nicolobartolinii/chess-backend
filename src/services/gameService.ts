@@ -135,6 +135,16 @@ export async function getGameStatus(playerId: number, gameId: number) {
         throw ErrorFactory.forbidden('You are not part of the game');
     }
 
+    if (game.game_status === Statuses.FINISHED) {
+        return {
+            game_id: game.game_id,
+            status: game.game_status,
+            current_configuration: game.game_configuration,
+            opponent: game.player_2_id ? (game.player_1_id === playerId ? game.player_2_id : game.player_1_id) : `AI-${game.AI_difficulty}`,
+            winner_id: game.winner_id ? game.winner_id : `AI-${game.AI_difficulty}`,
+            result: game.winner_id === playerId ? 'You are the winner.' : 'You are the loser.'
+        };
+    }
     return {
         game_id: game.game_id,
         status: game.game_status,
