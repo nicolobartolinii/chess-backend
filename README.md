@@ -135,7 +135,7 @@ The login route is used to authenticate a user. The user must provide an email a
 
 ```
 
-## GET `/players/ranking?field=points&order=ASC`
+## GET `/players/ranking?field=points&order=desc/asc`
 
 This endpoint retrieves the rankings of all players, sorted according to a specified field and order. Clients must provide both the sorting field and the direction of the sort.
 ### Query Parameters
@@ -173,12 +173,10 @@ This endpoint retrieves the rankings of all players, sorted according to a speci
 
 
 ```
-## POST `/login`
+## POST `/games/create`
 
-The login route is used to authenticate a user. The user must provide an email and a password in the request body. The email is used to find the player in the database and the password is used to authenticate the player. If the player is successfully authenticated, a JWT token is generated and returned to the player.
-
-### Request body example
-
+This endpoint allows users to create a new chess game. The user must provide the email of the opponent or the difficulty level of the AI opponent in the request body. The user must also provide a JWT token in the Authorization header to authenticate the request.
+### Request body example(another player)
 
 ```json
 
@@ -186,65 +184,149 @@ The login route is used to authenticate a user. The user must provide an email a
 
   "email": "email@example.com",
 
-  "password": "password"
-
 }
 
 ```
-## POST `/login`
 
-The login route is used to authenticate a user. The user must provide an email and a password in the request body. The email is used to find the player in the database and the password is used to authenticate the player. If the player is successfully authenticated, a JWT token is generated and returned to the player.
-
-### Request body example
-
+### Request body example(Vs IA)
 
 ```json
 
 {
-
-  "email": "email@example.com",
-
-  "password": "password"
-
+  "AI_difficulty": "MONKEY"
 }
 
 ```
-## POST `/login`
+
+### Response example
+```json
+{
+  "success": true,
+  "statusCode": 201,
+  "message": "Game created successfully",
+  "data": {
+    "game_id": 3,
+    "player_1_id": 1,
+    "player_2_id": null,
+    "AI_difficulty": "MONKEY",
+    "game_status": "ACTIVE",
+    "start_date": "2024-07-15T07:55:51.091Z"
+  }
+}
+```
+
+
+## GET `/games/history?start_date=<AAAA-MM-DD>&order=desc/asc`
 
 The login route is used to authenticate a user. The user must provide an email and a password in the request body. The email is used to find the player in the database and the password is used to authenticate the player. If the player is successfully authenticated, a JWT token is generated and returned to the player.
 
-### Request body example
+### Query Parameters
+-**start_date**: The date from which to retrieve the game history. This must be specified by the client in the format YYYY-MM-DD.
+-**order**: The direction of the sort. This must be specified by the client, and must be either ASC or DESC.
 
+### Response example
 
 ```json
 
 {
-
-  "email": "email@example.com",
-
-  "password": "password"
-
+  "success": true,
+  "statusCode": 200,
+  "message": "Games history retrieved successfully",
+  "data": [
+    {
+      "game_id": 2,
+      "game_status": "FINISHED",
+      "number_of_moves": 11,
+      "start_date": "2024-07-10T08:26:51.998Z",
+      "winner_id": 2,
+      "result": "You are the winner."
+    }
+  ]
 }
 
 ```
-## POST `/login`
+## GET `/games/:gameId/status`
 
-The login route is used to authenticate a user. The user must provide an email and a password in the request body. The email is used to find the player in the database and the password is used to authenticate the player. If the player is successfully authenticated, a JWT token is generated and returned to the player.
+This endpoint retrieves the current status of a specific chess game. The client must provide the game ID in the URL to identify the game, the player musto to be authenticated with a JWT token.
+### Query Parameters
+-**gameId**: The ID of the game for which to retrieve the status. This must be specified by the client in the URL.
 
-### Request body example
-
+### Response example
 
 ```json
 
 {
-
-  "email": "email@example.com",
-
-  "password": "password"
-
+  "success": true,
+  "statusCode": 200,
+  "message": "Game status retrieved successfully",
+  "data": {
+    "game_id": 2,
+    "status": "FINISHED",
+    "current_configuration": {
+      "moves": {},
+      "pieces": {
+        "E1": "K",
+        "A1": "R",
+        "H1": "R",
+        "C1": "B",
+        "B1": "N",
+        "A2": "P",
+        "B2": "P",
+        "C2": "P",
+        "D2": "P",
+        "F2": "P",
+        "G2": "P",
+        "H2": "P",
+        "A8": "r",
+        "H8": "r",
+        "C8": "b",
+        "B8": "n",
+        "G8": "n",
+        "A7": "p",
+        "B7": "p",
+        "C7": "p",
+        "D7": "p",
+        "G7": "p",
+        "H7": "p",
+        "E4": "P",
+        "E5": "p",
+        "C4": "B",
+        "H4": "q",
+        "D8": "k",
+        "F3": "N",
+        "B6": "b",
+        "F8": "Q"
+      },
+      "turn": "black",
+      "isFinished": true,
+      "check": true,
+      "checkMate": true,
+      "castling": {
+        "whiteShort": true,
+        "blackShort": false,
+        "whiteLong": true,
+        "blackLong": false
+      },
+      "enPassant": null,
+      "halfMove": 4,
+      "fullMove": 6
+    },
+    "opponent": 1,
+    "winner_id": 2,
+    "result": "You are the winner."
+  }
 }
 
 ```
+## GET `/games/:gameId/win-certificate`
+
+This endpoint retrieves a certificate in the pdf format of victory for a specific chess game. The client must provide the game ID in the URL to identify the game, the player must be the winner of the game, and must be authenticated with a JWT token.
+### ### Query Parameters
+-**gameId**: The ID of the game for which to retrieve the pdf certificate. This must be specified by the client in the URL.
+
+### Response example
+
+![img.png](img/win_certificate.png)
 ## POST `/login`
 
 The login route is used to authenticate a user. The user must provide an email and a password in the request body. The email is used to find the player in the database and the password is used to authenticate the player. If the player is successfully authenticated, a JWT token is generated and returned to the player.
