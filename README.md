@@ -51,11 +51,11 @@ Detailed project objectives, unique features, and in-depth technical aspects are
   - [GET `/games/:gameId/board`](#get-gamesgameidboard)
   - [GET `/games/:gameId/details`](#get-gamesgameiddetails)
   - [POST `/games/:gameId/abandon`](#post-gamesgameidabandon)
-  
 - [UML diagrams](#umldiagrams)
   - [uses case](#usecase)
   - [sequenzadiagrams](#sequenzadiagrams)
 - [Installation](#installation)
+- [Additional features](#additional-features)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -2210,5 +2210,73 @@ sequenceDiagram
     end
 
 ```
+## Installation Guide
+This section provides a step-by-step guide to setting up the project using Docker.
+Follow these instructions to get the project up and running on your machine.
 
+### Prerequisities
+Before you begin, ensure you have the following installed:
+- [Git](https://git-scm.com/downloads) - for cloning the repository.
+- [Docker](https://www.docker.com/get-started) - for building and running the containers.
+- [Docker Compose](https://docs.docker.com/compose/install/) - for orchestrating multi-container applications.
 
+### Step 1: Clone the Repository
+First, clone the project repository from GitHub to your local machine using the following command:
+```bash
+https://github.com/nicolobartolinii/chess-backend.git
+cd chess-backend
+```
+
+### Step 2: Configure the Environment
+Create a .env file in the root directory of the project.
+You can copy the sample from the provided .env.example file
+and adjust the variables according to your environment needs:
+
+```bash
+cp .env.example .env
+```
+
+### Step 3: Creare a jwt.key file
+Create a jwt.key file in the root directory of the project. You can do it with the following command:
+
+#### For the PrivateKey
+
+```bash
+ssh-keygen -t rsa -b 4096 -m PEM -f jwtRS256.key
+```
+#### For the PublicKey
+
+```bash
+openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
+```
+### Step 4: Build the Docker Images
+With Docker and Docker Compose installed, build the Docker images for the project.
+This step compiles the code, installs dependencies, and prepares everything needed to run the application.
+Run the following command in the project's root directory:
+
+```bash
+docker-compose build
+```
+
+### Step 5: Run the Containers
+```bash
+docker-compose up -d 
+```
+The -d flag runs the containers in the background, so you can continue using your terminal.
+
+### Step 6: Verify the Installation
+To ensure everything is set up correctly, you can check the status of the containers:
+    
+```bash
+    docker-compose ps
+```
+
+### Step 7: Access the Application
+Finally, access the application via your web browser. The application should be available at:
+```bash
+http://localhost:PORT/
+```
+
+## Additional features
+
+## Contributors
