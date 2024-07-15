@@ -200,7 +200,7 @@ This pattern allows for easy extension to support additional export formats in t
 | GET       | `/games/{gameId}/status`          | Retrieve current status of a specific chess game |         ✅          |
 | GET       | `/games/{gameId}/win-certificate` | Generate victory certificate for a match         |         ✅          |
 | POST      | `/games/{gameId}/moves`           | Make a move in the game                          |         ✅          |
-| GET       | `/games/{gameId}/board`           | Retrieve the latest game board configuration     |         ✅          |
+| GET       | `/games/{gameId}/chessboard`      | Retrieve the latest game board configuration     |         ✅          |
 | GET       | `/games/{gameId}/details`         | Retrieve game details (PDF or JSON format)       |         ✅          |
 | POST      | `/games/{gameId}/abandon`         | Forfeit a match                                  |         ✅          |
 
@@ -474,7 +474,7 @@ This endpoint allows users to make a move in a chess game. The user must provide
 }
 
 ```
-## GET `/games/{gameId}/board`
+## GET `/games/{gameId}/chessboard`
 This endpoint retrieves the latest board configuration of a specific chess game. The client must provide the game ID in the URL to identify the game, the player must be authenticated with a JWT token.
 ### Query Parameters
 -**gameId**: The ID of the game for which to retrieve the board configuration. This must be specified by the client in the URL.
@@ -1898,7 +1898,7 @@ sequenceDiagram
         App -->>- Client: HTTP Error Response
     end
 ```
-## GET `/games/history`
+## GET `/games`
 ```mermaid
 sequenceDiagram
     actor Client
@@ -1969,7 +1969,7 @@ sequenceDiagram
         App-->>-Client: HTTP Error Response
     end
 ```
-## POST `/games/create`
+## POST `/games`
 ```mermaid
 sequenceDiagram
     actor Client
@@ -2278,5 +2278,23 @@ http://localhost:PORT/
 ```
 
 ## Additional features
+In the project, additional features have been implemented to enhance user experience and functionality.
+One such feature is the [/games/{gameId}/chessboard](#get-gamesgameidchessboard) route,
+which returns a PNG image of the latest state of the chessboard for a specific game.
+This visualization feature has been integrated into other routes as well.
+
+For instance, the PNG chessboard image is utilized in the route that generates a victory certificate.
+This allows the certificate to visually display the final position of the game pieces,
+adding a graphical element that enriches the presentation of the game's outcome.
+
+Additionally, the chessboard image is also included in the PDF export of the game's move history.
+This integration provides a comprehensive and visually appealing overview of the game,
+helping users to better understand the progression of moves and strategies employed throughout the game.
+
+These enhancements not only improve the interactivity of the application but also make the data more accessible and engaging for the users.
+
 
 ## Contributors
+The contributors to this project are:
+- [Nicolò Bartolini](https://github.com/nicolobartolinii)
+- [Nicola Picciafuoco](https://github.com/NicolaPicciafuoco)
