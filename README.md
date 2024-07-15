@@ -20,8 +20,8 @@
 </p>
 
 <div align="center">
-<h1>Backend System for Chess Game</h1>
-This project implements a robust backend system for chess in <b>TypeScript</b> using <b>Node.js</b>, <b>Express.js</b>, <b>Sequelize</b>, and a chosen RDBMS. Developed as part of the Master's Degree in Computer Engineering and Automation (<b>LM-32</b>) at <b>UNIVPM</b> for the 2023-2024 academic year, it showcases the application of professional backend development practices and design patterns.<br>
+<h1>Backend system for chess game</h1>
+This project implements a robust backend system for chess in <b>TypeScript</b> using <b>Node.js</b>, <b>Express.js</b>, <b>Sequelize</b>, and other modern tools. Developed as part of the Master's Degree in Computer Engineering and Automation (<b>LM-32</b>) at <b>UNIVPM</b> for the 2023-2024 academic year, it showcases the application of professional backend development practices and design patterns.<br>
 The system was developed by students <a href="https://github.com/nicolobartolinii">Nicolò Bartolini</a> and <a href="https://github.com/NicolaPicciafuoco">Nicola Picciafuoco</a> for the <b>Advanced Programming</b> course led by Prof. Adriano Mancini.<br>
 Detailed project objectives, unique features, and in-depth technical aspects are discussed in the following sections of this README.
 </div>
@@ -40,8 +40,8 @@ Detailed project objectives, unique features, and in-depth technical aspects are
   - [Chain of Responsibility](#chain-of-responsibility)
   - [Factory Method](#factory-method)
   - [Strategy](#strategy)
-- [Routes](#Routes)
-  - [POST `/login`](#login)
+- [Endpoints](#endpoints)
+  - [POST `/login`](#post-login)
 - [UML diagrams](#umldiagrams)
   - [uses case](#usecase)
   - [sequenzadiagrams](#sequenzadiagrams)
