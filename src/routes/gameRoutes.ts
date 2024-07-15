@@ -15,9 +15,9 @@ const router = express.Router();
 router.use(authenticateJWT);
 
 /** POST /create - Creates a new game */
-router.post('/create', gameValidationMiddleware, gameController.createGame);
+router.post('/', gameValidationMiddleware, gameController.createGame);
 /** GET /history - Retrieves the game history */
-router.get('/history', dateValidationMiddleware, orderValidationMiddleware, gameController.gamesHistory);
+router.get('/', dateValidationMiddleware, orderValidationMiddleware, gameController.gamesHistory);
 /** GET /status/:gameId - Retrieves the status of a game */
 router.get('/:gameId/status', gameIdValidationMiddleware, gameController.gameStatus);
 /** GET /win-certificate/:gameId - Retrieves a win certificate for a game */

@@ -9,7 +9,7 @@
 <p align="center">
 <img src="https://forthebadge.com/images/badges/built-with-love.svg">
 <img src="https://forthebadge.com/images/badges/made-with-typescript.svg">
-<img src="https://forthebadge.com/images/badges/cc-0.svg">
+<img src="https://forthebadge.com/images/badges/works-on-my-machine.svg">
 <br>
 <img src="https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB">
 <img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white">
@@ -19,22 +19,28 @@
 <img src="https://img.shields.io/badge/webstorm-143?style=for-the-badge&logo=webstorm&logoColor=white&color=blue">
 </p>
 
-# Prograamazione -Avanzata UNIVPM 2023/24
-####  The Advanced Programming project for the Computer and Automation Engineering course 2023/24 at the Polytechnic University of Marche
+<div align="center">
+<h1>Backend System for Chess Game</h1>
+This project implements a robust backend system for chess in <b>TypeScript</b> using <b>Node.js</b>, <b>Express.js</b>, <b>Sequelize</b>, and a chosen RDBMS. Developed as part of the Master's Degree in Computer Engineering and Automation (<b>LM-32</b>) at <b>UNIVPM</b> for the 2023-2024 academic year, it showcases the application of professional backend development practices and design patterns.<br>
+The system was developed by students <a href="https://github.com/nicolobartolinii">Nicolò Bartolini</a> and <a href="https://github.com/NicolaPicciafuoco">Nicola Picciafuoco</a> for the <b>Advanced Programming</b> course led by Prof. Adriano Mancini.<br>
+Detailed project objectives, unique features, and in-depth technical aspects are discussed in the following sections of this README.
+</div>
 
-## Table of Contents
-- [Project goals](#Project-goals)
-- [Used tools](#usedTools)
-- [Pattern used](#pattern)
-  - [Singleton](#singleton)
-  - [Sequalize](#sequelize)
-    - [DAO](#dao)
+---
+
+# Table of contents
+
+- [Project goals](#project-goals)
+- [Tools used](#tools-used)
+- [Patterns used](#patterns-used)
+  - [Model-Controller (MVC)](#mvc-model-controller)
+  - [Data Access Object (DAO)](#data-access-object-dao)
   - [Repository](#repository)
+  - [Singleton](#singleton)
+  - [Chain of Responsibility](#chain-of-responsibility)
+  - [Factory Method](#factory-method)
   - [Strategy](#strategy)
-  - [Factory](#factory)
-  - [ModelViewController](#modelViewController)
-  - [Middleware](#middleweare)
-- [Routes](#Routes) 
+- [Routes](#Routes)
   - [POST `/login`](#login)
 - [UML diagrams](#umldiagrams)
   - [uses case](#usecase)
@@ -43,63 +49,150 @@
 - [Contributing](#contributing)
 - [License](#license)
 
+# Project goals
 
-# Use Case Diagram
-<img src="./img/usecase.png">
+This project aims to develop a robust and secure backend system for a chess game application, demonstrating advanced programming concepts and best practices in backend development. The primary objectives are:
+
+1. Implement a **chess game backend system** allowing users to play against AI or other players, integrating the [`js-chess-engine`](https://npmjs.com/package/js-chess-engine) library for game logic.
+2. Develop a secure **JWT-based asymmetric authentication** system with role-based access control, including admin functionality.
+3. Create a **token-based economy** for game participation, with specific costs for game creation and moves.
+4. Design and implement **RESTful API endpoints** for game management, move making, game state tracking, and other functionalities.
+5. Implement **data export functionality** in JSON and PDF formats, including victory certificates.
+6. Create an unauthenticated **public leaderboard system** with customizable sorting options.
+7. Integrate a database using [**Sequelize ORM**](https://sequelize.org/) to store game and user data efficiently.
+8. Implement **middleware** for request _validation_, _error handling_, and other cross-cutting concerns.
+9. Ensure code quality through **TypeScript** usage, comprehensive _commenting_, and application of various _design patterns_.
+10. Configure the project for **easy deployment** using [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/).
+11. Develop a comprehensive **test suite** using [Postman](https://www.postman.com/) and [Newman](https://learning.postman.com/docs/collections/using-newman-cli/command-line-integration-with-newman/) to ensure API reliability.
+12. Adhere to RESTful API design principles and backend development best practices throughout the project.
+
+This chess game backend system serves as a practical application of advanced programming techniques, showcasing the ability to create a scalable, maintainable, and feature-rich application in a real-world context.
+
+# Tools used
+
+This project leverages a variety of modern tools and technologies for backend development:
+
+- [Node.js](https://nodejs.org/)
+- [Express.js](https://expressjs.com/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Sequelize](https://sequelize.org/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
+- [js-chess-engine](https://www.npmjs.com/package/js-chess-engine) - JavaScript chess engine for game logic
+- [JWT (JSON Web Tokens)](https://jwt.io/)
+- [Postman](https://www.postman.com/) and [Newman](https://learning.postman.com/docs/collections/using-newman-cli/command-line-integration-with-newman/)
+- [PDFKit](https://pdfkit.org/) - PDF generation library for Node.js
+- [Mermaid](https://mermaid-js.github.io/mermaid/#/) - Diagramming and charting tool
+- [bcryptjs](https://www.npmjs.com/package/bcryptjs) and [sequelize-bcrypt](https://www.npmjs.com/package/sequelize-bcrypt) - Password hashing libraries
+- [Sharp](https://sharp.pixelplumbing.com/) - High performance Node.js image processing
+
+Certamente, ecco una versione leggermente più dettagliata della sezione "Patterns Used":
 
 
-# Project-goals
+# Patterns used
 
-Here is a professional, cohesive translation of the project objectives for your advanced programming course into English:
+This project implements several design patterns and two architectural patterns to ensure a robust, maintainable, and scalable codebase. Each pattern addresses specific challenges in software design and contributes to the overall quality of the application.
 
-The  goal of this project is to implement a robust backend system that enables authenticated users to create and play chess games, both against artificial intelligence and other users. The system incorporates several key features designed to enhance user experience and functionality:
+## MVC (Model-Controller)
 
-## Key Features
+The **Model-Controller** (**MC**) architectural pattern is used to separate concerns in the application:
 
-- **Game Creation**: Users can start new chess matches utilizing the js-chess-engine, choosing either to face AI at varying levels of difficulty or to challenge other authenticated users. This flexibility supports a wide range of player skills and preferences.
+- **Models**: represent the data structures and database schema, encapsulating the business logic and data manipulation.
+- **Controllers**: handle incoming HTTP requests, process data using the models, and return appropriate responses.
 
-- **Game Management**: The system adeptly handles multiple active games simultaneously. It ensures that a user participates in only one game at a time. Each activity within the platform, from creating games to making moves, incurs a deduction of tokens from the user's account based on a pre-defined tariff.
+As this is a backend-only project, the traditional **View** layer is omitted, resulting in an MC rather than MVC structure.
 
-- **Game History**: Participants can access and review their completed games' history, which includes an comprehensive game details in PDF or Json format.
+## Data Access Object (DAO)
 
-- **Player Ranking**: The system provides a feature to view the ranking by score of all players.
+The **DAO** pattern provides an abstract interface to a database, encapsulating all access logic and exposing methods for database operations.
 
-- **Admin Token Recharge**: Administrators have the ability to recharge tokens for other users.
-
-- **Victory Certification**: Players can view a certificate of victory for each game won.
-
-- **Additional Features**: Detailed analysis of further functionalities will be discussed in the "Routes" chapter, which includes the technical specifics and implementation details of each feature.
+#### Implementation
+Leveraged through Sequelize ORM to [define database models](https://github.com/nicolobartolinii/chess-backend/blob/main/src/models) and interact with the database. This abstraction simplifies database integration and allows for easier switching between different database systems if needed.
 
 
-[//]: # (L'obiettivo principale di questo progetto è quello di implementare un sistema di backend robusto che permetta agli utenti autenticati di creare e giocare partite di scacchi, sia contro l'intelligenza artificaile sia contro altri utenti.)
+## Repository
 
-[//]: # (In particolare le caratteristiche che ha sono:)
+The **Repository** pattern mediates between the domain and data mapping layers, acting like an in-memory collection of domain objects. This pattern centralizes data access logic, improving maintainability and allowing for easier implementation of caching or data retrieval strategies.
 
-[//]: # (Creazione delle Partite: Gli utenti possono iniziare nuove partite di scacchi utilizzando il js-chess-engine, scegliendo tra giocare contro l'IA a vari livelli di difficoltà o contro altri utenti autenticati.)
+#### Implementation
+Defines [methods for database queries and interactions](https://github.com/nicolobartolinii/chess-backend/blob/main/src/repositories), working with Sequelize models (DAO) to provide a clean functionality for data access.
 
-[//]: # (Gestione delle Partite: Il sistema gestirà simultaneamente più partite attive, assicurando che gli utenti possano partecipare a una sola partita alla volta. Ogni azione, come la creazione di partite e l'esecuzione di mosse, dedurrà token dal conto dell'utente secondo un tasso predefinito.)
+## Singleton
 
-[//]: # (Storico delle Partite: Gli utenti possono visualizzare lo storico delle partite completate, con la possibilità di scaricare i dettagli delle partite in formato PDF.)
+The [Singleton](https://refactoring.guru/design-patterns/singleton) creational pattern ensures a class has only one instance and provides a global point of access to it. 
 
+<p align="center">
+    <img src="https://refactoring.guru/images/patterns/diagrams/singleton/structure-en.png" width="50%">
+</p>
 
+*Image source: [Refactoring Guru](https://refactoring.guru/design-patterns/singleton), with [permission](https://refactoring.guru/content-usage-policy)
 
+#### Implementation
+Used for managing [database connections](https://github.com/nicolobartolinii/chess-backend/blob/main/src/db/sequelizeConnection.ts), ensuring that only one connection pool is maintained throughout the application lifecycle. This optimizes resource usage and provides a consistent interface for database operations.
 
-# Routes
+## Chain of Responsibility
 
-| Route                                    | Method | Description                                          | JWT Authentication |
-|------------------------------------------|--------|------------------------------------------------------|--------------------|
-| /login                                   | POST   | Do a login                                           | Yes                |
-| /admin/update-tokens                     | POST   | Admin can Recharge a user's credits                  | Yes                |
-| /players/ranking                         | GET    | An User can view the ranking by score of all players | No                 |
-| /games/create                            | POST   | Users can start new chess matches                    | Yes                |
-| /games/history                           | GET    | Get all finish match from current player             | Yes                |
-| /games/:gameId/status                    | GET    | Get current status of a specific chess game          | Yes                |
-| /games/:gameId/win-certificate           | GET    | Get certificate from victory a match                 | Yes                | 
-| /games/:gameId/move                      | POST   | Make a move in the game                              | Yes                | 
-| /games/:gameId/chessboard                | GET    | Get the last game configuration of the match         | Yes                |
-| /games/:gameId/details?format=<pdf/json> | GET    | Get the game details                                 | Yes                |
-| /games/:gameId/abandon                   | POST   | Quit a match                                         | Yes                |
+The [Chain of Responsibility](https://refactoring.guru/design-patterns/chain-of-responsibility) behavioral pattern passes requests along a chain of handlers, allowing multiple objects to handle the request without coupling sender to receiver.
 
+<p align="center">
+    <img src="https://refactoring.guru/images/patterns/diagrams/chain-of-responsibility/solution1-en.png" width="75%">
+</p>
+
+*Image source: [Refactoring Guru](https://refactoring.guru/design-patterns/chain-of-responsibility), with [permission](https://refactoring.guru/content-usage-policy)
+
+#### Implementation
+Utilized through [Express.js middleware system](https://expressjs.com/en/guide/using-middleware.html), where each middleware function can process the request, perform specific tasks (e.g., authentication, logging, error handling), and decide whether to pass it to the next handler in the chain. This creates a flexible and extensible request processing pipeline.
+
+In our project, the Chain of Responsibility pattern is applied to handle [request validation, authentication, and error handling](https://github.com/nicolobartolinii/chess-backend/blob/main/src/middlewares) in a modular and composable manner.
+
+## Factory Method
+
+The [Factory Method](https://refactoring.guru/design-patterns/factory-method) creational pattern provides an interface for creating objects in a superclass, allowing subclasses to alter the type of objects created.
+
+<p align="center">
+    <img src="https://refactoring.guru/images/patterns/diagrams/factory-method/structure.png" width="60%">
+</p>
+
+*Image source: [Refactoring Guru](https://refactoring.guru/design-patterns/factory-method), with [permission](https://refactoring.guru/content-usage-policy)
+
+#### Implementation
+- [`ResponseFactory`](https://github.com/nicolobartolinii/chess-backend/blob/main/src/factories/responseFactory.ts): creates standardized JSON responses, ensuring consistency across the API.
+- [`ErrorFactory`](https://github.com/nicolobartolinii/chess-backend/blob/main/src/factories/errorFactory.ts): generates consistent error structures, facilitating uniform error handling and reporting.
+
+This approach centralizes object creation logic and makes it easier to modify or extend response and error handling in the future.
+
+## Strategy
+
+The [Strategy](https://refactoring.guru/design-patterns/strategy) behavioral pattern defines a family of algorithms, encapsulates each one, and makes them interchangeable.
+
+<p align="center">
+    <img src="https://refactoring.guru/images/patterns/diagrams/strategy/structure.png" width="50%">
+</p>
+
+*Image source: [Refactoring Guru](https://refactoring.guru/design-patterns/strategy), with [permission](https://refactoring.guru/content-usage-policy)
+
+#### Implementation
+Used for [exporting game move history in different formats](https://github.com/nicolobartolinii/chess-backend/blob/main/src/strategies):
+- `JSONExportStrategy`: Handles exporting in JSON format.
+- `PDFExportStrategy`: Manages exporting in PDF format.
+
+This pattern allows for easy extension to support additional export formats in the future without modifying existing code, adhering to the Open/Closed principle.
+
+# Endpoints
+
+| HTTP Verb | Endpoint                        | Description                                      | JWT Authentication |
+|-----------|---------------------------------|--------------------------------------------------|:------------------:|
+| POST      | /login                          | Authenticate user                                |         ❌          |
+| POST      | /admin/update-tokens            | Recharge user's credits (admin only)             |         ✅          |
+| GET       | /players/ranking                | Retrieve player rankings by score                |         ❌          |
+| POST      | /games                          | Create a new chess match                         |         ✅          |
+| GET       | /games                          | Retrieve user's completed match history          |         ✅          |
+| GET       | /games/{gameId}/status          | Retrieve current status of a specific chess game |         ✅          |
+| GET       | /games/{gameId}/win-certificate | Generate victory certificate for a match         |         ✅          |
+| POST      | /games/{gameId}/moves           | Make a move in the game                          |         ✅          |
+| GET       | /games/{gameId}/board           | Retrieve the latest game board configuration     |         ✅          |
+| GET       | /games/{gameId}/details         | Retrieve game details (PDF or JSON format)       |         ✅          |
+| POST      | /games/{gameId}/abandon         | Forfeit a match                                  |         ✅          |
 
 ## POST `/login`
 
@@ -379,6 +472,10 @@ The login route is used to authenticate a user. The user must provide an email a
 }
 
 ```
+
+
+# Use Case Diagram
+<img src="./img/usecase.png">
 
 ### Sequence diagram
 
