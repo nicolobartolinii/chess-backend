@@ -89,7 +89,7 @@ class PdfExportStrategy implements IExportStrategy {
                     doc
                         .font('Helvetica')
                         .fontSize(12)
-                        .text(`Player ${move.player_name} moved a ${move.piece} from ${move.from_position} to ${move.to_position}.`, {continued: false})
+                        .text(`Player ${move.player_name} moved a ${move.piece} from ${move.from_position} to ${move.to_position}.`, {continued: true})
                         .text(`Move number: ${move.move_number}`, {align: 'right'})
                 }
             } else {
@@ -125,7 +125,7 @@ class PdfExportStrategy implements IExportStrategy {
                 valign: 'center'
             });
 
-            doc.moveDown(25);
+            doc.moveDown(20);
         }
 
         doc.end();
