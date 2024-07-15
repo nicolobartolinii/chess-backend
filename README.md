@@ -180,19 +180,19 @@ This pattern allows for easy extension to support additional export formats in t
 
 # Endpoints
 
-| HTTP Verb | Endpoint                        | Description                                      | JWT Authentication |
-|-----------|---------------------------------|--------------------------------------------------|:------------------:|
-| POST      | /login                          | Authenticate user                                |         ❌          |
-| POST      | /admin/update-tokens            | Recharge user's credits (admin only)             |         ✅          |
-| GET       | /players/ranking                | Retrieve player rankings by score                |         ❌          |
-| POST      | /games                          | Create a new chess match                         |         ✅          |
-| GET       | /games                          | Retrieve user's completed match history          |         ✅          |
-| GET       | /games/{gameId}/status          | Retrieve current status of a specific chess game |         ✅          |
-| GET       | /games/{gameId}/win-certificate | Generate victory certificate for a match         |         ✅          |
-| POST      | /games/{gameId}/moves           | Make a move in the game                          |         ✅          |
-| GET       | /games/{gameId}/board           | Retrieve the latest game board configuration     |         ✅          |
-| GET       | /games/{gameId}/details         | Retrieve game details (PDF or JSON format)       |         ✅          |
-| POST      | /games/{gameId}/abandon         | Forfeit a match                                  |         ✅          |
+| HTTP Verb | Endpoint                          | Description                                      | JWT Authentication |
+|-----------|-----------------------------------|--------------------------------------------------|:------------------:|
+| POST      | `/login`                          | Authenticate user                                |         ❌          |
+| POST      | `/admin/update-tokens`            | Recharge user's credits (admin only)             |         ✅          |
+| GET       | `/players/ranking `               | Retrieve player rankings by score                |         ❌          |
+| POST      | `/games`                          | Create a new chess match                         |         ✅          |
+| GET       | `/games`                          | Retrieve user's completed match history          |         ✅          |
+| GET       | `/games/{gameId}/status`          | Retrieve current status of a specific chess game |         ✅          |
+| GET       | `/games/{gameId}/win-certificate` | Generate victory certificate for a match         |         ✅          |
+| POST      | `/games/{gameId}/moves`           | Make a move in the game                          |         ✅          |
+| GET       | `/games/{gameId}/board`           | Retrieve the latest game board configuration     |         ✅          |
+| GET       | `/games/{gameId}/details`         | Retrieve game details (PDF or JSON format)       |         ✅          |
+| POST      | `/games/{gameId}/abandon`         | Forfeit a match                                  |         ✅          |
 
 ## POST `/login`
 
