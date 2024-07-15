@@ -42,6 +42,16 @@ Detailed project objectives, unique features, and in-depth technical aspects are
   - [Strategy](#strategy)
 - [Endpoints](#endpoints)
   - [POST `/login`](#post-login)
+  - [GET `/players/ranking`](#get-playersrankingfieldpointsorderdescasc)
+  - [POST `/games`](#post-games)
+  - [GET `/games`](#get-gamesstart_dateaaaa-mm-ddorderdescasc)
+  - [GET `/games/:gameId/status`](#get-gamesgameidstatus)
+  - [GET `/games/:gameId/win-certificate`](#get-gamesgameidwin-certificate)
+  - [POST `/games/:gameId/moves`](#post-gamesgameidmoves)
+  - [GET `/games/:gameId/board`](#get-gamesgameidboard)
+  - [GET `/games/:gameId/details`](#get-gamesgameiddetails)
+  - [POST `/games/:gameId/abandon`](#post-gamesgameidabandon)
+  
 - [UML diagrams](#umldiagrams)
   - [uses case](#usecase)
   - [sequenzadiagrams](#sequenzadiagrams)
@@ -309,7 +319,7 @@ This endpoint allows users to create a new chess game. The user must provide the
 ```
 
 
-## GET `/games/history?start_date=<AAAA-MM-DD>&order=desc/asc`
+## GET `/games?start_date=<AAAA-MM-DD>&order=desc/asc`
 
 The login route is used to authenticate a user. The user must provide an email and a password in the request body. The email is used to find the player in the database and the password is used to authenticate the player. If the player is successfully authenticated, a JWT token is generated and returned to the player.
 
@@ -1674,7 +1684,7 @@ This endpoint retrieves the details of a specific chess game in either JSON or P
 ### Response example PDF
 ![pdf_history.png](img%2Fpdf_history.png)
 
-## POST '/games/{gameId}/abandon'
+## POST `/games/{gameId}/abandon`
 This endpoint allows a player to abandon a game. The player must be authenticated and must be one of the players of the game. The game must be in progress. The game is marked as abandoned and the winner is the other player. The game is marked as finished.
 
 ### query parameters
