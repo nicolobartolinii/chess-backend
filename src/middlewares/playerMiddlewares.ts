@@ -22,7 +22,7 @@ export const validatePlayerRanking = (req: Request, res: Response, next: NextFun
         return next(ErrorFactory.badRequest('Both field and order parameters must be provided'));
     }
 
-    if (!['points', 'gamesPlayed', 'gamesWon'].includes(field)) {
+    if (!['points'].includes(field)) {
         return next(ErrorFactory.badRequest('Invalid field for ordering'));
     }
 
