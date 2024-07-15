@@ -266,7 +266,7 @@ This endpoint retrieves the rankings of all players, sorted according to a speci
 
 
 ```
-## POST `/games/create`
+## POST `/games`
 
 This endpoint allows users to create a new chess game. The user must provide the email of the opponent or the difficulty level of the AI opponent in the request body. The user must also provide a JWT token in the Authorization header to authenticate the request.
 ### Request body example(another player)
@@ -438,46 +438,1265 @@ The login route is used to authenticate a user. The user must provide an email a
 }
 
 ```
-## POST `/login`
+## POST `/games/{gameId}/moves`
 
-The login route is used to authenticate a user. The user must provide an email and a password in the request body. The email is used to find the player in the database and the password is used to authenticate the player. If the player is successfully authenticated, a JWT token is generated and returned to the player.
-
+This endpoint allows users to make a move in a chess game. The user must provide the move in the request body, and the game ID in the URL to identify the game. The user must also provide a JWT token in the Authorization header to authenticate the request.
 ### Request body example
 
 
 ```json
 
 {
-
-  "email": "email@example.com",
-
-  "password": "password"
-
+  "from": "C2",
+  "to": "C4"
 }
 
 ```
+### Response example
+```json
+{
+  "success": true,
+  "statusCode": 201,
+  "message": "Move made successfully",
+  "data": {
+    "move": "You moved a White Pawn from C2 to C4. AI moved a Black Knight from F6 to E4."
+  }
+}
 
+```
+## GET `/games/{gameId}/board`
+This endpoint retrieves the latest board configuration of a specific chess game. The client must provide the game ID in the URL to identify the game, the player must be authenticated with a JWT token.
+### Query Parameters
+-**gameId**: The ID of the game for which to retrieve the board configuration. This must be specified by the client in the URL.
 
 ### Response example
 
+![boad_img.png](img%2Fboad_img.png)
+
+## Get `/games/{gameId}/details`
+This endpoint retrieves the details of a specific chess game in either JSON or PDF format. The client must provide the game ID in the URL to identify the game, the player must be authenticated with a JWT token.
+
+### Query Parameters
+-**gameId**: The ID of the game for which to retrieve the details. This must be specified by the client in the URL.
+-**format**: The format in which to retrieve the details. This must be specified by the client, and must be either JSON or PDF.
+
+### Response example Json
 
 ```json
 
-{
-
-  "
-
-    token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiZm9vIiwiaWF0IjoxNjI5MzUwNzQ4LCJleHAiOjE2MjkzNTA3NDh9.7"
-
-}
+[
+  {
+    "player_name": "franco",
+    "game_id": 2,
+    "move_number": 1,
+    "from_position": "E2",
+    "to_position": "E4",
+    "player_id": 2,
+    "configuration_after": {
+      "turn": "black",
+      "check": false,
+      "moves": {
+        "A7": [
+          "A6",
+          "A5"
+        ],
+        "B7": [
+          "B6",
+          "B5"
+        ],
+        "B8": [
+          "A6",
+          "C6"
+        ],
+        "C7": [
+          "C6",
+          "C5"
+        ],
+        "D7": [
+          "D6",
+          "D5"
+        ],
+        "E7": [
+          "E6",
+          "E5"
+        ],
+        "F7": [
+          "F6",
+          "F5"
+        ],
+        "G7": [
+          "G6",
+          "G5"
+        ],
+        "G8": [
+          "F6",
+          "H6"
+        ],
+        "H7": [
+          "H6",
+          "H5"
+        ]
+      },
+      "pieces": {
+        "A1": "R",
+        "A2": "P",
+        "A7": "p",
+        "A8": "r",
+        "B1": "N",
+        "B2": "P",
+        "B7": "p",
+        "B8": "n",
+        "C1": "B",
+        "C2": "P",
+        "C7": "p",
+        "C8": "b",
+        "D1": "Q",
+        "D2": "P",
+        "D7": "p",
+        "D8": "q",
+        "E1": "K",
+        "E4": "P",
+        "E7": "p",
+        "E8": "k",
+        "F1": "B",
+        "F2": "P",
+        "F7": "p",
+        "F8": "b",
+        "G1": "N",
+        "G2": "P",
+        "G7": "p",
+        "G8": "n",
+        "H1": "R",
+        "H2": "P",
+        "H7": "p",
+        "H8": "r"
+      },
+      "castling": {
+        "blackLong": true,
+        "whiteLong": true,
+        "blackShort": true,
+        "whiteShort": true
+      },
+      "fullMove": 1,
+      "halfMove": 0,
+      "checkMate": false,
+      "enPassant": "E3",
+      "isFinished": false
+    },
+    "piece": "White Pawn",
+    "moveEffect": "",
+    "time_elapsed": "126h 56m 23s"
+  },
+  {
+    "player_name": "prova",
+    "game_id": 2,
+    "move_number": 2,
+    "from_position": "E7",
+    "to_position": "E5",
+    "player_id": 1,
+    "configuration_after": {
+      "turn": "white",
+      "check": false,
+      "moves": {
+        "A2": [
+          "A3",
+          "A4"
+        ],
+        "B1": [
+          "C3",
+          "A3"
+        ],
+        "B2": [
+          "B3",
+          "B4"
+        ],
+        "C2": [
+          "C3",
+          "C4"
+        ],
+        "D1": [
+          "E2",
+          "F3",
+          "G4",
+          "H5"
+        ],
+        "D2": [
+          "D3",
+          "D4"
+        ],
+        "E1": [
+          "E2"
+        ],
+        "F1": [
+          "E2",
+          "D3",
+          "C4",
+          "B5",
+          "A6"
+        ],
+        "F2": [
+          "F3",
+          "F4"
+        ],
+        "G1": [
+          "H3",
+          "F3",
+          "E2"
+        ],
+        "G2": [
+          "G3",
+          "G4"
+        ],
+        "H2": [
+          "H3",
+          "H4"
+        ]
+      },
+      "pieces": {
+        "A1": "R",
+        "A2": "P",
+        "A7": "p",
+        "A8": "r",
+        "B1": "N",
+        "B2": "P",
+        "B7": "p",
+        "B8": "n",
+        "C1": "B",
+        "C2": "P",
+        "C7": "p",
+        "C8": "b",
+        "D1": "Q",
+        "D2": "P",
+        "D7": "p",
+        "D8": "q",
+        "E1": "K",
+        "E4": "P",
+        "E5": "p",
+        "E8": "k",
+        "F1": "B",
+        "F2": "P",
+        "F7": "p",
+        "F8": "b",
+        "G1": "N",
+        "G2": "P",
+        "G7": "p",
+        "G8": "n",
+        "H1": "R",
+        "H2": "P",
+        "H7": "p",
+        "H8": "r"
+      },
+      "castling": {
+        "blackLong": true,
+        "whiteLong": true,
+        "blackShort": true,
+        "whiteShort": true
+      },
+      "fullMove": 2,
+      "halfMove": 0,
+      "checkMate": false,
+      "enPassant": "E6",
+      "isFinished": false
+    },
+    "piece": "Black Pawn",
+    "moveEffect": "",
+    "time_elapsed": "27s"
+  },
+  {
+    "player_name": "franco",
+    "game_id": 2,
+    "move_number": 3,
+    "from_position": "F1",
+    "to_position": "C4",
+    "player_id": 2,
+    "configuration_after": {
+      "turn": "black",
+      "check": false,
+      "moves": {
+        "A7": [
+          "A6",
+          "A5"
+        ],
+        "B7": [
+          "B6",
+          "B5"
+        ],
+        "B8": [
+          "A6",
+          "C6"
+        ],
+        "C7": [
+          "C6",
+          "C5"
+        ],
+        "D7": [
+          "D6",
+          "D5"
+        ],
+        "D8": [
+          "E7",
+          "F6",
+          "G5",
+          "H4"
+        ],
+        "E8": [
+          "E7"
+        ],
+        "F7": [
+          "F6",
+          "F5"
+        ],
+        "F8": [
+          "E7",
+          "D6",
+          "C5",
+          "B4",
+          "A3"
+        ],
+        "G7": [
+          "G6",
+          "G5"
+        ],
+        "G8": [
+          "E7",
+          "F6",
+          "H6"
+        ],
+        "H7": [
+          "H6",
+          "H5"
+        ]
+      },
+      "pieces": {
+        "A1": "R",
+        "A2": "P",
+        "A7": "p",
+        "A8": "r",
+        "B1": "N",
+        "B2": "P",
+        "B7": "p",
+        "B8": "n",
+        "C1": "B",
+        "C2": "P",
+        "C4": "B",
+        "C7": "p",
+        "C8": "b",
+        "D1": "Q",
+        "D2": "P",
+        "D7": "p",
+        "D8": "q",
+        "E1": "K",
+        "E4": "P",
+        "E5": "p",
+        "E8": "k",
+        "F2": "P",
+        "F7": "p",
+        "F8": "b",
+        "G1": "N",
+        "G2": "P",
+        "G7": "p",
+        "G8": "n",
+        "H1": "R",
+        "H2": "P",
+        "H7": "p",
+        "H8": "r"
+      },
+      "castling": {
+        "blackLong": true,
+        "whiteLong": true,
+        "blackShort": true,
+        "whiteShort": true
+      },
+      "fullMove": 2,
+      "halfMove": 1,
+      "checkMate": false,
+      "enPassant": null,
+      "isFinished": false
+    },
+    "piece": "White Bishop",
+    "moveEffect": "",
+    "time_elapsed": "27s"
+  },
+  {
+    "player_name": "prova",
+    "game_id": 2,
+    "move_number": 4,
+    "from_position": "F8",
+    "to_position": "C5",
+    "player_id": 1,
+    "configuration_after": {
+      "turn": "white",
+      "check": false,
+      "moves": {
+        "A2": [
+          "A3",
+          "A4"
+        ],
+        "B1": [
+          "C3",
+          "A3"
+        ],
+        "B2": [
+          "B3",
+          "B4"
+        ],
+        "C2": [
+          "C3"
+        ],
+        "C4": [
+          "B5",
+          "A6",
+          "D5",
+          "E6",
+          "F7",
+          "B3",
+          "D3",
+          "E2",
+          "F1"
+        ],
+        "D1": [
+          "E2",
+          "F3",
+          "G4",
+          "H5"
+        ],
+        "D2": [
+          "D3",
+          "D4"
+        ],
+        "E1": [
+          "E2",
+          "F1"
+        ],
+        "F2": [
+          "F3",
+          "F4"
+        ],
+        "G1": [
+          "H3",
+          "F3",
+          "E2"
+        ],
+        "G2": [
+          "G3",
+          "G4"
+        ],
+        "H2": [
+          "H3",
+          "H4"
+        ]
+      },
+      "pieces": {
+        "A1": "R",
+        "A2": "P",
+        "A7": "p",
+        "A8": "r",
+        "B1": "N",
+        "B2": "P",
+        "B7": "p",
+        "B8": "n",
+        "C1": "B",
+        "C2": "P",
+        "C4": "B",
+        "C5": "b",
+        "C7": "p",
+        "C8": "b",
+        "D1": "Q",
+        "D2": "P",
+        "D7": "p",
+        "D8": "q",
+        "E1": "K",
+        "E4": "P",
+        "E5": "p",
+        "E8": "k",
+        "F2": "P",
+        "F7": "p",
+        "G1": "N",
+        "G2": "P",
+        "G7": "p",
+        "G8": "n",
+        "H1": "R",
+        "H2": "P",
+        "H7": "p",
+        "H8": "r"
+      },
+      "castling": {
+        "blackLong": true,
+        "whiteLong": true,
+        "blackShort": true,
+        "whiteShort": true
+      },
+      "fullMove": 3,
+      "halfMove": 2,
+      "checkMate": false,
+      "enPassant": null,
+      "isFinished": false
+    },
+    "piece": "Black Bishop",
+    "moveEffect": "",
+    "time_elapsed": "18s"
+  },
+  {
+    "player_name": "franco",
+    "game_id": 2,
+    "move_number": 5,
+    "from_position": "D1",
+    "to_position": "H5",
+    "player_id": 2,
+    "configuration_after": {
+      "turn": "black",
+      "check": false,
+      "moves": {
+        "A7": [
+          "A6",
+          "A5"
+        ],
+        "B7": [
+          "B6",
+          "B5"
+        ],
+        "B8": [
+          "A6",
+          "C6"
+        ],
+        "C5": [
+          "B6",
+          "D6",
+          "E7",
+          "F8",
+          "B4",
+          "A3",
+          "D4",
+          "E3",
+          "F2"
+        ],
+        "C7": [
+          "C6"
+        ],
+        "D7": [
+          "D6",
+          "D5"
+        ],
+        "D8": [
+          "E7",
+          "F6",
+          "G5",
+          "H4"
+        ],
+        "E8": [
+          "F8",
+          "E7"
+        ],
+        "G7": [
+          "G6",
+          "G5"
+        ],
+        "G8": [
+          "E7",
+          "F6",
+          "H6"
+        ],
+        "H7": [
+          "H6"
+        ]
+      },
+      "pieces": {
+        "A1": "R",
+        "A2": "P",
+        "A7": "p",
+        "A8": "r",
+        "B1": "N",
+        "B2": "P",
+        "B7": "p",
+        "B8": "n",
+        "C1": "B",
+        "C2": "P",
+        "C4": "B",
+        "C5": "b",
+        "C7": "p",
+        "C8": "b",
+        "D2": "P",
+        "D7": "p",
+        "D8": "q",
+        "E1": "K",
+        "E4": "P",
+        "E5": "p",
+        "E8": "k",
+        "F2": "P",
+        "F7": "p",
+        "G1": "N",
+        "G2": "P",
+        "G7": "p",
+        "G8": "n",
+        "H1": "R",
+        "H2": "P",
+        "H5": "Q",
+        "H7": "p",
+        "H8": "r"
+      },
+      "castling": {
+        "blackLong": true,
+        "whiteLong": true,
+        "blackShort": true,
+        "whiteShort": true
+      },
+      "fullMove": 3,
+      "halfMove": 3,
+      "checkMate": false,
+      "enPassant": null,
+      "isFinished": false
+    },
+    "piece": "White Queen",
+    "moveEffect": "",
+    "time_elapsed": "20s"
+  },
+  {
+    "player_name": "prova",
+    "game_id": 2,
+    "move_number": 6,
+    "from_position": "D8",
+    "to_position": "H4",
+    "player_id": 1,
+    "configuration_after": {
+      "turn": "white",
+      "check": false,
+      "moves": {
+        "A2": [
+          "A3",
+          "A4"
+        ],
+        "B1": [
+          "C3",
+          "A3"
+        ],
+        "B2": [
+          "B3",
+          "B4"
+        ],
+        "C2": [
+          "C3"
+        ],
+        "C4": [
+          "B5",
+          "A6",
+          "D5",
+          "E6",
+          "F7",
+          "B3",
+          "D3",
+          "E2",
+          "F1"
+        ],
+        "D2": [
+          "D3",
+          "D4"
+        ],
+        "E1": [
+          "E2",
+          "F1",
+          "D1"
+        ],
+        "G1": [
+          "H3",
+          "F3",
+          "E2"
+        ],
+        "G2": [
+          "G3",
+          "G4"
+        ],
+        "H2": [
+          "H3"
+        ],
+        "H5": [
+          "H6",
+          "H7",
+          "H4",
+          "G5",
+          "F5",
+          "E5",
+          "G6",
+          "F7",
+          "G4",
+          "F3",
+          "E2",
+          "D1"
+        ]
+      },
+      "pieces": {
+        "A1": "R",
+        "A2": "P",
+        "A7": "p",
+        "A8": "r",
+        "B1": "N",
+        "B2": "P",
+        "B7": "p",
+        "B8": "n",
+        "C1": "B",
+        "C2": "P",
+        "C4": "B",
+        "C5": "b",
+        "C7": "p",
+        "C8": "b",
+        "D2": "P",
+        "D7": "p",
+        "E1": "K",
+        "E4": "P",
+        "E5": "p",
+        "E8": "k",
+        "F2": "P",
+        "F7": "p",
+        "G1": "N",
+        "G2": "P",
+        "G7": "p",
+        "G8": "n",
+        "H1": "R",
+        "H2": "P",
+        "H4": "q",
+        "H5": "Q",
+        "H7": "p",
+        "H8": "r"
+      },
+      "castling": {
+        "blackLong": true,
+        "whiteLong": true,
+        "blackShort": true,
+        "whiteShort": true
+      },
+      "fullMove": 4,
+      "halfMove": 4,
+      "checkMate": false,
+      "enPassant": null,
+      "isFinished": false
+    },
+    "piece": "Black Queen",
+    "moveEffect": "",
+    "time_elapsed": "1m 10s"
+  },
+  {
+    "player_name": "franco",
+    "game_id": 2,
+    "move_number": 7,
+    "from_position": "H5",
+    "to_position": "F7",
+    "player_id": 2,
+    "configuration_after": {
+      "turn": "black",
+      "check": true,
+      "moves": {
+        "E8": [
+          "D8"
+        ]
+      },
+      "pieces": {
+        "A1": "R",
+        "A2": "P",
+        "A7": "p",
+        "A8": "r",
+        "B1": "N",
+        "B2": "P",
+        "B7": "p",
+        "B8": "n",
+        "C1": "B",
+        "C2": "P",
+        "C4": "B",
+        "C5": "b",
+        "C7": "p",
+        "C8": "b",
+        "D2": "P",
+        "D7": "p",
+        "E1": "K",
+        "E4": "P",
+        "E5": "p",
+        "E8": "k",
+        "F2": "P",
+        "F7": "Q",
+        "G1": "N",
+        "G2": "P",
+        "G7": "p",
+        "G8": "n",
+        "H1": "R",
+        "H2": "P",
+        "H4": "q",
+        "H7": "p",
+        "H8": "r"
+      },
+      "castling": {
+        "blackLong": true,
+        "whiteLong": true,
+        "blackShort": true,
+        "whiteShort": true
+      },
+      "fullMove": 4,
+      "halfMove": 0,
+      "checkMate": false,
+      "enPassant": null,
+      "isFinished": false
+    },
+    "piece": "White Queen",
+    "moveEffect": "CHECK",
+    "time_elapsed": "1m 29s"
+  },
+  {
+    "player_name": "prova",
+    "game_id": 2,
+    "move_number": 8,
+    "from_position": "E8",
+    "to_position": "D8",
+    "player_id": 1,
+    "configuration_after": {
+      "turn": "white",
+      "check": false,
+      "moves": {
+        "A2": [
+          "A3",
+          "A4"
+        ],
+        "B1": [
+          "C3",
+          "A3"
+        ],
+        "B2": [
+          "B3",
+          "B4"
+        ],
+        "C2": [
+          "C3"
+        ],
+        "C4": [
+          "B5",
+          "A6",
+          "D5",
+          "E6",
+          "B3",
+          "D3",
+          "E2",
+          "F1"
+        ],
+        "D2": [
+          "D3",
+          "D4"
+        ],
+        "E1": [
+          "E2",
+          "F1",
+          "D1"
+        ],
+        "F7": [
+          "F8",
+          "F6",
+          "F5",
+          "F4",
+          "F3",
+          "G7",
+          "E7",
+          "D7",
+          "E8",
+          "G8",
+          "E6",
+          "D5",
+          "G6",
+          "H5"
+        ],
+        "G1": [
+          "H3",
+          "F3",
+          "E2"
+        ],
+        "G2": [
+          "G3",
+          "G4"
+        ],
+        "H2": [
+          "H3"
+        ]
+      },
+      "pieces": {
+        "A1": "R",
+        "A2": "P",
+        "A7": "p",
+        "A8": "r",
+        "B1": "N",
+        "B2": "P",
+        "B7": "p",
+        "B8": "n",
+        "C1": "B",
+        "C2": "P",
+        "C4": "B",
+        "C5": "b",
+        "C7": "p",
+        "C8": "b",
+        "D2": "P",
+        "D7": "p",
+        "D8": "k",
+        "E1": "K",
+        "E4": "P",
+        "E5": "p",
+        "F2": "P",
+        "F7": "Q",
+        "G1": "N",
+        "G2": "P",
+        "G7": "p",
+        "G8": "n",
+        "H1": "R",
+        "H2": "P",
+        "H4": "q",
+        "H7": "p",
+        "H8": "r"
+      },
+      "castling": {
+        "blackLong": false,
+        "whiteLong": true,
+        "blackShort": false,
+        "whiteShort": true
+      },
+      "fullMove": 5,
+      "halfMove": 1,
+      "checkMate": false,
+      "enPassant": null,
+      "isFinished": false
+    },
+    "piece": "Black King",
+    "moveEffect": "",
+    "time_elapsed": "51s"
+  },
+  {
+    "player_name": "franco",
+    "game_id": 2,
+    "move_number": 9,
+    "from_position": "G1",
+    "to_position": "F3",
+    "player_id": 2,
+    "configuration_after": {
+      "turn": "black",
+      "check": false,
+      "moves": {
+        "A7": [
+          "A6",
+          "A5"
+        ],
+        "B7": [
+          "B6",
+          "B5"
+        ],
+        "B8": [
+          "A6",
+          "C6"
+        ],
+        "C5": [
+          "B6",
+          "D6",
+          "E7",
+          "F8",
+          "B4",
+          "A3",
+          "D4",
+          "E3",
+          "F2"
+        ],
+        "C7": [
+          "C6"
+        ],
+        "D7": [
+          "D6",
+          "D5"
+        ],
+        "G7": [
+          "G6",
+          "G5"
+        ],
+        "G8": [
+          "E7",
+          "F6",
+          "H6"
+        ],
+        "H4": [
+          "H5",
+          "H6",
+          "H3",
+          "H2",
+          "G4",
+          "F4",
+          "E4",
+          "G5",
+          "F6",
+          "E7",
+          "G3",
+          "F2"
+        ],
+        "H7": [
+          "H6",
+          "H5"
+        ]
+      },
+      "pieces": {
+        "A1": "R",
+        "A2": "P",
+        "A7": "p",
+        "A8": "r",
+        "B1": "N",
+        "B2": "P",
+        "B7": "p",
+        "B8": "n",
+        "C1": "B",
+        "C2": "P",
+        "C4": "B",
+        "C5": "b",
+        "C7": "p",
+        "C8": "b",
+        "D2": "P",
+        "D7": "p",
+        "D8": "k",
+        "E1": "K",
+        "E4": "P",
+        "E5": "p",
+        "F2": "P",
+        "F3": "N",
+        "F7": "Q",
+        "G2": "P",
+        "G7": "p",
+        "G8": "n",
+        "H1": "R",
+        "H2": "P",
+        "H4": "q",
+        "H7": "p",
+        "H8": "r"
+      },
+      "castling": {
+        "blackLong": false,
+        "whiteLong": true,
+        "blackShort": false,
+        "whiteShort": true
+      },
+      "fullMove": 5,
+      "halfMove": 2,
+      "checkMate": false,
+      "enPassant": null,
+      "isFinished": false
+    },
+    "piece": "White Knight",
+    "moveEffect": "",
+    "time_elapsed": "18s"
+  },
+  {
+    "player_name": "prova",
+    "game_id": 2,
+    "move_number": 10,
+    "from_position": "C5",
+    "to_position": "B6",
+    "player_id": 1,
+    "configuration_after": {
+      "turn": "white",
+      "check": false,
+      "moves": {
+        "A2": [
+          "A3",
+          "A4"
+        ],
+        "B1": [
+          "C3",
+          "A3"
+        ],
+        "B2": [
+          "B3",
+          "B4"
+        ],
+        "C2": [
+          "C3"
+        ],
+        "C4": [
+          "B5",
+          "A6",
+          "D5",
+          "E6",
+          "B3",
+          "D3",
+          "E2",
+          "F1"
+        ],
+        "D2": [
+          "D3",
+          "D4"
+        ],
+        "E1": [
+          "E2",
+          "F1",
+          "D1",
+          "G1"
+        ],
+        "F3": [
+          "G5",
+          "H4",
+          "E5",
+          "D4",
+          "G1"
+        ],
+        "F7": [
+          "F8",
+          "F6",
+          "F5",
+          "F4",
+          "G7",
+          "E7",
+          "D7",
+          "E8",
+          "G8",
+          "E6",
+          "D5",
+          "G6",
+          "H5"
+        ],
+        "G2": [
+          "G3",
+          "G4"
+        ],
+        "H1": [
+          "G1",
+          "F1"
+        ],
+        "H2": [
+          "H3"
+        ]
+      },
+      "pieces": {
+        "A1": "R",
+        "A2": "P",
+        "A7": "p",
+        "A8": "r",
+        "B1": "N",
+        "B2": "P",
+        "B6": "b",
+        "B7": "p",
+        "B8": "n",
+        "C1": "B",
+        "C2": "P",
+        "C4": "B",
+        "C7": "p",
+        "C8": "b",
+        "D2": "P",
+        "D7": "p",
+        "D8": "k",
+        "E1": "K",
+        "E4": "P",
+        "E5": "p",
+        "F2": "P",
+        "F3": "N",
+        "F7": "Q",
+        "G2": "P",
+        "G7": "p",
+        "G8": "n",
+        "H1": "R",
+        "H2": "P",
+        "H4": "q",
+        "H7": "p",
+        "H8": "r"
+      },
+      "castling": {
+        "blackLong": false,
+        "whiteLong": true,
+        "blackShort": false,
+        "whiteShort": true
+      },
+      "fullMove": 6,
+      "halfMove": 3,
+      "checkMate": false,
+      "enPassant": null,
+      "isFinished": false
+    },
+    "piece": "Black Bishop",
+    "moveEffect": "",
+    "time_elapsed": "37s"
+  },
+  {
+    "player_name": "franco",
+    "game_id": 2,
+    "move_number": 11,
+    "from_position": "F7",
+    "to_position": "F8",
+    "player_id": 2,
+    "configuration_after": {
+      "turn": "black",
+      "check": true,
+      "moves": {},
+      "pieces": {
+        "A1": "R",
+        "A2": "P",
+        "A7": "p",
+        "A8": "r",
+        "B1": "N",
+        "B2": "P",
+        "B6": "b",
+        "B7": "p",
+        "B8": "n",
+        "C1": "B",
+        "C2": "P",
+        "C4": "B",
+        "C7": "p",
+        "C8": "b",
+        "D2": "P",
+        "D7": "p",
+        "D8": "k",
+        "E1": "K",
+        "E4": "P",
+        "E5": "p",
+        "F2": "P",
+        "F3": "N",
+        "F8": "Q",
+        "G2": "P",
+        "G7": "p",
+        "G8": "n",
+        "H1": "R",
+        "H2": "P",
+        "H4": "q",
+        "H7": "p",
+        "H8": "r"
+      },
+      "castling": {
+        "blackLong": false,
+        "whiteLong": true,
+        "blackShort": false,
+        "whiteShort": true
+      },
+      "fullMove": 6,
+      "halfMove": 4,
+      "checkMate": true,
+      "enPassant": null,
+      "isFinished": true
+    },
+    "piece": "White Queen",
+    "moveEffect": "CHECKMATE",
+    "time_elapsed": "20s"
+  }
+]
 
 ```
+
+### Response example PDF
+![pdf_history.png](img%2Fpdf_history.png)
+
+## POST '/games/{gameId}/abandon'
+This endpoint allows a player to abandon a game. The player must be authenticated and must be one of the players of the game. The game must be in progress. The game is marked as abandoned and the winner is the other player. The game is marked as finished.
+
+### query parameters
+- gameId: the id of the game to abandon
+
+### Response example
+```json
+{
+  "success": true,
+  "statusCode": 201,
+  "message": "Game 1 abandoned. You lost!"
+}
+```
+
 
 
 # Use Case Diagram
 <img src="./img/usecase.png">
 
 ### Sequence diagram
+
+
 
 ```mermaid
 sequenceDiagram
