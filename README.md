@@ -38,7 +38,7 @@ Detailed project objectives, unique features, and in-depth technical aspects are
     - [Chain of Responsibility](#chain-of-responsibility)
     - [Factory Method](#factory-method)
     - [Strategy](#strategy)
-- [Endpoints](#endpoints)
+- [API Reference](#api-reference)
     - [POST `/login`](#post-login)
     - [POST `/admin/update-tokens`](#post-adminupdate-tokens)
     - [GET `/players/ranking`](#get-playersranking)
@@ -46,16 +46,17 @@ Detailed project objectives, unique features, and in-depth technical aspects are
     - [GET `/games`](#get-games)
     - [GET `/games/{gameId}/status`](#get-gamesgameidstatus)
     - [GET `/games/{gameId}/win-certificate`](#get-gamesgameidwin-certificate)
-    - [POST `/games/{gameId}/moves`](#post-gamesgameidmoves)
+    - [POST `/games/{gameId}/move`](#post-gamesgameidmove)
     - [GET `/games/{gameId}/chessboard`](#get-gamesgameidchessboard)
     - [GET `/games/{gameId}/details`](#get-gamesgameiddetails)
     - [POST `/games/{gameId}/abandon`](#post-gamesgameidabandon)
-- [UML diagrams](#umldiagrams)
-    - [uses case](#usecase)
-    - [sequenzadiagrams](#sequenzadiagrams)
-- [Installation](#installation)
+- [UML diagrams](#uml-diagrams)
+    - [Use case diagram](#use-case-diagram)
+    - [Sequence diagrams](#sequence-diagrams)
+- [Installation and usage](#installation-and-usage)
+- [Testing](#testing)
 - [Additional features](#additional-features)
-- [Contributing](#contributing)
+- [Authors](#authors)
 - [License](#license)
 
 # Project goals
@@ -740,7 +741,7 @@ The following use case diagram illustrates the interactions between the actors a
 
 \* The use case marked with an asterisk (*) represents all the use cases that include the JWT token authentication.
 Every `<<include>>` relationship with the `Authenticate` use case indicates that the JWT token is required to access the
-specific functionality. The multiple `<<include>>` relationships with the `Authenticate` have been omitted for clarity.
+specific functionality. The multiple `<<include>>` relationships with the `Authenticate` use case have been omitted for clarity.
 
 ## Sequence diagrams
 
@@ -1254,109 +1255,119 @@ sequenceDiagram
 
 ```
 
-## Installation Guide
+# Installation and usage
 
-This section provides a step-by-step guide to setting up the project using Docker.
-Follow these instructions to get the project up and running on your machine.
+A step-by-step guide for setting up the project using Docker is provided in this section.
 
-### Prerequisities
+**Note:** The described steps have been written for a Unix-based operating system. Some commands may differ for Windows.
 
-Before you begin, ensure you have the following installed:
+### Prerequisites
 
-- [Git](https://git-scm.com/downloads) - for cloning the repository.
-- [Docker](https://www.docker.com/get-started) - for building and running the containers.
-- [Docker Compose](https://docs.docker.com/compose/install/) - for orchestrating multi-container applications.
+The following tools are required to be installed for building and running the project:
 
-### Step 1: Clone the Repository
+- [Git](https://git-scm.com/downloads) - for repository cloning.
+- [Docker](https://www.docker.com/get-started) - for container building and running.
+- [Docker Compose](https://docs.docker.com/compose/install/) - for multi-container application orchestration.
+- [SSH](https://www.ssh.com/ssh/command/) and [OpenSSL](https://www.openssl.org/) - for JWT key pair generation.
 
-First, clone the project repository from GitHub to your local machine using the following command:
+### Step 1: Repository cloning
+
+The repository should be cloned to the desired location on the local machine:
 
 ```bash
 https://github.com/nicolobartolinii/chess-backend.git
 cd chess-backend
 ```
 
-### Step 2: Configure the Environment
+### Step 2: Environment configuration
 
-Create a .env file in the root directory of the project.
-You can copy the sample from the provided .env.example file
-and adjust the variables according to your environment needs:
+A `.env` file should be created in the root directory of the project.
+The sample from the provided [`.env.example`](https://github.com/nicolobartolinii/chess-backend/blob/main/.env.example) file can be copied
+and the variables should be adjusted according to the environment needs:
 
 ```bash
 cp .env.example .env
 ```
 
-### Step 3: Creare a jwt.key file
+### Step 3: Private and public keys creation
 
-Create a jwt.key file in the root directory of the project. You can do it with the following command:
+A private key and a public key files should be created in the root directory of the project. It can be done with the following commands:
 
-#### For the PrivateKey
+#### For the private key
 
 ```bash
 ssh-keygen -t rsa -b 4096 -m PEM -f jwtRS256.key
 ```
 
-#### For the PublicKey
+#### For the public key
 
 ```bash
 openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
 ```
 
-### Step 4: Build the Docker Images
+**Note:** The public key file provided in the repository is a placeholder and should be replaced with the generated one.
 
-With Docker and Docker Compose installed, build the Docker images for the project.
-This step compiles the code, installs dependencies, and prepares everything needed to run the application.
-Run the following command in the project's root directory:
+### Step 4: Docker images building
+
+With Docker and Docker Compose installed, the Docker images for the project should be built.
+In this step, the code is compiled, dependencies are installed, and everything needed to run the application is prepared.
+The following command should be run in the project's root directory:
 
 ```bash
 docker-compose build
 ```
 
-### Step 5: Run the Containers
+### Step 5: Running the application
 
 ```bash
 docker-compose up -d 
 ```
 
-The -d flag runs the containers in the background, so you can continue using your terminal.
+The `-d` flag allows the containers to be run in the background, so the terminal can continue to be used.
 
-### Step 6: Verify the Installation
+### Step 6: Installation verification
 
-To ensure everything is set up correctly, you can check the status of the containers:
-
-```bash
-    docker-compose ps
-```
-
-### Step 7: Access the Application
-
-Finally, access the application via your web browser. The application should be available at:
+To ensure everything is set up correctly, the status of the containers can be checked:
 
 ```bash
-http://localhost:PORT/
+docker-compose ps
 ```
 
-## Additional features
+### Step 7: Application access
 
-In the project, additional features have been implemented to enhance user experience and functionality.
-One such feature is the [/games/{gameId}/chessboard](#get-gamesgameidchessboard) route,
-which returns a PNG image of the latest state of the chessboard for a specific game.
-This visualization feature has been integrated into other routes as well.
+Finally, the application can be accessed via a web browser. The application should be available at:
 
-For instance, the PNG chessboard image is utilized in the route that generates a victory certificate.
-This allows the certificate to visually display the final position of the game pieces,
-adding a graphical element that enriches the presentation of the game's outcome.
+```bash
+http://localhost:<APPLICATION_PORT>/
+```
 
-Additionally, the chessboard image is also included in the PDF export of the game's move history.
-This integration provides a comprehensive and visually appealing overview of the game,
-helping users to better understand the progression of moves and strategies employed throughout the game.
+The default port for the application is 3000. It can be changed in the `.env` file.
 
-These enhancements not only improve the interactivity of the application but also make the data more accessible and
-engaging for the users.
+# Testing
 
-## Contributors
+# Additional features
+
+The project includes enhancements beyond the requirements provided by the teacher to improve user experience and functionality.
+
+### Chessboard visualization
+
+- **Route:** [GET /games/{gameId}/chessboard](#get-gamesgameidchessboard)
+- **Function:** Returns a PNG image of the latest chessboard state for a specific game
+- **Integrations:**
+    - Included in [victory certificates](#get-gamesgameidwin-certificate)
+    - Incorporated in PDF exports of [game move history](#get-gamesgameiddetails)
+
+This additional feature enhances data presentation and improves the understanding of game progression. We built it to make testing and debugging easier.
+
+# Authors
 
 The contributors to this project are:
 
-- [Nicolò Bartolini](https://github.com/nicolobartolinii)
-- [Nicola Picciafuoco](https://github.com/NicolaPicciafuoco)
+#### [Nicolò Bartolini](https://github.com/nicolobartolinii) (Matricola 1118768) 
+#### [Nicola Picciafuoco](https://github.com/NicolaPicciafuoco) (Matricola 1118755)
+
+# License
+
+[MIT License](LICENSE)
+
+Copyright © 2024 Nicolò Bartolini, Nicola Picciafuoco
