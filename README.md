@@ -24,6 +24,12 @@ The system was developed by students <a href="https://github.com/nicolobartolini
 Detailed project objectives, unique features, and in-depth technical aspects are discussed in the following sections of this README.
 </div>
 
+<p align="center">
+<a href="https://www.univpm.it/">
+<img src="./README-assets/logo_univpm.png", width="10%", style="background: white; padding: 0.5rem; border-radius: 10rem">
+</a>
+</p>
+
 ---
 
 # Table of contents
@@ -80,7 +86,7 @@ programming concepts and best practices in backend development. The primary obje
 10. Configure the project for **easy deployment** using [Docker](https://www.docker.com/)
     and [Docker Compose](https://docs.docker.com/compose/).
 11. Develop a comprehensive **test suite** using [Postman](https://www.postman.com/)
-    and [Newman](https://learning.postman.com/docs/collections/using-newman-cli/command-line-integration-with-newman/)to
+    and [Newman](https://www.npmjs.com/package/newman) to
     ensure API reliability.
 12. Adhere to RESTful API design principles and backend development best practices throughout the project.
 
@@ -100,7 +106,7 @@ This project leverages a variety of modern tools and technologies for backend de
 - [js-chess-engine](https://www.npmjs.com/package/js-chess-engine) - JavaScript chess engine for game logic
 - [JWT (JSON Web Tokens)](https://jwt.io/)
 - [Postman](https://www.postman.com/)
-  and [Newman](https://learning.postman.com/docs/collections/using-newman-cli/command-line-integration-with-newman/)
+  and [Newman](https://www.npmjs.com/package/newman)
 - [PDFKit](https://pdfkit.org/) - PDF generation library for Node.js
 - [Mermaid](https://mermaid-js.github.io/mermaid/#/) - Diagramming and charting tool
 - [bcryptjs](https://www.npmjs.com/package/bcryptjs)
