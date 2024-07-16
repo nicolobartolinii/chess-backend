@@ -3,10 +3,11 @@ import {Statuses} from "../utils/statuses";
 import {repositories} from "../repositories";
 import * as constants from "../utils/constants";
 import * as playerService from "./playerService";
-import {AiLevel, AiLevels} from "../utils/aiLevels";
+import {AiLevel} from "../utils/aiLevels";
 import PDFDocument from 'pdfkit';
 import {svg2imgAsync} from "../strategies/exportStrategies";
 import sharp from 'sharp';
+import {Game} from "../models/game";
 
 const jsChessEngine = require('js-chess-engine')
 
@@ -27,17 +28,37 @@ const jsChessEngine = require('js-chess-engine')
  *
  * @returns {Promise<void>} - A promise that resolves when the game is created.
  */
-export async function createGame(player_1_id: number, player_2_email?: string, AI_difficulty?: AiLevel): Promise<void> {
+export async function createGame(player_1_id: number, player_2_email?: string, AI_difficulty?: AiLevel): Promise<Game> {
     const hasEnoughTokens = await playerService.checkSufficientTokens(player_1_id, constants.GAME_CREATE_COST);
     if (!hasEnoughTokens) {
         throw ErrorFactory.unauthorized('Insufficient tokens');
     }
+
+    const player1Games = await repositories.game.findByPlayer(player_1_id);
+
+    player1Games.forEach(game => {
+        if (game.game_status === Statuses.ACTIVE) {
+            throw ErrorFactory.forbidden('Player 1 is already playing a game');
+        }
+    })
 
     let player2 = null;
     if (player_2_email) {
         player2 = await repositories.player.findByEmail(player_2_email);
         if (!player2) {
             throw ErrorFactory.notFound('Player 2 not found');
+        }
+
+        const player2Games = await repositories.game.findByPlayer(player2.player_id);
+
+        player2Games.forEach(game => {
+            if (game.game_status === Statuses.ACTIVE) {
+                throw ErrorFactory.forbidden('Player 2 is already playing a game');
+            }
+        })
+
+        if (player2.player_id === player_1_id) {
+            throw ErrorFactory.badRequest('Player 1 and Player 2 cannot be the same');
         }
     }
 
@@ -46,7 +67,7 @@ export async function createGame(player_1_id: number, player_2_email?: string, A
     const game = new jsChessEngine.Game();
     const gameConfiguration = game.exportJson();
 
-    await repositories.game.create({
+    const newGame = await repositories.game.create({
         game_status: Statuses.ACTIVE,
         game_configuration: gameConfiguration,
         number_of_moves: 0,
@@ -57,6 +78,8 @@ export async function createGame(player_1_id: number, player_2_email?: string, A
     });
 
     await playerService.decrementTokens(player_1_id, constants.GAME_CREATE_COST);
+
+    return newGame;
 }
 
 /**
@@ -64,17 +87,32 @@ export async function createGame(player_1_id: number, player_2_email?: string, A
  *
  * @param {number} player_id - The id of the player whose game history is retrieved
  * @param {Date} startDate - The start date of the game history. If not provided, it retrieves the entire game history.
- *
+ * @param {order} order - The order of the game history. It can be 'asc' or 'desc'.
  * @returns A promise that resolves to an array of information about each game.
  */
-export async function getGamesHistory(player_id: number, startDate?: Date) {
+export async function getGamesHistory(player_id: number, startDate: Date, order: string) {
     const filter_field = 'start_date';
+    const finishedGames = await repositories.game.findFinishGames();
+    const finishedGameId = new Set(finishedGames.map(game => game.game_id));
     const games = await repositories.game.findByPlayer(player_id, filter_field, startDate);
-    return games.map(game => ({
+    const filteredGames = games.filter(game => finishedGameId.has(game.game_id));
+
+    // order the games by start date
+    filteredGames.sort((a, b) => {
+        if (order === 'asc') {
+            return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+        } else {
+            return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
+        }
+    });
+
+    return filteredGames.map(game => ({
+        game_id: game.game_id,
         game_status: game.game_status,
         number_of_moves: game.number_of_moves,
         start_date: game.start_date,
-        winner_id: game.winner_id
+        winner_id: game.winner_id,
+        result: game.winner_id === player_id ? 'You are the winner.' : 'You are the loser.'
     }));
 }
 
@@ -97,11 +135,22 @@ export async function getGameStatus(playerId: number, gameId: number) {
         throw ErrorFactory.forbidden('You are not part of the game');
     }
 
+    if (game.game_status === Statuses.FINISHED) {
+        return {
+            game_id: game.game_id,
+            status: game.game_status,
+            current_configuration: game.game_configuration,
+            opponent: game.player_2_id ? (game.player_1_id === playerId ? game.player_2_id : game.player_1_id) : `AI-${game.AI_difficulty}`,
+            winner_id: game.winner_id ? game.winner_id : `AI-${game.AI_difficulty}`,
+            result: game.winner_id === playerId ? 'You are the winner.' : 'You are the loser.'
+        };
+    }
     return {
+        game_id: game.game_id,
         status: game.game_status,
         current_configuration: game.game_configuration,
         opponent: game.player_2_id ? (game.player_1_id === playerId ? game.player_2_id : game.player_1_id) : `AI-${game.AI_difficulty}`,
-        turn: game.game_configuration.turn === "white" ? game.player_1_id : game.player_2_id
+        turn: game.player_1_id === playerId && game.game_configuration.turn === "white" ? "Your turn" : game.player_2_id === playerId && game.game_configuration.turn === "black" ? "Your turn" : "Opponent's turn"
     };
 }
 
@@ -193,9 +242,9 @@ export async function getWinCertificate(player_id: number, game_id: number): Pro
         .resize(750, 750, {
             kernel: sharp.kernel.lanczos3,
             fit: 'contain',
-            background: { r: 255, g: 255, b: 255, alpha: 0 }
+            background: {r: 255, g: 255, b: 255, alpha: 0}
         })
-        .png({ quality: 100 })
+        .png({quality: 100})
         .toBuffer();
 
     const x = (doc.page.width - 300) / 2;
@@ -215,207 +264,6 @@ export async function getWinCertificate(player_id: number, game_id: number): Pro
         });
         doc.on('error', reject);
     });
-}
-
-/**
- * This function makes a move in a specific game. It checks if the game is active and if it is the player's turn.
- * It checks if the start and end locations are valid and if the move is valid.
- * If the move is valid, it makes the move and updates the game configuration.
- * After the player move, it checks if the game is finished and in case it is, it updates the game status and winner.
- * If the game is vs AI, it makes a move for the AI.
- * After the AI move, it checks if the game is finished and in case it is, it updates the game status and winner.
- *
- * @param {string} from - The start location of the move
- * @param {string} to - The end location of the move
- * @param {number} playerId - The id of the player who makes the move
- * @param {number} gameId - The id of the game where the move is made
- *
- * @returns {Promise<string>} - A promise that resolves to a string with the move information.
- */
-export async function move(from: string, to: string, playerId: number, gameId: number): Promise<string> {
-    const game = await repositories.game.findById(gameId);
-    if (!game) {
-        throw ErrorFactory.notFound('Game not found');
-    }
-
-    if (game.game_status !== Statuses.ACTIVE) {
-        throw ErrorFactory.badRequest('Game is finished');
-    }
-
-    if (game.player_1_id !== playerId && game.player_2_id !== playerId) {
-        throw ErrorFactory.forbidden('You are not part of the game');
-    }
-
-    if ((game.player_1_id == playerId && game.game_configuration.turn == "black") || (game.player_2_id == playerId && game.game_configuration.turn == "white")) {
-        throw ErrorFactory.forbidden('Not your turn');
-    }
-
-    if (!constants.AVAILABLE_LOCATIONS.includes(from) || !constants.AVAILABLE_LOCATIONS.includes(to)) {
-        throw ErrorFactory.badRequest('Invalid start or end location');
-    }
-
-    const chessGame = new jsChessEngine.Game(game.game_configuration);
-
-    const possibleMoves = chessGame.moves(from);
-
-    let pieceMoved: string;
-    let pieceKey = chessGame.exportJson().pieces[from] as constants.PieceKey;
-    if (pieceKey in constants.PIECES) {
-        pieceMoved = constants.PIECES[pieceKey];
-    } else {
-        throw ErrorFactory.internalServerError('Invalid piece key');
-    }
-
-    if (!possibleMoves.includes(to)) {
-        if (!pieceKey) {
-            throw ErrorFactory.badRequest('Invalid move. No piece at start location');
-        }
-        throw ErrorFactory.badRequest('Invalid move. ' + (possibleMoves.length > 0 ? 'Available end locations: ' + possibleMoves.join(', ') : 'No available moves from start position provided.'));
-    }
-
-    const move = chessGame.move(from, to);
-    if (!move) {
-        throw ErrorFactory.internalServerError('Move failed');
-    }
-
-    let newConfiguration = chessGame.exportJson();
-
-    await repositories.move.create({
-        player_id: playerId,
-        game_id: gameId,
-        move_number: game.number_of_moves + 1,
-        from_position: from,
-        to_position: to,
-        configuration_after: newConfiguration,
-        piece: pieceMoved
-    })
-
-    const [, [updatedGame]] = await repositories.game.update(gameId, {
-        game_configuration: newConfiguration,
-        number_of_moves: game.number_of_moves + 1
-    });
-
-    const hasEnoughTokens = await playerService.checkSufficientTokens(playerId, constants.GAME_MOVE_COST);
-    if (!hasEnoughTokens) {
-        throw ErrorFactory.unauthorized('Insufficient tokens');
-    }
-
-    await playerService.decrementTokens(playerId, constants.GAME_MOVE_COST);
-
-    let returnString = `You moved a ${pieceMoved} from ${from} to ${to}. `;
-
-    if (isGameFinished(newConfiguration)) {
-        const winnerId = isStalemate(newConfiguration) ? null : await winGame(newConfiguration, game.player_1_id, game.player_2_id ? game.player_2_id : 0)
-        await repositories.game.update(gameId, {
-            game_status: Statuses.FINISHED,
-            winner_id: winnerId || null,
-            end_date: new Date()
-        });
-        return returnString + 'Game finished. ' + (isStalemate(newConfiguration) ? 'Stalemate!' : 'You won!');
-    }
-
-    if (game.AI_difficulty) {
-        const aiLevel = getAiLevelValue(game.AI_difficulty as AiLevel);
-        const oldConfiguration = JSON.parse(JSON.stringify(newConfiguration));
-        const aiMove = chessGame.aiMove(aiLevel);
-        if (!aiMove) {
-            throw ErrorFactory.internalServerError('AI move failed');
-        }
-
-        const [from, to]: [string, string] = Object.entries(aiMove)[0] as [string, string];
-
-        pieceKey = oldConfiguration.pieces[from] as constants.PieceKey;
-        if (pieceKey in constants.PIECES) {
-            pieceMoved = constants.PIECES[pieceKey];
-        } else {
-            throw ErrorFactory.internalServerError('Invalid piece key');
-        }
-
-        newConfiguration = chessGame.exportJson();
-
-        await repositories.move.create({
-            game_id: gameId,
-            move_number: updatedGame.number_of_moves + 1,
-            from_position: from,
-            to_position: to,
-            configuration_after: newConfiguration,
-            piece: pieceMoved
-        })
-
-        await repositories.game.update(gameId, {
-            game_configuration: newConfiguration,
-            number_of_moves: updatedGame.number_of_moves + 1
-        });
-
-        await playerService.decrementTokens(playerId, constants.GAME_MOVE_COST);
-
-        returnString += `AI moved a ${pieceMoved} from ${from} to ${to}. `;
-    }
-
-    if (isGameFinished(newConfiguration)) {
-        const winnerId = isStalemate(newConfiguration) ? null : await winGame(newConfiguration, game.player_1_id, game.player_2_id ? game.player_2_id : 0)
-        await repositories.game.update(gameId, {
-            game_status: Statuses.FINISHED,
-            winner_id: winnerId || null,
-            end_date: new Date()
-        });
-        return returnString + 'Game finished. ' + (isStalemate(newConfiguration) ? 'Stalemate!' : (game.player_1_id === winnerId ? 'You won!' : 'You lost.'));
-    } else {
-        return returnString;
-    }
-}
-
-/**
- * This function checks if a game is finished.
- *
- * @param {any} gameConfiguration - A JSON object representing the game configuration (provided by the js-chess-engine library)
- *
- * @returns {boolean} - A boolean indicating if the game is finished.
- */
-function isGameFinished(gameConfiguration: any) {
-    return gameConfiguration.isFinished;
-}
-
-/**
- * This function checks if a game is a stalemate.
- *
- * @param {any} gameConfiguration - A JSON object representing the game configuration (provided by the js-chess-engine library)
- *
- * @returns {boolean} - A boolean indicating if the game is a stalemate.
- */
-function isStalemate(gameConfiguration: any) {
-    return !gameConfiguration.check && !gameConfiguration.checkMate && gameConfiguration.isFinished;
-}
-
-/**
- * This function increments the points of the winner of a game.
- * If the winner is the AI, it does not increment the points because the AI is not a player in the database.
- *
- * @param {any} gameConfiguration - A JSON object representing the game configuration (provided by the js-chess-engine library)
- * @param {number} player1Id - The id of the player who created the game
- * @param {number} player2Id - The id of the player who joined the game. If the game is vs AI, it is 0.
- *
- * @returns {Promise<number>} - A promise that resolves to the id of the winner.
- */
-async function winGame(gameConfiguration: any, player1Id: number, player2Id: number): Promise<number> {
-    // Player 1 is always the creator of the game, so the white. Player 2, instead, is the black. If the game
-    // is vs AI, AI is black. (Player2Id, if AI game, is 0)
-    const winnerId = gameConfiguration.turn === "white" ? player2Id : player1Id;
-    if (winnerId !== 0) {
-        await playerService.incrementPoints(winnerId, constants.GAME_WIN_PRIZE);
-    }
-    return winnerId;
-}
-
-/**
- * This function returns the numerical value of the AI level.
- *
- * @param {AiLevel} level - The AI level in string format (using a custom enum)
- *
- * @returns {number} - The numerical value of the AI level to be used in the js-chess-engine library.
- */
-function getAiLevelValue(level: AiLevel): number {
-    return AiLevels[level];
 }
 
 /**
@@ -509,113 +357,3 @@ export function generateChessboardSVG(configuration: { pieces: Record<string, st
     return svg;
 }
 
-/**
- * This function retrieves all the moves of a specific game.
- * It returns an array of objects with the player name, game id, move number, start and end locations,
- * player id, configuration after the move, piece moved and move effect.
- * The move effect is a string indicating if the move resulted in a check, checkmate or abandonment.
- *
- * @param {number} playerId - The id of the player who requests the moves
- * @param {number} gameId - The id of the game whose moves are retrieved
- *
- * @returns {Promise<{ player_name: string, game_id: number, move_number: number, from_position: string, to_position: string, player_id: number, configuration_after: any, piece: string, moveEffect: string }[]>} - A promise that resolves to an array of information about each move.
- */
-export async function getGameMoves(playerId: number, gameId: number) {
-    const game = await repositories.game.findById(gameId)
-    if (!game) {
-        throw ErrorFactory.notFound('Game not found');
-    }
-    if (game.player_1_id !== playerId && game.player_2_id !== playerId) {
-        throw ErrorFactory.forbidden('You are not part of the game');
-    }
-
-    if (!game) {
-        throw ErrorFactory.notFound('Game not found');
-    }
-
-    const moves = await repositories.move.findByGame(gameId);
-
-    const player1 = await repositories.player.findById(game.player_1_id);
-
-    const player2 = game.player_2_id ? await repositories.player.findById(game.player_2_id) : null;
-
-    return moves.map(move => {
-        let moveEffect = '';
-        if (move.configuration_after.check) {
-            moveEffect = 'CHECK';
-        }
-        if (moves[moves.length - 1].move_number === move.move_number && game.game_status === Statuses.FINISHED) {
-            if (move.piece === null) {
-                moveEffect = 'ABANDON';
-            }
-            if (move.configuration_after.checkMate) {
-                moveEffect = 'CHECKMATE';
-            }
-        }
-        const player_name = move.player_id === game.player_1_id ? player1?.username : player2?.username;
-        return {
-            player_name: player_name ? player_name : 'AI',
-            game_id: move.game_id,
-            move_number: move.move_number,
-            from_position: move.from_position,
-            to_position: move.to_position,
-            player_id: move.player_id,
-            configuration_after: move.configuration_after,
-            piece: move.piece,
-            moveEffect: moveEffect
-        }
-    });
-}
-
-/**
- * This function makes a player abandon a specific game.
- * It checks if the game is active and if it is the player's turn.
- * If the player abandons the game, the game status is updated to finished and the winner is the other player.
- *
- * @param {number} playerId - The id of the player who abandons the game
- * @param {number} gameId - The id of the game that is abandoned
- *
- * @returns {Promise<void>} - A promise that resolves when the game is abandoned.
- */
-export async function abandon(playerId: number, gameId: number): Promise<void> {
-    const game = await repositories.game.findById(gameId);
-    if (!game) {
-        throw ErrorFactory.notFound('Game not found');
-    }
-
-    if (game.player_1_id !== playerId && game.player_2_id !== playerId) {
-        throw ErrorFactory.forbidden('You are not part of the game');
-    }
-
-    if (game.game_status !== Statuses.ACTIVE) {
-        throw ErrorFactory.badRequest('Game is already finished');
-    }
-
-    if ((game.player_1_id == playerId && game.game_configuration.turn == "black") || (game.player_2_id == playerId && game.game_configuration.turn == "white")) {
-        throw ErrorFactory.forbidden('Not your turn');
-    }
-
-    const winnerId = game.player_1_id === playerId ? game.player_2_id : game.player_1_id;
-
-    await repositories.game.update(gameId, {
-        game_status: Statuses.FINISHED,
-        number_of_moves: game.number_of_moves + 1,
-        winner_id: winnerId,
-        end_date: new Date()
-    });
-
-    await repositories.move.create({
-        player_id: playerId,
-        game_id: gameId,
-        move_number: game.number_of_moves + 1,
-        from_position: null,
-        to_position: null,
-        configuration_after: game.game_configuration,
-        piece: null
-    });
-
-    if (winnerId) {
-        await playerService.incrementPoints(winnerId, constants.GAME_WIN_PRIZE);
-    }
-    await playerService.incrementPoints(playerId, constants.GAME_ABANDON_PENALTY);
-}

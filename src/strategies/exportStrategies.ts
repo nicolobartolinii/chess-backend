@@ -3,13 +3,14 @@ import sharp from 'sharp';
 import svg2img from 'svg2img';
 import {generateChessboardSVG} from '../services/gameService';
 import {promisify} from 'util';
+import {MoveEffects} from '../utils/moveEffects';
 
 export const svg2imgAsync = promisify(svg2img);
 
 /**
  * This interface represents the ExportStrategy class.
  */
-interface ExportStrategy {
+interface IExportStrategy {
     export(moves: any[]): Promise<any>;
 }
 
@@ -20,7 +21,7 @@ interface ExportStrategy {
  * It implements the ExportStrategy interface and provides the export method
  * which converts the array of game moves into a JSON formatted string.
  */
-class JSONExportStrategy implements ExportStrategy {
+class JSONExportStrategy implements IExportStrategy {
     /**
      * Exports the game moves as a JSON string.
      *
@@ -43,7 +44,7 @@ class JSONExportStrategy implements ExportStrategy {
  * which processes the game moves, generates a PDF with detailed move information,
  * and embeds images of the game state after each move.
  */
-class PdfExportStrategy implements ExportStrategy {
+class PdfExportStrategy implements IExportStrategy {
     /**
      * Exports the game moves as a PDF document.
      *
@@ -60,24 +61,25 @@ class PdfExportStrategy implements ExportStrategy {
         const doc = new PDFDocument();
         const buffers: Buffer[] = [];
         doc.on('data', buffers.push.bind(buffers));
-        doc.on('end', () => {});
+        doc.on('end', () => {
+        });
 
         doc
             .font('Helvetica-Bold')
             .fontSize(14)
-            .text(`Game ${moves[0].game_id} moves`, { align: 'center' });
+            .text(`Game ${moves[0].game_id} moves`, {align: 'center'});
         doc.moveDown(2);
 
         for (const move of moves) {
-            if (move.moveEffect !== 'ABANDON') {
-                if (move.moveEffect === 'CHECKMATE') {
+            if (move.moveEffect !== MoveEffects.ABANDON) {
+                if (move.moveEffect === MoveEffects.CHECKMATE) {
                     doc
                         .font('Helvetica-Bold')
                         .fontSize(12)
                         .text(`Player ${move.player_name} moved a ${move.piece} from ${move.from_position} to ${move.to_position}. Checkmate!`, {continued: false})
                         .text(`Player ${move.player_name} won the game and gained 1 point.`, {continued: true})
                         .text(`Move number: ${move.move_number}`, {align: 'right'})
-                } else if (move.moveEffect === 'CHECK') {
+                } else if (move.moveEffect === MoveEffects.CHECK) {
                     doc
                         .font('Helvetica')
                         .fontSize(12)
@@ -87,7 +89,7 @@ class PdfExportStrategy implements ExportStrategy {
                     doc
                         .font('Helvetica')
                         .fontSize(12)
-                        .text(`Player ${move.player_name} moved a ${move.piece} from ${move.from_position} to ${move.to_position}.`, {continued: false})
+                        .text(`Player ${move.player_name} moved a ${move.piece} from ${move.from_position} to ${move.to_position}.`, {continued: true})
                         .text(`Move number: ${move.move_number}`, {align: 'right'})
                 }
             } else {
@@ -101,7 +103,8 @@ class PdfExportStrategy implements ExportStrategy {
             }
             doc
                 .fontSize(12)
-                .text(`   Player ID: ${move.player_id || 'AI'}`, { align: 'right' })
+                .text(`   Time elapsed: ${move.time_elapsed}`, {align: 'right'})
+                .text(`   Player ID: ${move.player_id || 'AI'}`, {align: 'right'})
 
             const svgString = generateChessboardSVG(move.configuration_after);
 
@@ -111,9 +114,9 @@ class PdfExportStrategy implements ExportStrategy {
                 .resize(750, 750, {
                     kernel: sharp.kernel.lanczos3, // Increases image quality, I think
                     fit: 'contain',
-                    background: { r: 255, g: 255, b: 255, alpha: 0 }
+                    background: {r: 255, g: 255, b: 255, alpha: 0}
                 })
-                .png({ quality: 100 })
+                .png({quality: 100})
                 .toBuffer();
 
             doc.image(resizedPngBuffer, {
@@ -122,7 +125,7 @@ class PdfExportStrategy implements ExportStrategy {
                 valign: 'center'
             });
 
-            doc.moveDown(25);
+            doc.moveDown(20);
         }
 
         doc.end();
@@ -134,4 +137,4 @@ class PdfExportStrategy implements ExportStrategy {
     }
 }
 
-export {JSONExportStrategy, PdfExportStrategy, ExportStrategy};
+export {JSONExportStrategy, PdfExportStrategy, IExportStrategy};

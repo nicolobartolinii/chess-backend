@@ -98,10 +98,25 @@ module.exports = {
             winner_id: {
                 type: Sequelize.INTEGER,
                 allowNull: true
+            },
+            createdAt: {
+                allowNull: false,
+                type: Sequelize.DATE,
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+            },
+            updatedAt: {
+                allowNull: false,
+                type: Sequelize.DATE,
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             }
         });
 
         await queryInterface.createTable('Moves', {
+            move_id: {
+                type: Sequelize.INTEGER,
+                primaryKey: true,
+                autoIncrement: true
+            },
             player_id: {
                 type: Sequelize.INTEGER,
                 allowNull: true,

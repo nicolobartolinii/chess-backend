@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import { ErrorFactory } from "../factories/errorFactory";
+import {NextFunction, Request, Response} from 'express';
+import {ErrorFactory} from "../factories/errorFactory";
 
 /**
  * Middleware to validate query parameters used for sorting player rankings.
@@ -22,7 +22,7 @@ export const validatePlayerRanking = (req: Request, res: Response, next: NextFun
         return next(ErrorFactory.badRequest('Both field and order parameters must be provided'));
     }
 
-    if (!['points', 'gamesPlayed', 'gamesWon'].includes(field)) {
+    if (!['points'].includes(field)) {
         return next(ErrorFactory.badRequest('Invalid field for ordering'));
     }
 

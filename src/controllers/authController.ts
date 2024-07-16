@@ -1,4 +1,4 @@
-import {Request, Response, NextFunction} from 'express';
+import {NextFunction, Request, Response} from 'express';
 import * as authService from '../services/authService';
 import {StatusCodes} from 'http-status-codes';
 import ResponseFactory from '../factories/responseFactory';

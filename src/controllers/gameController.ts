@@ -2,8 +2,9 @@ import {NextFunction, Request, Response} from 'express';
 import {StatusCodes} from 'http-status-codes';
 import ResponseFactory from "../factories/responseFactory";
 import * as gameService from "../services/gameService";
-import {ExportStrategy, JSONExportStrategy, PdfExportStrategy} from "../strategies/exportStrategies";
+import {IExportStrategy, JSONExportStrategy, PdfExportStrategy} from "../strategies/exportStrategies";
 import {AiLevel} from "../utils/aiLevels";
+import {abandon, getGameMoves, move} from "../services/moveService";
 
 /**
  * This function is used in the /games/create route.
@@ -24,9 +25,16 @@ export const createGame = async (req: Request, res: Response, next: NextFunction
         const player_2_email = req.body.player_2_email;
         const AI_difficulty: AiLevel | undefined = req.body.AI_difficulty as AiLevel | undefined;
 
-        await gameService.createGame(player_1_id, player_2_email, AI_difficulty);
+        const newGame = await gameService.createGame(player_1_id, player_2_email, AI_difficulty);
 
-        res.status(StatusCodes.OK).json(ResponseFactory.success('Game created successfully'));
+        res.status(StatusCodes.CREATED).json(ResponseFactory.successCreated('Game created successfully', {
+            game_id: newGame.game_id,
+            player_1_id: newGame.player_1_id,
+            player_2_id: newGame.player_2_id,
+            AI_difficulty: newGame.AI_difficulty,
+            game_status: newGame.game_status,
+            start_date: newGame.start_date
+        }));
     } catch (err) {
         next(err);
     }
@@ -47,8 +55,8 @@ export const gamesHistory = async (req: Request, res: Response, next: NextFuncti
     try {
         const player_id = req.player!.id;
         const startDate = req.startDate!;
-
-        const games = await gameService.getGamesHistory(player_id, startDate);
+        const order = req.query.order as string;
+        const games = await gameService.getGamesHistory(player_id, startDate, order);
 
         res.status(StatusCodes.OK).json(ResponseFactory.success("Games history retrieved successfully", games));
     } catch (err) {
@@ -71,9 +79,9 @@ export const gamesHistory = async (req: Request, res: Response, next: NextFuncti
 export const getWinCertificate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const playerId = req.player!.id;
-        const gameId = req.params.gameId;
+        const game_id = req.params.gameId;
 
-        const pdfBuffer = await gameService.getWinCertificate(playerId, parseInt(gameId));
+        const pdfBuffer = await gameService.getWinCertificate(playerId, parseInt(game_id));
 
         const pdfResponse = ResponseFactory.pdf(pdfBuffer, 'winCertificate.pdf');
 
@@ -131,9 +139,9 @@ export const makeMove = async (req: Request, res: Response, next: NextFunction):
         const from = req.body.from;
         const to = req.body.to;
 
-        const moveString = await gameService.move(from, to, playerId, parseInt(gameId));
+        const moveString = await move(from, to, playerId, parseInt(gameId));
 
-        res.status(StatusCodes.OK).json(ResponseFactory.success('Move made successfully', {move: moveString}));
+        res.status(StatusCodes.CREATED).json(ResponseFactory.successCreated('Move made successfully', {move: moveString}));
     } catch (err) {
         next(err);
     }
@@ -183,14 +191,14 @@ export const getChessboard = async (req: Request, res: Response, next: NextFunct
  *
  * @returns {Promise<void>} - A promise that resolves when the game history is retrieved. The response contains the game history.
  */
-export const getGameHistory = async (req: Request, res: Response, next: NextFunction) => {
+export const getGameDetails = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const gameId = req.params.gameId;
         const playerId = req.player!.id;
-        const format = req.params.format;
+        const format = req.query.format;
 
-        const moves = await gameService.getGameMoves(playerId, parseInt(gameId)); // Get the moves of the game
-        let exportStrategy: ExportStrategy;
+        const moves = await getGameMoves(playerId, parseInt(gameId)); // Get the moves of the game
+        let exportStrategy: IExportStrategy;
 
         if (format === 'pdf') {
             exportStrategy = new PdfExportStrategy();
@@ -232,9 +240,9 @@ export const abandonGame = async (req: Request, res: Response, next: NextFunctio
         const playerId = req.player!.id;
         const gameId = req.params.gameId;
 
-        await gameService.abandon(playerId, parseInt(gameId));
+        await abandon(playerId, parseInt(gameId));
 
-        res.status(StatusCodes.OK).json(ResponseFactory.success('Game abandoned. You lost!'));
+        res.status(StatusCodes.CREATED).json(ResponseFactory.successCreated(`Game ${gameId} abandoned. You lost!`));
     } catch (err) {
         next(err);
     }

@@ -1,4 +1,4 @@
-import {StatusCodes, ReasonPhrases} from 'http-status-codes';
+import {ReasonPhrases, StatusCodes} from 'http-status-codes';
 
 /**
  * Interface for the base response.
@@ -71,6 +71,24 @@ class ResponseFactory {
      * @returns {IAPIResponse} - The successful response
      */
     static success(message: string = ReasonPhrases.OK, data?: any, statusCode: number = StatusCodes.OK): IAPIResponse {
+        return {
+            success: true,
+            statusCode,
+            message,
+            data
+        }
+    }
+
+    /**
+     * Creates a successful response for a created resource.
+     *
+     * @param {string} [message=ReasonPhrases.CREATED] - The message of the response
+     * @param {any} [data] - The data to be returned
+     * @param {number} [statusCode=StatusCodes.CREATED] - The status code of the response
+     *
+     * @returns {IAPIResponse} - The successful response
+     */
+    static successCreated(message: string = ReasonPhrases.CREATED, data?: any, statusCode: number = StatusCodes.CREATED): IAPIResponse {
         return {
             success: true,
             statusCode,

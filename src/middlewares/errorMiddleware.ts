@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-import { CustomError } from '../factories/errorFactory';
+import {NextFunction, Request, Response} from 'express';
+import {CustomError} from '../factories/errorFactory';
 import ResponseFactory from '../factories/responseFactory';
-import { StatusCodes } from 'http-status-codes';
+import {StatusCodes} from 'http-status-codes';
 
 /**
  * Express middleware to handle errors that occur during request processing.

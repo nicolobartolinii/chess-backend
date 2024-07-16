@@ -1,4 +1,4 @@
-import {Request, Response, NextFunction} from 'express';
+import {NextFunction, Request, Response} from 'express';
 import {ErrorFactory} from "../factories/errorFactory";
 import {AI_LEVELS} from "../utils/aiLevels";
 
@@ -48,7 +48,7 @@ export const gameValidationMiddleware = (req: Request, res: Response, next: Next
  */
 export const gameIdValidationMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     const gameId = req.params.gameId;
-    if (typeof gameId !== "string") {
+    if (typeof gameId !== "string" || isNaN(parseInt(gameId))) {
         return next(ErrorFactory.badRequest('Invalid game ID'));
     }
 
@@ -67,7 +67,7 @@ export const gameIdValidationMiddleware = (req: Request, res: Response, next: Ne
  *
  * @returns {void} - Calls the next middleware or error handler
  */
- export const moveValidationMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+export const moveValidationMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     const from = req.body.from;
     const to = req.body.to;
 
@@ -96,7 +96,7 @@ export const gameIdValidationMiddleware = (req: Request, res: Response, next: Ne
  * @returns {void} - Calls the next middleware or error handler
  */
 export const exportFormatValidationMiddleware = (req: Request, res: Response, next: NextFunction): void => {
-    const format = req.params.format;
+    const format = req.query.format;
 
     if (format !== 'pdf' && format !== 'json') {
         return next(ErrorFactory.badRequest('Invalid format'));

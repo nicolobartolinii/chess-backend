@@ -53,9 +53,6 @@ export const decrementTokens = async (playerId: number, amount: number): Promise
     if (!player) {
         throw ErrorFactory.notFound('Player not found');
     }
-    if (!await checkSufficientTokens(playerId, amount)) {
-        throw ErrorFactory.unauthorized('Insufficient tokens');
-    }
 
     await repositories.player.updatePlayerField(playerId, "tokens", player.tokens - amount);
 };

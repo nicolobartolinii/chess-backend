@@ -22,7 +22,15 @@ export const updatePlayerTokens = async (req: Request, res: Response, next: Next
         const {email, tokens} = req.body;
 
         const updatedPlayer = await playerService.updatePlayerTokens(email, tokens);
-        res.status(StatusCodes.OK).json(ResponseFactory.success('Player tokens updated successfully', updatedPlayer));
+        const mappedPlayer = {
+            player_id: updatedPlayer.player_id,
+            username: updatedPlayer.username,
+            email: updatedPlayer.email,
+            tokens: updatedPlayer.tokens,
+            role: updatedPlayer.role
+        };
+
+        res.status(StatusCodes.CREATED).json(ResponseFactory.successCreated('Player tokens updated successfully', mappedPlayer));
     } catch (err) {
         next(err);
     }

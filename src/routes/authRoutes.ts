@@ -1,6 +1,7 @@
 import express from 'express';
 import * as authController from '../controllers/authController';
 import {emailValidationMiddleware, passwordValidationMiddleware} from "../middlewares/authMiddlewares";
+
 /** Express router to handle authentication-related actions and endpoints. */
 const router = express.Router();
 

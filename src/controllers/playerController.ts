@@ -1,7 +1,8 @@
-import {Request, Response, NextFunction} from 'express';
+import {NextFunction, Request, Response} from 'express';
 import {StatusCodes} from 'http-status-codes';
 import ResponseFactory from "../factories/responseFactory";
 import {repositories} from "../repositories";
+import {Player} from "../models/player";
 
 /**
  * This function is used in the /player/ranking route.
@@ -16,12 +17,21 @@ import {repositories} from "../repositories";
  * The response contains the ranking of all players.
  */
 export const getPlayerRanking = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const field = req.query.field as string || 'points';
-    const order = req.query.order as string || 'DESC';
+    const field = req.query.field as string;
+    const order = req.query.order as string;
 
     try {
         const players = await repositories.player.findAllOrdering(field, order);
-        res.status(StatusCodes.OK).json(ResponseFactory.success('Players retrieved successfully', players));
+        const mappedPlayers = players.map((player: Player) => {
+            return {
+                player_id: player.player_id,
+                username: player.username,
+                email: player.email,
+                points: player.points,
+                tokens: player.tokens
+            }
+        });
+        res.status(StatusCodes.OK).json(ResponseFactory.success('Players retrieved successfully', mappedPlayers));
     } catch (error) {
         next(error);
     }
