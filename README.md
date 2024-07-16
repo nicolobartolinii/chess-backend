@@ -18,7 +18,7 @@
 </p>
 
 <div align="center">
-<h1>Backend system for chess game</h1>
+<h1>♟️ Backend system for chess game</h1>
 This project implements a robust backend system for chess in <b>TypeScript</b> using <b>Node.js</b>, <b>Express.js</b>, <b>Sequelize</b>, and other modern tools. Developed as part of the Master's Degree in Computer Engineering and Automation (<b>LM-32</b>) at <b>UNIVPM</b> for the 2023-2024 academic year, it showcases the application of professional backend development practices and design patterns.<br>
 The system was developed by students <a href="https://github.com/nicolobartolinii">Nicolò Bartolini</a> and <a href="https://github.com/NicolaPicciafuoco">Nicola Picciafuoco</a> for the <b>Advanced Programming</b> course led by Prof. Adriano Mancini.<br>
 Detailed project objectives, unique features, and in-depth technical aspects are discussed in the following sections of this README.
@@ -28,17 +28,17 @@ Detailed project objectives, unique features, and in-depth technical aspects are
 
 # Table of contents
 
-- [Project goals](#project-goals)
-- [Tools used](#tools-used)
-- [Patterns used](#patterns-used)
-    - [Model-Controller (MVC)](#mvc-model-controller)
-    - [Data Access Object (DAO)](#data-access-object-dao)
-    - [Repository](#repository)
-    - [Singleton](#singleton)
-    - [Chain of Responsibility](#chain-of-responsibility)
-    - [Factory Method](#factory-method)
-    - [Strategy](#strategy)
-- [API Reference](#api-reference)
+- [🎯 Project goals](#-project-goals)
+- [🛠️ Tools used](#-tools-used)
+- [🧩 Patterns used](#-patterns-used)
+    - [🏗️ Model-Controller (MVC)](#-mvc-model-controller)
+    - [🗄️ Data Access Object (DAO)](#-data-access-object-dao)
+    - [📦 Repository](#-repository)
+    - [🔒 Singleton](#-singleton)
+    - [⛓️ Chain of Responsibility](#-chain-of-responsibility)
+    - [🏭 Factory Method](#-factory-method)
+    - [🔀 Strategy](#-strategy)
+- [📚 API Reference](#-api-reference)
     - [POST `/login`](#post-login)
     - [POST `/admin/update-tokens`](#post-adminupdate-tokens)
     - [GET `/players/ranking`](#get-playersranking)
@@ -50,16 +50,16 @@ Detailed project objectives, unique features, and in-depth technical aspects are
     - [GET `/games/{gameId}/chessboard`](#get-gamesgameidchessboard)
     - [GET `/games/{gameId}/details`](#get-gamesgameiddetails)
     - [POST `/games/{gameId}/abandon`](#post-gamesgameidabandon)
-- [UML diagrams](#uml-diagrams)
+- [📊 UML diagrams](#-uml-diagrams)
     - [Use case diagram](#use-case-diagram)
     - [Sequence diagrams](#sequence-diagrams)
-- [Installation and usage](#installation-and-usage)
-- [Testing](#testing)
-- [Additional features](#additional-features)
-- [Authors](#authors)
-- [License](#license)
+- [🚀 Installation and usage](#-installation-and-usage)
+- [🧪 Testing](#-testing)
+- [🌟 Additional features](#-additional-features)
+- [👥 Authors](#-authors)
+- [📄 License](#-license)
 
-# Project goals
+# 🎯 Project goals
 
 This project aims to develop a robust and secure backend system for a chess game application, demonstrating advanced
 programming concepts and best practices in backend development. The primary objectives are:
@@ -87,7 +87,7 @@ programming concepts and best practices in backend development. The primary obje
 This chess game backend system serves as a practical application of advanced programming techniques, showcasing the
 ability to create a scalable, maintainable, and feature-rich application in a real-world context.
 
-# Tools used
+# 🛠️ Tools used
 
 This project leverages a variety of modern tools and technologies for backend development:
 
@@ -109,13 +109,13 @@ This project leverages a variety of modern tools and technologies for backend de
 
 Certamente, ecco una versione leggermente più dettagliata della sezione "Patterns Used":
 
-# Patterns used
+# 🧩 Patterns used
 
 This project implements several design patterns and two architectural patterns to ensure a robust, maintainable, and
 scalable codebase. Each pattern addresses specific challenges in software design and contributes to the overall quality
 of the application.
 
-## MVC (Model-Controller)
+## 🏗️ MVC (Model-Controller)
 
 The **Model-Controller** (**MC**) architectural pattern is used to separate concerns in the application:
 
@@ -125,7 +125,7 @@ The **Model-Controller** (**MC**) architectural pattern is used to separate conc
 As this is a backend-only project, the traditional **View** layer is omitted, resulting in an MC rather than MVC
 structure.
 
-## Data Access Object (DAO)
+## 🗄️ Data Access Object (DAO)
 
 The **DAO** pattern provides an abstract interface to a database, encapsulating all access logic and exposing methods
 for database operations.
@@ -137,7 +137,7 @@ to [define database models](https://github.com/nicolobartolinii/chess-backend/bl
 the database. This abstraction simplifies database integration and allows for easier switching between different
 database systems if needed.
 
-## Repository
+## 📦 Repository
 
 The **Repository** pattern mediates between the domain and data mapping layers, acting like an in-memory collection of
 domain objects. This pattern centralizes data access logic, improving maintainability and allowing for easier
@@ -148,7 +148,7 @@ implementation of caching or data retrieval strategies.
 Defines [methods for database queries and interactions](https://github.com/nicolobartolinii/chess-backend/blob/main/src/repositories),
 working with Sequelize models (DAO) to provide a clean functionality for data access.
 
-## Singleton
+## 🔒 Singleton
 
 The [Singleton](https://refactoring.guru/design-patterns/singleton) creational pattern ensures a class has only one
 instance and provides a global point of access to it.
@@ -167,7 +167,7 @@ managing [database connections](https://github.com/nicolobartolinii/chess-backen
 ensuring that only one connection pool is maintained throughout the application lifecycle. This optimizes resource usage
 and provides a consistent interface for database operations.
 
-## Chain of Responsibility
+## ⛓️ Chain of Responsibility
 
 The [Chain of Responsibility](https://refactoring.guru/design-patterns/chain-of-responsibility) behavioral pattern
 passes requests along a chain of handlers, allowing multiple objects to handle the request without coupling sender to
@@ -191,7 +191,7 @@ In our project, the Chain of Responsibility pattern is applied to
 handle [request validation, authentication, and error handling](https://github.com/nicolobartolinii/chess-backend/blob/main/src/middlewares)
 in a modular and composable manner.
 
-## Factory Method
+## 🏭 Factory Method
 
 The [Factory Method](https://refactoring.guru/design-patterns/factory-method) creational pattern provides an interface
 for creating objects in a superclass, allowing subclasses to alter the type of objects created.
@@ -213,7 +213,7 @@ with [permission](https://refactoring.guru/content-usage-policy)
 This approach centralizes object creation logic and makes it easier to modify or extend response and error handling in
 the future.
 
-## Strategy
+## 🔀 Strategy
 
 The [Strategy](https://refactoring.guru/design-patterns/strategy) behavioral pattern defines a family of algorithms,
 encapsulates each one, and makes them interchangeable.
@@ -236,7 +236,7 @@ for [exporting game move history in different formats](https://github.com/nicolo
 This pattern allows for easy extension to support additional export formats in the future without modifying existing
 code, adhering to the Open/Closed principle.
 
-# API Reference
+# 📚 API Reference
 
 | HTTP Verb | Endpoint                          | Description                                       | JWT Authentication |
 |-----------|-----------------------------------|---------------------------------------------------|:------------------:|
@@ -731,7 +731,7 @@ Authorization: Bearer <JWT token>
 }
 ```
 
-# UML diagrams
+# 📊 UML diagrams
 
 ## Use case diagram
 
@@ -1255,7 +1255,7 @@ sequenceDiagram
 
 ```
 
-# Installation and usage
+# 🚀 Installation and usage
 
 A step-by-step guide for setting up the project using Docker is provided in this section.
 
@@ -1343,9 +1343,9 @@ http://localhost:<APPLICATION_PORT>/
 
 The default port for the application is 3000. It can be changed in the `.env` file.
 
-# Testing
+# 🧪 Testing
 
-# Additional features
+# 🌟 Additional features
 
 The project includes enhancements beyond the requirements provided by the teacher to improve user experience and functionality.
 
@@ -1359,14 +1359,14 @@ The project includes enhancements beyond the requirements provided by the teache
 
 This additional feature enhances data presentation and improves the understanding of game progression. We built it to make testing and debugging easier.
 
-# Authors
+# 👥 Authors
 
 The contributors to this project are:
 
 #### [Nicolò Bartolini](https://github.com/nicolobartolinii) (Matricola 1118768) 
 #### [Nicola Picciafuoco](https://github.com/NicolaPicciafuoco) (Matricola 1118755)
 
-# License
+# 📄 License
 
 [MIT License](LICENSE)
 
