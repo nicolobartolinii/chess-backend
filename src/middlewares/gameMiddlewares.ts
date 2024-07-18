@@ -19,7 +19,7 @@ export const gameValidationMiddleware = (req: Request, res: Response, next: Next
     const {player_2_email, AI_difficulty} = req.body;
 
     if (!player_2_email && !AI_difficulty) {
-        return next(ErrorFactory.badRequest('Player 2 email or AI difficulty is required'));
+        return next(ErrorFactory.badRequest('Player 2 email or AI difficulty must be provided'));
     }
 
     if (typeof player_2_email !== 'string' && player_2_email !== undefined) {
@@ -27,7 +27,7 @@ export const gameValidationMiddleware = (req: Request, res: Response, next: Next
     }
 
     if (AI_difficulty !== undefined && !(AI_LEVELS.includes(AI_difficulty))) {
-        return next(ErrorFactory.badRequest('Invalid AI difficulty'));
+        return next(ErrorFactory.badRequest(`Invalid AI difficulty. Choose from: ${AI_LEVELS.join(', ')}.`));
     }
 
     next();
@@ -48,7 +48,11 @@ export const gameValidationMiddleware = (req: Request, res: Response, next: Next
  */
 export const gameIdValidationMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     const gameId = req.params.gameId;
-    if (typeof gameId !== "string" || isNaN(parseInt(gameId))) {
+    if (!gameId) {
+        return next();
+    }
+
+    if (typeof gameId !== "string" || isNaN(parseInt(gameId)) || parseInt(gameId) < 1) {
         return next(ErrorFactory.badRequest('Invalid game ID'));
     }
 
@@ -96,6 +100,10 @@ export const moveValidationMiddleware = (req: Request, res: Response, next: Next
  * @returns {void} - Calls the next middleware or error handler
  */
 export const exportFormatValidationMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+    if (!req.query.format) {
+        req.query.format = 'json';
+    }
+
     const format = req.query.format;
 
     if (format !== 'pdf' && format !== 'json') {

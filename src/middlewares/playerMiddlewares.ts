@@ -16,11 +16,16 @@ import {ErrorFactory} from "../factories/errorFactory";
  * @returns {void} - Calls the next middleware or error handler.
  */
 export const validatePlayerRanking = (req: Request, res: Response, next: NextFunction): void => {
+    if (!req.query.field) {
+        req.query.field = 'points';
+    }
+
+    if (!req.query.order) {
+        req.query.order = 'DESC';
+    }
+
     const field = req.query.field as string;
     const order = req.query.order as string;
-    if (!field || !order) {
-        return next(ErrorFactory.badRequest('Both field and order parameters must be provided'));
-    }
 
     if (!['points'].includes(field)) {
         return next(ErrorFactory.badRequest('Invalid field for ordering'));

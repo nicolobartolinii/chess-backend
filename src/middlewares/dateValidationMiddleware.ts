@@ -62,11 +62,16 @@ export const dateValidationMiddleware = (req: Request, res: Response, next: Next
  * @returns {void} - Calls the next middleware or error handler
  */
 export const orderValidationMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    if (!req.query.order) {
+        req.query.order = 'DESC';
+    }
+
     const order = req.query.order;
 
     if (typeof order !== 'string') {
         return next(ErrorFactory.badRequest('Order must be strings'));
     }
+
     if (!['ASC', 'DESC'].includes(order.toUpperCase())) {
         return next(ErrorFactory.badRequest('Invalid order direction'));
     }

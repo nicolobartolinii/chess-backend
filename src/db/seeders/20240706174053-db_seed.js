@@ -25,7 +25,28 @@ module.exports = {
                 tokens: 8.1,
                 createdAt: new Date(),
                 updatedAt: new Date()
-            }], {});
+            },
+            {
+                username: 'test',
+                email: 'test@test.it',
+                password: await bcrypt.hash('test', 10),
+                role: 0,
+                points: 42.5,
+                tokens: 143.2,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            },
+            {
+                username: 'test2',
+                email: 'test2@test.it',
+                password: await bcrypt.hash('test2', 10),
+                role: 1,
+                points: 0,
+                tokens: 10,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            }
+        ], {});
 
         await queryInterface.bulkInsert('Games', [
             {
