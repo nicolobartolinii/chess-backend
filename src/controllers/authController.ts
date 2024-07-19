@@ -5,7 +5,7 @@ import ResponseFactory from '../factories/responseFactory';
 import {ErrorFactory} from '../factories/errorFactory';
 
 /**
- * This function is used in the /auth/login route.
+ * This function is used in the /login route.
  * It logs in a player by their email and password.
  *
  * @param {Request} req - The request object

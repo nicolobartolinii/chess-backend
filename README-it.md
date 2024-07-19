@@ -960,7 +960,7 @@ sequenceDiagram
     end
 ```
 
-### GET `/games/history`
+### GET `/games`
 
 ```mermaid
 sequenceDiagram
@@ -973,7 +973,7 @@ sequenceDiagram
     participant DAO
     participant ErrorFactory
     participant ResponseFactory
-    Client ->>+ App: GET games/history (start_date)
+    Client ->>+ App: GET /games (start_date)
     App ->>+ Middleware: authenticateJWT()
     alt valid JWT
         Middleware -->>- App: next()

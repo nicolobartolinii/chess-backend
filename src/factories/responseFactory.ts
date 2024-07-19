@@ -114,7 +114,7 @@ class ResponseFactory {
     }
 
     /**
-     * Creates a SVG response.
+     * Creates an SVG response.
      *
      * @param {string} data - The SVG data
      * @param {string} filename - The filename of the SVG file

@@ -120,7 +120,7 @@ module.exports = {
             player_id: {
                 type: Sequelize.INTEGER,
                 allowNull: true,
-                references:{
+                references: {
                     model: "Players",
                     key: 'player_id'
                 }
@@ -128,7 +128,7 @@ module.exports = {
             game_id: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
-                references:{
+                references: {
                     model: "Games",
                     key: 'game_id'
                 }

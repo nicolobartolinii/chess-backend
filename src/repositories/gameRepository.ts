@@ -2,7 +2,6 @@ import {IBaseRepository} from './baseRepository';
 import {Game} from '../models/game';
 import {Statuses} from "../utils/statuses";
 import {CreationAttributes, Op} from "sequelize";
-import {ErrorFactory} from "../factories/errorFactory";
 
 /**
  * Interface for the Game repository. Extends the {@link IBaseRepository} interface.
