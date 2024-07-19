@@ -1371,11 +1371,63 @@ http://localhost:<PORTA_APPLICAZIONE>/
 
 La porta predefinita per l'applicazione è 3000. Può essere cambiata nel file `.env`.
 
+### Utenti predefiniti
+
+Avviare l'applicazione utilizzando `NODE_ENV=development` nel file `.env` creerà quattro utenti predefiniti:
+
+- prova@prova.it (password: prova) - Giocatore standard
+- franco@giovanni.it (password: franco) - Admin
+- test@test.it (password: test) - Admin
+- test2@test.it (password: test2) - Giocatore standard
+
 # 🧪 Testing
+
+Il progetto include una suite di test completa per ogni endpoint API. Tale suite copre quasi tutte le possibili
+risposte (i.e.: successo, bad request, unauthorized, forbidden, not found, etc.) e i verifica la correttezza delle
+risposte JSON restituite.
 
 **Nota:** I test sono stati scritti per essere eseguiti immediatamente dopo che l'applicazione è stata avviata perché
 richiedono un database pulito. Se l'applicazione è stata in esecuzione per un po', i test potrebbero fallire a causa dei
 dati esistenti nel database.
+
+Prima di eseguire i test, Newman deve essere installato. Può essere globalmente installato con il seguente comando:
+
+```bash
+npm install -g newman
+```
+
+Per eseguire i test, il seguente comando deve essere eseguito nella directory root del progetto:
+
+```bash
+newman run api-tests/api-tests-collection.json -e api-tests/api-tests-environment.json
+```
+
+## Risultati dei test
+
+L'esecuzione dei test (prima di effettuare qualunque operazione manuale sull'applicazione) dovrebbe produrre il seguente
+output:
+
+```bash
+┌─────────────────────────┬───────────────────┬──────────────────┐
+│                         │          executed │           failed │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│              iterations │                 1 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│                requests │                68 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│            test-scripts │                62 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│      prerequest-scripts │                40 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│              assertions │               320 │                0 │
+├─────────────────────────┴───────────────────┴──────────────────┤
+│ total run duration: 6.7s                                       │
+├────────────────────────────────────────────────────────────────┤
+│ total data received: 505.44kB (approx)                         │
+├────────────────────────────────────────────────────────────────┤
+│ average response time: 24ms [min: 2ms, max: 791ms, s.d.: 97ms] │
+└────────────────────────────────────────────────────────────────┘
+```
 
 # 🌟 Funzionalità aggiuntive
 

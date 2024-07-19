@@ -1,0 +1,5694 @@
+{
+	"info": {
+		"_postman_id": "62c3cf9f-f8b6-475e-93df-171703eff7cc",
+		"name": "api-tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18509073",
+		"_collection_link": "https://i-bocciati.postman.co/workspace/chess-backend~e166cb57-650f-49b0-968e-c8287701e02e/collection/18509073-62c3cf9f-f8b6-475e-93df-171703eff7cc?action=share&source=collection_link&creator=18509073"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "POST /login",
+					"item": [
+						{
+							"name": "Test: valid credentials login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 500ms\", function () {",
+											"  pm.expect(pm.response.responseTime).to.be.below(500);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    let jsonData = pm.response.json();",
+											"    ",
+											"    pm.expect(jsonData.statusCode).to.eql(200);",
+											"    pm.expect(jsonData.success).to.be.true;",
+											"    pm.expect(jsonData.message).to.eql(\"Login successful\");",
+											"    pm.expect(jsonData.data).to.have.all.keys('token');",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.exist;",
+											"    pm.expect(responseData.data).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Token is in a valid format\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.data.token).to.be.a('string');",
+											"    pm.expect(responseData.data.token).to.match(/^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+$/);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"prova@prova.it\",\n    \"password\": \"{{PROVA_PASSWORD}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/login",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: missing email login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"  pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    let jsonData = pm.response.json();",
+											"    ",
+											"    pm.expect(jsonData.statusCode).to.eql(400);",
+											"    pm.expect(jsonData.success).to.be.false;",
+											"    pm.expect(jsonData.message).to.eql(\"Email is required\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"password\": \"prova\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/login",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: missing password login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"  pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    let jsonData = pm.response.json();",
+											"    ",
+											"    pm.expect(jsonData.statusCode).to.eql(400);",
+											"    pm.expect(jsonData.success).to.be.false;",
+											"    pm.expect(jsonData.message).to.eql(\"Password is required\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"prova@prova.it\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/login",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: login with not existing user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"  pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    let jsonData = pm.response.json();",
+											"    ",
+											"    pm.expect(jsonData.statusCode).to.eql(400);",
+											"    pm.expect(jsonData.success).to.be.false;",
+											"    pm.expect(jsonData.message).to.eql(\"Player not found\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"prova2@prova.it\",\n    \"password\": \"prova\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/login",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: login with wrong password",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"  pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    let jsonData = pm.response.json();",
+											"    ",
+											"    pm.expect(jsonData.statusCode).to.eql(401);",
+											"    pm.expect(jsonData.success).to.be.false;",
+											"    pm.expect(jsonData.message).to.eql(\"Invalid credentials\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"prova@prova.it\",\n    \"password\": \"wrongPassword\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/login",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "POST /admin/update-tokens",
+					"item": [
+						{
+							"name": "Test: updating tokens successfully",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 500ms\", function () {",
+											"  pm.expect(pm.response.responseTime).to.be.below(500);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(201);",
+											"    pm.expect(responseData.success).to.be.true;",
+											"    pm.expect(responseData.message).to.eql(\"Player tokens updated successfully\");",
+											"    pm.expect(responseData.data).to.have.all.keys('player_id', 'username', 'email', 'tokens', 'role');",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.exist;",
+											"    pm.expect(responseData.data).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Tokens have been correctly updated\", function () {",
+											"    const responseData = pm.response.json();",
+											"    const newTokens = JSON.parse(pm.request.body.toString()).tokens;",
+											"    ",
+											"    pm.expect(responseData.data.tokens).to.be.a('string');",
+											"    pm.expect(Number(responseData.data.tokens)).to.eql(newTokens);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"prova@prova.it\",\n    \"tokens\": 10\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/admin/update-tokens",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"admin",
+										"update-tokens"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: updating tokens without email",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"  pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Email is required\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"tokens\": 10\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/admin/update-tokens",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"admin",
+										"update-tokens"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: updating tokens without token amount",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"  pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Tokens are required\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"prova@prova.it\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/admin/update-tokens",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"admin",
+										"update-tokens"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: updating tokens with tokens not number",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"  pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Invalid token amount\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"prova@prova.it\",\n    \"tokens\": \"wrongFromat\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/admin/update-tokens",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"admin",
+										"update-tokens"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: updating tokens with email not string",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"  pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Email must be a string\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": 10,\n    \"tokens\": 10\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/admin/update-tokens",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"admin",
+										"update-tokens"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: updating tokens with not existing player",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"  pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(404);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Player not found\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"prova2@prova.it\",\n    \"tokens\": 10\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/admin/update-tokens",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"admin",
+										"update-tokens"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: updating tokens with not admin account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"  pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(403);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"This route is only accessible to administrators\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{PROVA_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"prova@prova.it\",\n    \"tokens\": 10\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/admin/update-tokens",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"admin",
+										"update-tokens"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "players",
+			"item": [
+				{
+					"name": "GET /players/ranking",
+					"item": [
+						{
+							"name": "Test: retrieve ranking in ascending order",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 500ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(200);",
+											"    pm.expect(responseData.success).to.be.true;",
+											"    pm.expect(responseData.message).to.eql(\"Players retrieved successfully\");",
+											"    pm.expect(responseData.data).to.be.an('array').that.is.not.empty;",
+											"    pm.expect(responseData.data[0]).to.have.property('player_id');",
+											"    pm.expect(responseData.data[0]).to.have.property('username');",
+											"    pm.expect(responseData.data[0]).to.have.property('email');",
+											"    pm.expect(responseData.data[0]).to.have.property('points');",
+											"    pm.expect(responseData.data[0]).to.have.property('tokens');",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.exist;",
+											"    pm.expect(responseData.data).to.be.an('array');",
+											"});",
+											"",
+											"pm.test(\"First player has less points than last player\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(Number(responseData.data[0].points)).to.be.lessThan(Number(responseData.data[responseData.data.length - 1].points));",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/players/ranking?field=points&order=asc",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"players",
+										"ranking"
+									],
+									"query": [
+										{
+											"key": "field",
+											"value": "points"
+										},
+										{
+											"key": "order",
+											"value": "asc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: retrieve ranking in descending order",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 500ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(200);",
+											"    pm.expect(responseData.success).to.be.true;",
+											"    pm.expect(responseData.message).to.eql(\"Players retrieved successfully\");",
+											"    pm.expect(responseData.data).to.be.an('array').that.is.not.empty;",
+											"    pm.expect(responseData.data[0]).to.have.property('player_id');",
+											"    pm.expect(responseData.data[0]).to.have.property('username');",
+											"    pm.expect(responseData.data[0]).to.have.property('email');",
+											"    pm.expect(responseData.data[0]).to.have.property('points');",
+											"    pm.expect(responseData.data[0]).to.have.property('tokens');",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.exist;",
+											"    pm.expect(responseData.data).to.be.an('array');",
+											"});",
+											"",
+											"pm.test(\"First player has more tokens than last player\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(Number(responseData.data[0].points)).to.be.greaterThan(Number(responseData.data[responseData.data.length - 1].points));",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/players/ranking",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"players",
+										"ranking"
+									],
+									"query": [
+										{
+											"key": "field",
+											"value": "points",
+											"disabled": true
+										},
+										{
+											"key": "order",
+											"value": "desc",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: retrieve ranking with invalid field",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Invalid field for ordering\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/players/ranking?field=invalidField",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"players",
+										"ranking"
+									],
+									"query": [
+										{
+											"key": "field",
+											"value": "invalidField"
+										},
+										{
+											"key": "order",
+											"value": "desc",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: retrieve ranking with invalid order",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Invalid order direction\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/players/ranking?order=invalidOrder",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"players",
+										"ranking"
+									],
+									"query": [
+										{
+											"key": "field",
+											"value": "invalidField",
+											"disabled": true
+										},
+										{
+											"key": "order",
+											"value": "invalidOrder"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "games",
+			"item": [
+				{
+					"name": "POST /games",
+					"item": [
+						{
+							"name": "Test: create game against AI",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 500ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(201);",
+											"    pm.expect(responseData.success).to.be.true;",
+											"    pm.expect(responseData.message).to.eql(\"Game created successfully\");",
+											"    pm.expect(responseData.data).to.have.all.keys('game_id', 'player_1_id', 'player_2_id', 'AI_difficulty', 'game_status', 'start_date')",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.exist;",
+											"    pm.expect(responseData.data).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Game status is active and AI difficulty is correct\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.data.game_status).to.eql(\"ACTIVE\");",
+											"    pm.expect(responseData.data.AI_difficulty).to.eql(\"MONKEY\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TEST_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"AI_difficulty\": \"MONKEY\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: create game against another player",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 500ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(201);",
+											"    pm.expect(responseData.success).to.be.true;",
+											"    pm.expect(responseData.message).to.eql(\"Game created successfully\");",
+											"    pm.expect(responseData.data).to.have.all.keys('game_id', 'player_1_id', 'player_2_id', 'AI_difficulty', 'game_status', 'start_date')",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.exist;",
+											"    pm.expect(responseData.data).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Game status is active and AI difficulty is correct\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.data.game_status).to.eql(\"ACTIVE\");",
+											"    pm.expect(responseData.data.AI_difficulty).to.be.null;",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"var abandon = {",
+											"    url: 'http://' + pm.environment.get('HOST') + ':' + pm.environment.get('PORT') + '/games/move/abandon',",
+											"    method: 'POST',",
+											"    header: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + pm.environment.get('TEST_JWT')}",
+											"};",
+											"",
+											"pm.sendRequest(abandon, function (err, res) {",
+											"    console.log(res);",
+											"});",
+											"",
+											"Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1000);",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TEST2_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"player_2_email\": \"test@test.it\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to create a game with insufficient tokens",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(401);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Insufficient tokens\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let abandon = {",
+											"    url: 'http://' + pm.environment.get('HOST') + ':' + pm.environment.get('PORT') + '/games/move/abandon',",
+											"    method: 'POST',",
+											"    header: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + pm.environment.get('TEST2_JWT')}",
+											"};",
+											"",
+											"let updateTokens = {",
+											"    url: 'http://' + pm.environment.get('HOST') + ':' + pm.environment.get('PORT') + '/admin/update-tokens',",
+											"    method: 'POST',",
+											"    header: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + pm.environment.get('FRANCO_JWT')},",
+											"    body: {",
+											"        mode: 'raw',",
+											"        raw: JSON.stringify({email: 'test2@test.it', tokens: 0.4})",
+											"    }",
+											"}",
+											"",
+											"pm.sendRequest(abandon, function (err, res) {",
+											"    console.log(res);",
+											"});",
+											"pm.sendRequest(updateTokens, function (err, res) {",
+											"    console.log(res);",
+											"})",
+											"",
+											"Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1000);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TEST2_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"player_2_email\": \"test@test.it\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to create a game with invalid AI difficulty",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Invalid AI difficulty. Choose from: MONKEY, BEGINNER, INTERMEDIATE, ADVANCED, EXPERIENCED.\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TEST2_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"AI_difficulty\": \"INVALID\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to create a game against a non existing player",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(404);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Chosen opponent not found\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"",
+											"let updateTokens = {",
+											"    url: 'http://' + pm.environment.get('HOST') + ':' + pm.environment.get('PORT') + '/admin/update-tokens',",
+											"    method: 'POST',",
+											"    header: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + pm.environment.get('FRANCO_JWT')},",
+											"    body: {",
+											"        mode: 'raw',",
+											"        raw: JSON.stringify({email: 'test2@test.it', tokens: 10})",
+											"    }",
+											"}",
+											"",
+											"pm.sendRequest(updateTokens, function (err, res) {",
+											"    console.log(res);",
+											"})",
+											"",
+											"Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1000);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TEST2_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"player_2_email\": \"invalid@email.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to create a game with invalid parameter type",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Invalid player 2 email\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TEST2_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"player_2_email\": 7\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to create a game while already playing one",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(403);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"You are already playing a game\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"AI_difficulty\": \"BEGINNER\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to create a game against a player that is already playing a game",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(403);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"The chosen opponent is already playing a game\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TEST2_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"player_2_email\": \"franco@giovanni.it\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to create a game without parameters",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Player 2 email or AI difficulty must be provided\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TEST2_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to create a game without JWT",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(401);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Token not provided\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"player_2_email\": \"prova@prova.it\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "GET /games",
+					"item": [
+						{
+							"name": "Test: retrieve game history successfully",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 500ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(200);",
+											"    pm.expect(responseData.success).to.be.true;",
+											"    pm.expect(responseData.message).to.eql(\"Games history retrieved successfully\");",
+											"    if (responseData.data.length > 0) {",
+											"        pm.expect(responseData.data[0]).to.have.all.keys('game_id', 'game_status', 'number_of_moves', 'start_date', 'winner_id', 'result')",
+											"    } else {",
+											"        pm.expect(responseData.data.length).to.eql(0);",
+											"    }",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.exist;",
+											"    pm.expect(responseData.data).to.be.an('array');",
+											"});",
+											"",
+											"pm.test(\"Games are retrieved correctly\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    if (responseData.data.length > 0) {",
+											"        pm.expect(responseData.data[0].game_status).to.eql(\"FINISHED\");",
+											"        pm.expect(responseData.data[0].number_of_moves).to.be.greaterThan(0);",
+											"        pm.expect(responseData.data[0].result).to.eql(\"You are the winner.\" || \"You are the loser.\");",
+											"    } else {",
+											"        pm.expect(responseData.data.length).to.eql(0);",
+											"    }",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: retrieve game history with valid start date",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 500ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"All games are after the specified start date\", function () {",
+											"     pm.expect(pm.response.json()).to.be.an('object');",
+											"     pm.expect(pm.response.json().data).to.be.an('array');",
+											"     pm.response.json().data.forEach((game) => {",
+											"            pm.expect(new Date(game.start_date)).to.be.at.least(new Date(\"2022-07-30\"));",
+											"     });",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games?start_date=2022-07-30",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games"
+									],
+									"query": [
+										{
+											"key": "start_date",
+											"value": "2022-07-30"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: retrieve game history with future start date",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 500ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(200);",
+											"    pm.expect(responseData.success).to.be.true;",
+											"    pm.expect(responseData.message).to.eql(\"Games history retrieved successfully\");",
+											"    pm.expect(responseData.data.length).to.eql(0);",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.exist;",
+											"    pm.expect(responseData.data).to.be.an('array');",
+											"});",
+											"",
+											"pm.test(\"Games are retrieved correctly\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.data.length).to.eql(0);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TEST2_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games?start_date=2029-07-10",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games"
+									],
+									"query": [
+										{
+											"key": "start_date",
+											"value": "2029-07-10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: retrieve game history with desc order",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 500ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Games are correctly ordered\", function () {",
+											"    let responseData = pm.response.json();",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.data).to.exist.and.to.be.an('array');",
+											"",
+											"    let isOrdered = true;",
+											"    for (let i = 0; i < responseData.data.length - 1; i++) {",
+											"     if (new Date(responseData.data[i].start_date) < new Date(responseData.data[i + 1].start_date)) {",
+											"        isOrdered = false;",
+											"        break;",
+											"     }",
+											"    }",
+											"    pm.expect(isOrdered).to.be.true;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TEST_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games?order=desc",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games"
+									],
+									"query": [
+										{
+											"key": "order",
+											"value": "desc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to retrieve game history with invalid date",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Invalid date format. Use YYYY-MM-DD\");    ",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games?start_date=10/12/2023",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games"
+									],
+									"query": [
+										{
+											"key": "start_date",
+											"value": "10/12/2023"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to retrieve game history with invalid order",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Invalid order direction\");    ",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games?order=ascendant",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games"
+									],
+									"query": [
+										{
+											"key": "order",
+											"value": "ascendant"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "GET /games[/{gameId}]/status",
+					"item": [
+						{
+							"name": "Test: retrieve status of currently active game successfully",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 500ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(200);",
+											"    pm.expect(responseData.success).to.be.true;",
+											"    pm.expect(responseData.message).to.eql(\"Game status retrieved successfully\");",
+											"    pm.expect(responseData.data).to.have.all.keys('game_id', 'status', 'current_configuration', 'opponent', 'turn')",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.exist;",
+											"    pm.expect(responseData.data).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Game status is active\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.data.status).to.eql(\"ACTIVE\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/status",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"status"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: retrieve status of specific finished game successfully",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 500ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(200);",
+											"    pm.expect(responseData.success).to.be.true;",
+											"    pm.expect(responseData.message).to.eql(\"Game status retrieved successfully\");",
+											"    pm.expect(responseData.data).to.have.all.keys('game_id', 'status', 'current_configuration', 'opponent', 'winner_id', 'result')",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.exist;",
+											"    pm.expect(responseData.data).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Game status is finished\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.data.status).to.eql(\"FINISHED\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/2/status",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"2",
+										"status"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to retrieve status of specific not existing game",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(404);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Game not found\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/10000/status",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"10000",
+										"status"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to retrieve status of game with invalid game ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Invalid game ID\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/-1/status",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"-1",
+										"status"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to retrieve status of another player's game",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(403);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"You are not part of the game\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/4/status",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"4",
+										"status"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "GET /games/{gameId}/win-certificate",
+					"item": [
+						{
+							"name": "Test: retrieve win certificate for won game successfully",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 1000ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/pdf\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\");",
+											"});",
+											"",
+											"pm.test(\"Response content disposition header includes filename\", function () {",
+											"     pm.expect(pm.response.headers.get('Content-Disposition')).to.include('filename');",
+											"});",
+											"",
+											"pm.test(\"Filename is correct\", function () {",
+											"     pm.expect(pm.response.headers.get('Content-Disposition')).to.include('filename=winCertificate.pdf');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/2/win-certificate",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"2",
+										"win-certificate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to retrieve win certificate for lost game",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(403);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"You are not the winner of the game\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{PROVA_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/2/win-certificate",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"2",
+										"win-certificate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to retrieve win certificate for active game",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Game is not finished\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/1/win-certificate",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"1",
+										"win-certificate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to retrieve win certificate for not existing game",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(404);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Game not found\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/7895/win-certificate",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"7895",
+										"win-certificate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to retrieve win certificate with invalid game ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Invalid game ID\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/invalidID/win-certificate",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"invalidID",
+										"win-certificate"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "POST /games/move",
+					"item": [
+						{
+							"name": "Test: execute valid move in valid game",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 500ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(201);",
+											"    pm.expect(responseData.success).to.be.true;",
+											"    pm.expect(responseData.message).to.eql(\"Move made successfully\");",
+											"    pm.expect(responseData.data).to.have.all.keys('move');",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.exist;",
+											"    pm.expect(responseData.data).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Performed move has been correctly done\", function () {",
+											"     var responseData = pm.response.json();",
+											"",
+											"     pm.expect(responseData.data.move).to.be.a('string');",
+											"     pm.expect(responseData.data.move).to.contain(\"You moved a White Pawn from C2 to C4\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"from\": \"C2\",\n    \"to\": \"C4\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/move",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"move"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to execute possible move while not playing any game",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(404);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"No active game found\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TEST2_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"from\": \"C2\",\n    \"to\": \"C4\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/move",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"move"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to execute move with no piece at start location",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Invalid move. No piece at start location\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"from\": \"C2\",\n    \"to\": \"C4\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/move",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"move"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to execute move with invalid end position",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.contain(\"Invalid move.\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"from\": \"B2\",\n    \"to\": \"C7\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/move",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"move"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to execute invalid move",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.contain(\"Invalid start or end location\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"from\": \"A0\",\n    \"to\": \"A10\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/move",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"move"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to execute move without start location",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.contain(\"Both move parameters are required\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"from\": \"A2\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/move",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"move"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to execute move out of turn",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(403);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.contain(\"Not your turn\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let createGame = {",
+											"    url: 'http://' + pm.environment.get('HOST') + ':' + pm.environment.get('PORT') + '/games',",
+											"    method: 'POST',",
+											"    header: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + pm.environment.get('TEST2_JWT')},",
+											"    body: {",
+											"        mode: 'raw',",
+											"        raw: JSON.stringify({player_2_email: 'test@test.it'})",
+											"    }",
+											"}",
+											"",
+											"pm.sendRequest(createGame, function (err, res) {",
+											"    console.log(res);",
+											"})",
+											"",
+											"Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1000);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TEST_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"from\": \"B7\",\n    \"to\": \"B5\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/move",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"move"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "GET /games/{gameId}/chessboard",
+					"item": [
+						{
+							"name": "Test: retrieve game chessboard successfully",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 500ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);",
+											"});",
+											"",
+											"pm.test(\"Response content type is image/svg+xml\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"image/svg+xml\");",
+											"});",
+											"",
+											"pm.test(\"Response content disposition header includes filename\", function () {",
+											"     pm.expect(pm.response.headers.get('Content-Disposition')).to.include('filename');",
+											"});",
+											"",
+											"pm.test(\"Filename is correct\", function () {",
+											"     pm.expect(pm.response.headers.get('Content-Disposition')).to.include('filename=chessboard.svg');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/2/chessboard",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"2",
+										"chessboard"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to retrieve chessboard for not existing game",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(404);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Game not found\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{PROVA_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/2000/chessboard",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"2000",
+										"chessboard"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to retrieve chessboard for a not-participating game",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(403);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"You are not part of the game\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TEST2_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/2/chessboard",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"2",
+										"chessboard"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to retrieve chessboard without providing game ID (not existing route)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(404);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Route not found\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/chessboard",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"chessboard"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "GET /games/{gameId}/details",
+					"item": [
+						{
+							"name": "Test: retrieve game details in JSON format",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 500ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(200);",
+											"    pm.expect(responseData.success).to.be.true;",
+											"    pm.expect(responseData.message).to.eql(\"Game details retrieved successfully\");",
+											"    if (responseData.data.length > 0) {",
+											"        pm.expect(responseData.data[0]).to.have.all.keys('player_name', 'game_id', 'move_number', 'from_position', 'to_position', 'player_id', \"configuration_after\", \"piece\", \"moveEffect\", \"time_elapsed\")",
+											"    } else {",
+											"        pm.expect(responseData.data.length).to.eql(0);",
+											"    }",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.exist;",
+											"    pm.expect(responseData.data).to.be.an('array');",
+											"});",
+											"",
+											"pm.test(\"First move has 1 as move number\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    if (responseData.data.length > 0) {",
+											"        pm.expect(responseData.data[0].move_number).to.eql(1);",
+											"    } else {",
+											"        pm.expect(responseData.data.length).to.eql(0);",
+											"    }",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/2/details",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"2",
+										"details"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: retrieve game details in PDF format",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 5000ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/pdf\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\");",
+											"});",
+											"",
+											"pm.test(\"Response content disposition header includes filename\", function () {",
+											"     pm.expect(pm.response.headers.get('Content-Disposition')).to.include('filename');",
+											"});",
+											"",
+											"pm.test(\"Filename is correct\", function () {",
+											"     pm.expect(pm.response.headers.get('Content-Disposition')).to.include('filename=gameHistory.pdf');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/2/details?format=pdf",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"2",
+										"details"
+									],
+									"query": [
+										{
+											"key": "format",
+											"value": "pdf"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to retrieve game details with invalid format",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Invalid format\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{PROVA_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/2/details?format=123",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"2",
+										"details"
+									],
+									"query": [
+										{
+											"key": "format",
+											"value": "123"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to retrieve game details for a not-participating game",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(403);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"You are not part of the game\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/5/win-certificate",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"5",
+										"win-certificate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to retrieve game details for not existing game",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(404);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Game not found\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/7895/details",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"7895",
+										"details"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to retrieve win certificate with invalid game ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(400);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Invalid game ID\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"    pm.expect(responseData.data).to.not.exist;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/invalidID/details",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"invalidID",
+										"details"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "POST /games/move/abandon",
+					"item": [
+						{
+							"name": "Test: abandon a game successfully",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 500ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(201);",
+											"    pm.expect(responseData.success).to.be.true;",
+											"    pm.expect(responseData.message).to.eql(\"Game abandoned. You lost.\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/move/abandon",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"move",
+										"abandon"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to abandon a game while not playing any",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(404);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"No active game found\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{FRANCO_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/move/abandon",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"move",
+										"abandon"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test: attempt to abandon a game out of turn",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"pm.test(\"Response content type is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"pm.test(\"Response fields have the correct values\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.statusCode).to.eql(403);",
+											"    pm.expect(responseData.success).to.be.false;",
+											"    pm.expect(responseData.message).to.eql(\"Not your turn\");",
+											"});",
+											"",
+											"pm.test(\"Response schema matches the expected format\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.success).to.exist;",
+											"    pm.expect(responseData.success).to.be.a('boolean');",
+											"    pm.expect(responseData.statusCode).to.exist;",
+											"    pm.expect(responseData.statusCode).to.be.a('number');",
+											"    pm.expect(responseData.message).to.exist;",
+											"    pm.expect(responseData.message).to.be.a('string');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let createGame = {",
+											"    url: 'http://' + pm.environment.get('HOST') + ':' + pm.environment.get('PORT') + '/games',",
+											"    method: 'POST',",
+											"    header: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + pm.environment.get('FRANCO_JWT')},",
+											"    body: {",
+											"        mode: 'raw',",
+											"        raw: JSON.stringify({player_2_email: 'prova@prova.it'})",
+											"    }",
+											"}",
+											"",
+											"pm.sendRequest(createGame, function (err, res) {",
+											"    console.log(res);",
+											"})",
+											"",
+											"Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 300);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{PROVA_JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{HOST}}:{{PORT}}/games/move/abandon",
+									"protocol": "http",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"games",
+										"move",
+										"abandon"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}

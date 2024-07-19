@@ -1,0 +1,69 @@
+{
+	"id": "ed75ee62-81c9-4ee0-b9bd-6df173f8a0b7",
+	"name": ".env",
+	"values": [
+		{
+			"key": "FRANCO_JWT",
+			"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6MCwiaWF0IjoxNzIxMjMyOTY1LCJleHAiOjE4MDc2MzI5NjV9.QYihZma07mBxyCXdxzZir5AyAoWLDPffxfMSTAWoU_1_Uu0bEijk_u0mV632txT45F5z1uNNpXA-D98wgR7gV2i7rFL61IbQ21AH-rcOMjW_ikTczypuJDLWhJzgoXZDqfteE2i8Z6rtuWBuvXHSksDBy3WwaYUFOHOQ1O_e4hx7WoGjAnfNnFdyCTDh7qZam9lgq-5APN0qiHnKhQNWnLaOawRTgzP6Vfy2psRfNIGJ_oaWOBi7bMmH43TALGLyoBUxstNa8pTDiw2Hvzr_xud3qVTNPnuPl0NrLT25ZSSedQvA598DnZaXz9SvgK3_Ts5Pg0nscIUjnopIPvdcHdamPv_6Rx_-dyyvoJUrnksE1eZ1_t3jveSIl33q-L_z-uOd_gWD6-rB_BPydEsR30NYNwf5dAHTiQb_gaDFIaZvrJ_icXWaqA6JuiurWWEDQnndUDnXpMrQnYs6INh5YTlB-l1mBFDovHb6H9HZn1cePtjPiBtkj067w2DPSPdp97zMr3fTiTjId-d_uE21P2paAtkGDewWdrObbW1HOPHkIeMtgw3-IRzQO26ecdgW2_7iJ2F9BVl3xlwGsPQVg4-nbJMSuLSnAqvSJbRkK_iXoYteKIrCdzYa4vSZGl--6kUbMHY7HpgQpHjYSzJ4htFFoAq0xJxP30CNjk2Ko_g",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "PROVA_JWT",
+			"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6MSwiaWF0IjoxNzIxMjMyODQ4LCJleHAiOjE4MDc2MzI4NDh9.g2zwrGzfS2z5ZTHrPOnwUoGGbkV_bbSX_wf_pPXzsay84_pGm5mS-JT9AxI7xLV59RStw7e4bK4ALGf84BGB9CRQSEp3BN2P34h8Vr-VMAs6xI7SscyJ4rZfrf4I9YVXYGyJz8rmcg-6U5xbIRyKRFaaYU4iZgH9feONtXzVTRA3E85Qm1SRJQeMD_ziL7XdzEt89D5Fg3pYXwjUIgW6QDAS4MHWh9OPONizaxwPme-HlEQu-KJ06p3dl_6sNO_qL5jq8UT31yRB3vVdHoEVIoJOV6RoD2a0mxuk7Idrog7Nw40xPN5bMTUrPHnONNbxQ5Jf2-7P2SSCkG7IW6B9s0jiam-_31dhp_P-WN3rmBBdNWvF6cr8XQV-OY1l12hbzE7NN1301LaXalDNO_zmo2vF25-LF9SX-6CqPexiFELzTTZ7wOMyPSIYWrOWK7XqdVo9Oaa-akImLGjFSm9_WEl3FerMg98aYZ53Ytic21eLlaCfwvP-C9d4X2Mtz9Dgwtji5P-xJLFC8hhS7220usQlkN6DUid1rm-9kls7GuLpFYNds-vBfaV26q8j81u-CBvdtFRxAKhzebEtvF8t17PShB2WIgcdlE_A0a4qt4tGZTA6GKj85mCCIFvvdsVOTD9ERTK5NTCQ9W95z5Sq5YxlGg2LHzVT-LhSJhr4J_Y",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "HOST",
+			"value": "localhost",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "PORT",
+			"value": "3000",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "FRANCO_PASSWORD",
+			"value": "franco",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "PROVA_PASSWORD",
+			"value": "prova",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "TEST_PASSWORD",
+			"value": "test",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "TEST2_PASSWORD",
+			"value": "test2",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "TEST_JWT",
+			"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6MCwiaWF0IjoxNzIxMjMyOTI3LCJleHAiOjE4MDc2MzI5Mjd9.GBgdbDgEiUpYsgSsbGSNPgoiWQR7O8OEzXxecuRxrlUaLeXT1eCWv4HbXQ-P8xjjK0CxwadEjoxVkoc7yJMXRd-AZ6xr1a3qZGxy_iCzVGYTKBWOg0JF3f-Hxz9DpZEIFQBt7AmGNbNB3__o2POd5FcdisFUot-78LNHnVp0ZegFVsu-FZ5JmobKIRcCvEVHTV31Vd1EsV0b79IFtJ2eFJvgiXtZ1ZmDnpN2I0Qloe1qdEwHj8ZlCm1qZAa_mBiMgY6rXBY1hRQN2FVkbi8UZzZQ4kBE-i6G3B7PB3K791UAwbwRd0G2CQN7wGSMsPPYhcjneFib0O-uTulsUqWvOz1tXgEbQleNlmL9YVg7BdNsihfOf8cyVMKzXiWJQwRCvAgGymXAyw61urbz7i2dvraqnlWMWLi9vQdAJSNU1yZ2x_KGro-C1mIgOhlKJ9mAaGFcw2k_U6wpie4K5_toQNb_umo-ir7ieto-F4vFPZwfYRHPWOD1DJxjLczpXenHjhVKiHuChEzHJjt1558LuwvVK7aQ1vvdXTk6UpdpMgVe2iqNp3SgHWfKW-jE05o0L3kdYQIrAA_NYGN8d1NSSKwRkKixi_MxGV4zmR2ABnaDhMRiILtT2NXnNsm9VU2GRF3GB9_Yq8uywSvylZOeGv7eXW9sJWAiIDxph6RwABc",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "TEST2_JWT",
+			"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwicm9sZSI6MSwiaWF0IjoxNzIxMjMyOTQ2LCJleHAiOjE4MDc2MzI5NDZ9.gTimoLj5KLabgUeN_mdvMP8mD35lcw8Tnso_0Ud9tUEx0Y8_MrPO89mc0lmTlPfB-8js2B-p5tZ0OT1d06fknH79UQrfmIQUQAXz4Eg_UX54BPuBImzVkWDxfX_wIO-vSTcHblwt4il4RRQWReOEWtx76BwNiHOn-azL-tXdaKUmxGpAUAFjQQG1SYpGTZZCnTMZfV2wl8Ox6LpEZqLftcgO1tBia1NOKdX7d3seCQQPgXfHokAr79JVR5_9OwnLqkptYLtmWdUWfCV3qKSoJBdX5UuqrpyjBRt0NNbO5LSd5E_ch0yQw6VhuEw6GeiwU-2LI7aXVf95QdhlbmvD9egUOb7rOK9pLyi_qq7yNzfu8K0G6IibHPHctcqciGnzAdMKSFLAQJtuWyQ0G1RUU5NCt1BSmB7a39J5DWmMQhriSAasQEbXwBLek4pPq0bNpPCqWMoT32VKUxYbxdYW6drbRk3WR99wLhFqoCQXWTd3Hy9uN7_fL1UW2El-Vk-hFdTj-n2924cftb22K2e1PMNJQmVj-QfBWgLEy8xe87pAsgGrj17mxn-eIEr2m24T8sK72DnjI0I4w1DPcxA66hKyN-qHq7ig8OWmp56LPYRzdLYl8yHcPPkejtBvsoZtRCiQ-yjlHoHLpXuO30ntSopeBKjRImj1mSnnuCW_mC0",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2024-07-18T17:08:44.537Z",
+	"_postman_exported_using": "Postman/11.4.0"
+}
