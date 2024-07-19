@@ -5,7 +5,7 @@ import {repositories} from "../repositories";
 import {Player} from "../models/player";
 
 /**
- * This function is used in the /player/ranking route.
+ * This function is used in the /players/ranking route.
  * It retrieves the ranking of all players in the database.
  * The ranking is based on the field and order provided in the request query.
  *

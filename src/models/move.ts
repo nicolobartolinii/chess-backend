@@ -15,7 +15,7 @@ const db_connection: Sequelize = SingletonDBConnection.getInstance();
  *
  * Fields:
  *  - move_id: The primary key and auto-incrementing identifier for each move, unique to each move.
- *  This field is not use in the application, but it is a good pratice for RESTful APIs.
+ *  This field is not use in the application, but it is a good practice for RESTful APIs.
  *  - player_id: Foreign key to the 'Player' model. Nullable if the move was automatically generated.
  *  - game_id: Foreign key to the 'Game' model, linking the move to a specific game.
  *  - move_number: The sequence number of the move within the game.

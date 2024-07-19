@@ -77,18 +77,6 @@ class ErrorFactory {
     static internalServerError(message: string = ReasonPhrases.INTERNAL_SERVER_ERROR): CustomError {
         return new CustomError(message, StatusCodes.INTERNAL_SERVER_ERROR);
     }
-
-    /**
-     * Creates a custom error.
-     *
-     * @param {string} message - The error message
-     * @param {number} statusCode - The status code of the error
-     *
-     * @returns {CustomError} - The custom error
-     */
-    static customError(message: string, statusCode: number): CustomError {
-        return new CustomError(message, statusCode);
-    }
 }
 
 export {ErrorFactory, CustomError};

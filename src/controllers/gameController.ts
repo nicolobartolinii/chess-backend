@@ -7,7 +7,7 @@ import {AiLevel} from "../utils/aiLevels";
 import {abandon, getGameMoves, move} from "../services/moveService";
 
 /**
- * This function is used in the /games/create route.
+ * This function is used in the POST /games route.
  * It creates a new game between two players. The first player is the one who is logged in.
  * The second player can be another player or an AI. Either the email of the second player or the AI difficulty
  * must be provided in the request body.
@@ -41,7 +41,7 @@ export const createGame = async (req: Request, res: Response, next: NextFunction
 }
 
 /**
- * This function is used in the /games/history route.
+ * This function is used in the GET /games route.
  * It retrieves the games history of the player who is logged in.
  * The games history is returned in the response.
  *
@@ -65,7 +65,7 @@ export const gamesHistory = async (req: Request, res: Response, next: NextFuncti
 }
 
 /**
- * This function is used in the /games/win-certificate/:gameId route.
+ * This function is used in the /games/:gameId/win-certificate route.
  * It generates a win certificate for the player who is logged in.
  * The win certificate is generated for the game with the ID provided in the request parameters.
  * The win certificate is returned in the response as a PDF file.
@@ -95,8 +95,9 @@ export const getWinCertificate = async (req: Request, res: Response, next: NextF
 };
 
 /**
- * This function is used in the /games/status/:gameId route.
+ * This function is used in the /games[/:gameId]/status route.
  * It retrieves the status of the game with the ID provided in the request parameters.
+ * If the game ID is not provided, the status of the currently active game of the player who is logged in is retrieved.
  * The status of the game is returned in the response.
  *
  * @param {Request} req - The request object
@@ -119,8 +120,8 @@ export const gameStatus = async (req: Request, res: Response, next: NextFunction
 }
 
 /**
- * This function is used in the /games/move/:gameId route.
- * It makes a move in the game with the ID provided in the request parameters.
+ * This function is used in the /games/move route.
+ * It makes a move in the currently active game of the player who is logged in.
  * The move is made by the player who is logged in. The move is made from the position provided in the request body
  * to the position provided in the request body. The move details is returned in the response.
  *
@@ -147,7 +148,7 @@ export const makeMove = async (req: Request, res: Response, next: NextFunction):
 }
 
 /**
- * This function is used in the /games/chessboard/:gameId route.
+ * This function is used in the /games/:gameId/chessboard route.
  * It retrieves the chessboard of the game with the ID provided in the request parameters.
  * The chessboard is returned in the response as an SVG file.
  *
@@ -176,7 +177,7 @@ export const getChessboard = async (req: Request, res: Response, next: NextFunct
 }
 
 /**
- * This function is used in the /games/details/:gameId/:format? route.
+ * This function is used in the /games/:gameId/details route.
  * It retrieves the game history of the game with the ID provided in the request parameters.
  * The game history is returned in the response. The format of the response can be either JSON or PDF.
  * If the format is PDF, the game history is returned as a PDF file. If the format is JSON, the game history is returned as a JSON object.
@@ -223,14 +224,14 @@ export const getGameDetails = async (req: Request, res: Response, next: NextFunc
 };
 
 /**
- * This function is used in the /games/abandon/:gameId route.
+ * This function is used in the /games/move/abandon route.
  * It abandons the game with the ID provided in the request parameters.
  * The player who is logged in abandons the game. The response contains a success message.
  *
  * Abandoning a game means that the player who abandons the game loses the game.
  * The opponent wins the game.
  *
- * If the player abandons the game, they lose 0.5 points.
+ * If the player abandons the game, he loses 0.5 points.
  *
  * @param {Request} req - The request object
  * @param {Response} res - The response object
