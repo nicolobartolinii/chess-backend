@@ -912,7 +912,7 @@ sequenceDiagram
     end
 ```
 
-## GET `/players/ranking`
+### GET `/players/ranking`
 
 ```mermaid
 sequenceDiagram
@@ -950,7 +950,7 @@ sequenceDiagram
     end
 ```
 
-## GET `/games/history`
+### GET `/games/history`
 
 ```mermaid
 sequenceDiagram
@@ -1022,7 +1022,7 @@ sequenceDiagram
     end
 ```
 
-## POST `/games`
+### POST `/games`
 
 ```mermaid
 sequenceDiagram
@@ -1124,7 +1124,7 @@ sequenceDiagram
     end
 ```
 
-## GET `/games/{gameId}/win-certificate`
+### GET `/games/{gameId}/win-certificate`
 
 ```mermaid
 sequenceDiagram
@@ -1178,7 +1178,7 @@ sequenceDiagram
     end
 ```
 
-## GET `/games/{gameId}/details`
+### GET `/games/{gameId}/details`
 
 ```mermaid
 sequenceDiagram
@@ -1359,12 +1359,18 @@ The default port for the application is 3000. It can be changed in the `.env` fi
 
 ### Default users
 
-Starting the application using `NODE_ENV=development` will create four default users:
+Starting the application using `NODE_ENV=development` in the `.env` file will create four default users:
 
 - prova@prova.it (password: prova) - Standard player
 - franco@giovanni.it (password: franco) - Admin
 - test@test.it (password: test) - Admin
 - test2@test.it (password: test2) - Standard player
+
+To run seeders using, instead, `NODE_ENV=production` in the `.env` file, the following command should be executed:
+
+```bash
+docker-compose exec api npm run seed
+```
 
 # 🧪 Testing
 
@@ -1422,10 +1428,10 @@ functionality.
 ### Chessboard visualization
 
 - **Endpoint:** [GET /games/{gameId}/chessboard](#get-gamesgameidchessboard)
-- **Function:** Returns a PNG image of the latest chessboard state for a specific game
+- **Function:** Returns a SVG image of the latest chessboard state for a specific game
 - **Integrations:**
     - Included in [victory certificates](#get-gamesgameidwin-certificate)
-    - Incorporated in PDF exports of [game move history](#get-gamesgameiddetails)
+    - Incorporated in PDF exports of [game details](#get-gamesgameiddetails)
 
 This additional feature enhances data presentation and improves the understanding of game progression. We built it to
 make testing and debugging easier.
