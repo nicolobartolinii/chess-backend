@@ -1380,6 +1380,12 @@ Avviare l'applicazione utilizzando `NODE_ENV=development` nel file `.env` creer�
 - test@test.it (password: test) - Admin
 - test2@test.it (password: test2) - Giocatore standard
 
+Per eseguire i seeders utilizzando, invece, `NODE_ENV=production` nel file `.env`, è necessario eseguire il seguente comando:
+
+```bash
+docker-compose exec api npm run seed
+```
+
 # 🧪 Testing
 
 Il progetto include una suite di test completa per ogni endpoint API. Tale suite copre quasi tutte le possibili
@@ -1437,7 +1443,7 @@ funzionalità.
 ### Visualizzazione della scacchiera
 
 - **Endpoint:** [GET /games/{gameId}/chessboard](#get-gamesgameidchessboard)
-- **Funzione:** Restituisce un'immagine PNG dello stato più recente della scacchiera per una specifica partita
+- **Funzione:** Restituisce un'immagine SVG dello stato più recente della scacchiera per una specifica partita
 - **Integrazioni:**
     - Inclusa nei [certificati di vittoria](#get-gamesgameidwin-certificate)
     - Incorporata nelle esportazioni PDF della [cronologia delle mosse di gioco](#get-gamesgameiddetails)
