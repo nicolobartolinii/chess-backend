@@ -38,7 +38,7 @@ export async function createGame(player_1_id: number, player_2_email?: string, A
 
     player1Games.forEach(game => {
         if (game.game_status === Statuses.ACTIVE) {
-            throw ErrorFactory.forbidden('Player 1 is already playing a game');
+            throw ErrorFactory.forbidden('You are already playing a game');
         }
     })
 
@@ -46,20 +46,20 @@ export async function createGame(player_1_id: number, player_2_email?: string, A
     if (player_2_email) {
         player2 = await repositories.player.findByEmail(player_2_email);
         if (!player2) {
-            throw ErrorFactory.notFound('Player 2 not found');
+            throw ErrorFactory.notFound('Chosen opponent not found');
+        }
+
+        if (player2.player_id === player_1_id) {
+            throw ErrorFactory.badRequest('Player 1 and Player 2 cannot be the same');
         }
 
         const player2Games = await repositories.game.findByPlayer(player2.player_id);
 
         player2Games.forEach(game => {
             if (game.game_status === Statuses.ACTIVE) {
-                throw ErrorFactory.forbidden('Player 2 is already playing a game');
+                throw ErrorFactory.forbidden('The chosen opponent is already playing a game');
             }
         })
-
-        if (player2.player_id === player_1_id) {
-            throw ErrorFactory.badRequest('Player 1 and Player 2 cannot be the same');
-        }
     }
 
     const player_2_id = player2 ? player2.player_id : undefined;
@@ -125,32 +125,42 @@ export async function getGamesHistory(player_id: number, startDate: Date, order:
  *
  * @returns A promise that resolves to the game status.
  */
-export async function getGameStatus(playerId: number, gameId: number) {
-    const game = await repositories.game.findById(gameId);
+export async function getGameStatus(playerId: number, gameId?: number) {
+    const game = gameId
+        ? await repositories.game.findById(gameId)
+        : (await repositories.game.findActiveGameByPlayer(playerId));
+
     if (!game) {
-        throw ErrorFactory.notFound('Game not found');
+        throw ErrorFactory.notFound(gameId ? 'Game not found' : 'No active game found');
     }
 
     if (game.player_1_id !== playerId && game.player_2_id !== playerId) {
         throw ErrorFactory.forbidden('You are not part of the game');
     }
 
-    if (game.game_status === Statuses.FINISHED) {
-        return {
-            game_id: game.game_id,
-            status: game.game_status,
-            current_configuration: game.game_configuration,
-            opponent: game.player_2_id ? (game.player_1_id === playerId ? game.player_2_id : game.player_1_id) : `AI-${game.AI_difficulty}`,
-            winner_id: game.winner_id ? game.winner_id : `AI-${game.AI_difficulty}`,
-            result: game.winner_id === playerId ? 'You are the winner.' : 'You are the loser.'
-        };
-    }
-    return {
+    const isPlayer1 = game.player_1_id === playerId;
+    const opponent = game.player_2_id ? (isPlayer1 ? game.player_2_id : game.player_1_id) : `AI-${game.AI_difficulty}`;
+
+    const baseResponse = {
         game_id: game.game_id,
         status: game.game_status,
         current_configuration: game.game_configuration,
-        opponent: game.player_2_id ? (game.player_1_id === playerId ? game.player_2_id : game.player_1_id) : `AI-${game.AI_difficulty}`,
-        turn: game.player_1_id === playerId && game.game_configuration.turn === "white" ? "Your turn" : game.player_2_id === playerId && game.game_configuration.turn === "black" ? "Your turn" : "Opponent's turn"
+        opponent,
+    };
+
+    if (game.game_status === Statuses.FINISHED) {
+        return {
+            ...baseResponse,
+            winner_id: game.winner_id || `AI-${game.AI_difficulty}`,
+            result: game.winner_id === playerId ? 'You are the winner.' : 'You are the loser.'
+        };
+    }
+
+    return {
+        ...baseResponse,
+        turn: (isPlayer1 && game.game_configuration.turn === "white") || (!isPlayer1 && game.game_configuration.turn === "black")
+            ? "Your turn"
+            : "Opponent's turn"
     };
 }
 
@@ -164,7 +174,23 @@ export async function getGameStatus(playerId: number, gameId: number) {
  * @returns {Promise<Buffer>} - A promise that resolves to the win certificate.
  */
 export async function getWinCertificate(player_id: number, game_id: number): Promise<Buffer> {
-    const game = await repositories.game.findWonGameByIds(player_id, game_id);
+    const game = await repositories.game.findById(game_id);
+
+    if (!game) {
+        throw ErrorFactory.notFound('Game not found');
+    }
+
+    if (game.player_1_id !== player_id && game.player_2_id !== player_id) {
+        throw ErrorFactory.forbidden('You are not part of the game');
+    }
+
+    if (game.game_status !== Statuses.FINISHED) {
+        throw ErrorFactory.badRequest('Game is not finished');
+    }
+
+    if (game.winner_id !== player_id) {
+        throw ErrorFactory.forbidden('You are not the winner of the game');
+    }
 
     const doc = new PDFDocument();
     const buffers: Buffer[] = [];

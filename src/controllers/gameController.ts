@@ -110,7 +110,7 @@ export const gameStatus = async (req: Request, res: Response, next: NextFunction
         const playerId = req.player!.id;
         const gameId = req.params.gameId;
 
-        const gameStatus = await gameService.getGameStatus(playerId, parseInt(gameId));
+        const gameStatus = gameId ? await gameService.getGameStatus(playerId, parseInt(gameId)) : await gameService.getGameStatus(playerId);
 
         res.status(StatusCodes.OK).json(ResponseFactory.success("Game status retrieved successfully", gameStatus));
     } catch (err) {
@@ -135,11 +135,10 @@ export const gameStatus = async (req: Request, res: Response, next: NextFunction
 export const makeMove = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const playerId = req.player!.id;
-        const gameId = req.params.gameId;
         const from = req.body.from;
         const to = req.body.to;
 
-        const moveString = await move(from, to, playerId, parseInt(gameId));
+        const moveString = await move(from, to, playerId);
 
         res.status(StatusCodes.CREATED).json(ResponseFactory.successCreated('Move made successfully', {move: moveString}));
     } catch (err) {
@@ -208,12 +207,16 @@ export const getGameDetails = async (req: Request, res: Response, next: NextFunc
 
         const exportedData = await exportStrategy.export(moves);
 
-        const response = format === 'pdf' ? ResponseFactory.pdf(exportedData, 'gameHistory.pdf') : ResponseFactory.success('Game history retrieved successfully', exportedData);
+        const response = format === 'pdf' ? ResponseFactory.pdf(exportedData, 'gameHistory.pdf') : ResponseFactory.success('Game details retrieved successfully', JSON.parse(exportedData));
 
-        res.status(response.statusCode)
-            .setHeader('Content-Type', format === 'pdf' ? 'application/pdf' : 'application/json')
-            .setHeader('Content-Disposition', `attachment; filename=${format === 'pdf' ? 'gameHistory.pdf' : 'gameHistory.json'}`)
-            .send(response.data);
+        if (format === 'pdf') {
+            res.status(response.statusCode)
+                .setHeader('Content-Type', 'application/pdf')
+                .setHeader('Content-Disposition', `attachment; filename=gameHistory.pdf`)
+                .send(response.data);
+        } else {
+            res.status(response.statusCode).json(response);
+        }
     } catch (error) {
         next(error);
     }
@@ -238,11 +241,10 @@ export const getGameDetails = async (req: Request, res: Response, next: NextFunc
 export const abandonGame = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const playerId = req.player!.id;
-        const gameId = req.params.gameId;
 
-        await abandon(playerId, parseInt(gameId));
+        await abandon(playerId);
 
-        res.status(StatusCodes.CREATED).json(ResponseFactory.successCreated(`Game ${gameId} abandoned. You lost!`));
+        res.status(StatusCodes.CREATED).json(ResponseFactory.successCreated(`Game abandoned. You lost.`));
     } catch (err) {
         next(err);
     }

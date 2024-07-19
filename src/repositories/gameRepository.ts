@@ -25,6 +25,8 @@ export interface IGameRepository extends IBaseRepository<Game> {
 
     findByPlayer(playerId: number, filterField?: string, filterValue?: any): Promise<Game[]>;
 
+    findActiveGameByPlayer(playerId: number): Promise<Game | null>;
+
     updateGameStatus(gameId: number, status: string): Promise<[number, Game[]]>;
 }
 
@@ -129,6 +131,22 @@ export class GameRepository implements IGameRepository {
     }
 
     /**
+     * Retrieves the active game where a player is involved.
+     *
+     * @param {number} playerId - The ID of the player
+     *
+     * @returns {Promise<Game>} - A promise that resolves with the active game where the player is involved.
+     */
+    async findActiveGameByPlayer(playerId: number): Promise<Game | null> {
+        return Game.findOne({
+            where: {
+                [Op.or]: [{player_1_id: playerId}, {player_2_id: playerId}],
+                game_status: Statuses.ACTIVE
+            }
+        });
+    }
+
+    /**
      * Updates the status of a game.
      *
      * @param {number} gameId - The ID of the game
@@ -139,27 +157,4 @@ export class GameRepository implements IGameRepository {
     async updateGameStatus(gameId: number, status: Statuses): Promise<[number, Game[]]> {
         return Game.update({game_status: status}, {where: {game_id: gameId} as any, returning: true});
     }
-
-    /**
-     * Retrieves a game by its ID and by the winner's ID only if the winner is the specified player.
-     *
-     * @param {number} winnerId - The ID of the winner
-     * @param {number} gameId - The ID of the game
-     *
-     * @returns {Promise<Game[]>} - A promise that resolves with the game if found, otherwise an error is thrown.
-     */
-    async findWonGameByIds(winnerId: number, gameId: number): Promise<Game> {
-        const game = await Game.findByPk(gameId);
-
-        if (!game) {
-            throw ErrorFactory.badRequest('Game not found');
-        }
-
-        if (game.winner_id !== winnerId) {
-            throw ErrorFactory.badRequest('Game not found with the specified winner');
-        }
-
-        return game;
-    }
-
 }

@@ -46,12 +46,12 @@ Detailed project objectives, unique features, and in-depth technical aspects are
     - [GET `/players/ranking`](#get-playersranking)
     - [POST `/games`](#post-games)
     - [GET `/games`](#get-games)
-    - [GET `/games/{gameId}/status`](#get-gamesgameidstatus)
+    - [GET `/games[/{gameId}]/status`](#get-gamesgameidstatus)
     - [GET `/games/{gameId}/win-certificate`](#get-gamesgameidwin-certificate)
-    - [POST `/games/{gameId}/move`](#post-gamesgameidmove)
+    - [POST `/games/move`](#post-gamesmove)
     - [GET `/games/{gameId}/chessboard`](#get-gamesgameidchessboard)
     - [GET `/games/{gameId}/details`](#get-gamesgameiddetails)
-    - [POST `/games/{gameId}/abandon`](#post-gamesgameidabandon)
+    - [POST `/games/move/abandon`](#post-gamesmoveabandon)
 - [📊 UML diagrams](#-uml-diagrams)
     - [Use case diagram](#use-case-diagram)
     - [Sequence diagrams](#sequence-diagrams)
@@ -108,6 +108,7 @@ This project leverages a variety of modern tools and technologies for backend de
 - [bcryptjs](https://www.npmjs.com/package/bcryptjs)
   and [sequelize-bcrypt](https://www.npmjs.com/package/sequelize-bcrypt) - Password hashing libraries
 - [Sharp](https://sharp.pixelplumbing.com/) - High performance Node.js image processing
+- [DBeaver](https://dbeaver.io/) - Universal SQL client for relational databases
 
 # 🧩 Patterns used
 
@@ -183,7 +184,8 @@ with [permission](https://refactoring.guru/content-usage-policy)
 #### Implementation
 
 Utilized through [Express.js middleware system](https://expressjs.com/en/guide/using-middleware.html), where each
-middleware function can process the request, perform specific tasks (e.g., authentication, validation, error handling), and
+middleware function can process the request, perform specific tasks (e.g., authentication, validation, error handling),
+and
 decide whether to pass it to the next handler in the chain. This creates a flexible and extensible request processing
 pipeline.
 
@@ -238,19 +240,19 @@ code.
 
 # 📚 API Reference
 
-| HTTP Verb | Endpoint                          | Description                                       | JWT Authentication |
-|-----------|-----------------------------------|---------------------------------------------------|:------------------:|
-| POST      | `/login`                          | Authenticate user                                 |         ❌          |
-| POST      | `/admin/update-tokens`            | Recharge user's credits (admin only)              |         ✅          |
-| GET       | `/players/ranking `               | Retrieve player rankings by score                 |         ❌          |
-| POST      | `/games`                          | Create a new chess match                          |         ✅          |
-| GET       | `/games`                          | Retrieve user's completed match history           |         ✅          |
-| GET       | `/games/{gameId}/status`          | Retrieve current status of a specific chess game  |         ✅          |
-| GET       | `/games/{gameId}/win-certificate` | Generate victory certificate for a match          |         ✅          |
-| POST      | `/games/{gameId}/move`            | Make a move in the game                           |         ✅          |
-| GET       | `/games/{gameId}/chessboard`      | Retrieve the latest game chessboard configuration |         ✅          |
-| GET       | `/games/{gameId}/details`         | Retrieve game details (PDF or JSON format)        |         ✅          |
-| POST      | `/games/{gameId}/abandon`         | Forfeit a match                                   |         ✅          |
+| HTTP Verb | Endpoint                                                             | Description                                       | JWT Authentication |
+|-----------|----------------------------------------------------------------------|---------------------------------------------------|:------------------:|
+| POST      | [`/login`](#post-login)                                              | Authenticate user                                 |         ❌          |
+| POST      | [`/admin/update-tokens`](#post-adminupdate-tokens)                   | Recharge user's credits (admin only)              |         ✅          |
+| GET       | [`/players/ranking`](#get-playersranking)                            | Retrieve player rankings by score                 |         ❌          |
+| POST      | [`/games`](#post-games)                                              | Create a new chess match                          |         ✅          |
+| GET       | [`/games`](#get-games)                                               | Retrieve user's completed match history           |         ✅          |
+| GET       | [`/games[/{gameId}]/status`](#get-gamesgameidstatus)                 | Retrieve current status of a specific chess game  |         ✅          |
+| GET       | [`/games/{gameId}/win-certificate`](#get-gamesgameidwin-certificate) | Generate victory certificate for a match          |         ✅          |
+| POST      | [`/game/move`](#post-gamesmove)                                      | Make a move in the current active game            |         ✅          |
+| GET       | [`/games/{gameId}/chessboard`](#get-gamesgameidchessboard)           | Retrieve the latest game chessboard configuration |         ✅          |
+| GET       | [`/games/{gameId}/details`](#get-gamesgameiddetails)                 | Retrieve game details (PDF or JSON format)        |         ✅          |
+| POST      | [`/games/move/abandon`](#post-gamesmoveabandon)                      | Forfeit a match                                   |         ✅          |
 
 ## POST `/login`
 
@@ -337,10 +339,10 @@ endpoint.
 
 ### Parameters
 
-| Location      | Name    | Type     | Description                                      | Accepted values | Required |
-|---------------|---------|----------|--------------------------------------------------|-----------------|:--------:|
-| Request query | `field` | `string` | The field by which the ranking is to be ordered. | `points`        |    ✅     |
-| Request query | `order` | `string` | The direction of the sort.                       | `asc`, `desc`   |    ✅     |
+| Location      | Name    | Type     | Description                                                               | Accepted values | Required |
+|---------------|---------|----------|---------------------------------------------------------------------------|-----------------|:--------:|
+| Request query | `field` | `string` | The field by which the ranking is to be ordered. Default value: `points`. | `points`        |    ❌     |
+| Request query | `order` | `string` | The direction of the sort. Default value: `desc`.                         | `asc`, `desc`   |    ❌     |
 
 ### Request example
 
@@ -382,10 +384,10 @@ is required to authenticate the request.
 
 ### Parameters
 
-| Location     | Name            | Type     | Description                         | Accepted values                                                 | Required |
-|--------------|-----------------|----------|-------------------------------------|-----------------------------------------------------------------|:--------:|
-| Request body | `email`         | `string` | Email of the human opponent         | Valid email address                                             |    *     |
-| Request body | `AI_difficulty` | `string` | Difficulty level of the AI opponent | `MONKEY`, `BEGINNER`, `INTERMEDIATE`, `ADVANCED`, `EXPERIENCED` |    *     |
+| Location     | Name             | Type     | Description                         | Accepted values                                                 | Required |
+|--------------|------------------|----------|-------------------------------------|-----------------------------------------------------------------|:--------:|
+| Request body | `player_2_email` | `string` | Email of the human opponent         | Valid email address                                             |    *     |
+| Request body | `AI_difficulty`  | `string` | Difficulty level of the AI opponent | `MONKEY`, `BEGINNER`, `INTERMEDIATE`, `ADVANCED`, `EXPERIENCED` |    *     |
 
 \* Either `email` or `AI_difficulty` must be provided, but not both.
 
@@ -397,7 +399,7 @@ Content-Type: application/json
 Authorization: Bearer <JWT token>
 
 {
-  "email": "opponent@example.com"
+  "player_2_email": "opponent@example.com"
 }
 ```
 
@@ -427,10 +429,10 @@ order of the sort. A valid JWT token in the Authorization header is required to 
 
 ### Parameters
 
-| Location      | Name         | Type     | Description                                       | Accepted values             | Required |
-|---------------|--------------|----------|---------------------------------------------------|-----------------------------|:--------:|
-| Request query | `start_date` | `string` | The date from which to retrieve the game history. | Date in `YYYY-MM-DD` format |    ❌     |
-| Request query | `order`      | `string` | The direction of the sort.                        | `asc`, `desc`               |    ✅     |
+| Location      | Name         | Type     | Description                                                                    | Accepted values             | Required |
+|---------------|--------------|----------|--------------------------------------------------------------------------------|-----------------------------|:--------:|
+| Request query | `start_date` | `string` | The date from which to retrieve the game history. Default value: `1970-01-01`. | Date in `YYYY-MM-DD` format |    ❌     |
+| Request query | `order`      | `string` | The direction of the sort. Default value: `desc`.                              | `asc`, `desc`               |    ❌     |
 
 ### Request example
 
@@ -459,17 +461,18 @@ Authorization: Bearer <JWT token>
 }
 ```
 
-## GET `/games/{gameId}/status`
+## GET `/games[/{gameId}]/status`
 
-The GET `/games/{gameId}/status` endpoint retrieves the current status of a specific chess game. The client must provide
-the game ID in the URL to identify the game, and a valid JWT token in the Authorization header to authenticate the
-request.
+The GET `/games[/{gameId}]/status` endpoint retrieves the current status of a specific chess game. The client can
+provide the game ID in the URL to identify the game. In this case, the client must be part of the game. If the gameId is
+not provided, the status of the current active game is returned. A valid JWT token in the Authorization header is
+required to authenticate the request.
 
 ### Parameters
 
-| Location | Name     | Type     | Description                                          | Required |
-|----------|----------|----------|------------------------------------------------------|:--------:|
-| URL      | `gameId` | `number` | The ID of the game for which to retrieve the status. |    ✅     |
+| Location | Name     | Type     | Description                                                                                                         | Required |
+|----------|----------|----------|---------------------------------------------------------------------------------------------------------------------|:--------:|
+| URL      | `gameId` | `number` | The ID of the game for which to retrieve the status. If omitted, the status of the current active game is returned. |    ❌     |
 
 ### Request example
 
@@ -542,24 +545,23 @@ of that certificate:
 
 ![img.png](README-assets/win_certificate_example.png)
 
-## POST `/games/{gameId}/move`
+## POST `/games/move`
 
-The POST `/games/{gameId}/move` endpoint allows users to make a move in an active chess game. The user must provide the
-move in the request body, and the game ID in the URL to identify the game. The user must also provide a JWT token in the
+The POST `/games/move` endpoint allows player to make a move in the current active chess game. The user must provide the
+move starting and ending positions in the request body. The user must also provide a JWT token in the
 Authorization header to authenticate the request.
 
 ### Parameters
 
-| Location     | Name     | Type     | Description                           | Required |
-|--------------|----------|----------|---------------------------------------|:--------:|
-| URL          | `gameId` | `number` | The ID of the game to make a move in. |    ✅     |
-| Request body | `from`   | `string` | The starting position of the move.    |    ✅     |
-| Request body | `to`     | `string` | The ending position of the move.      |    ✅     |
+| Location     | Name   | Type     | Description                        | Required |
+|--------------|--------|----------|------------------------------------|:--------:|
+| Request body | `from` | `string` | The starting position of the move. |    ✅     |
+| Request body | `to`   | `string` | The ending position of the move.   |    ✅     |
 
 ### Request example
 
 ```http
-POST /games/2/move HTTP/1.1
+POST /games/move HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer <JWT token>
 
@@ -613,10 +615,10 @@ token in the Authorization header is required to authenticate the request.
 
 ### Parameters
 
-| Location      | Name     | Type     | Description                                          | Accepted values  | Required |
-|---------------|----------|----------|------------------------------------------------------|------------------|:--------:|
-| URL           | `gameId` | `number` | The ID of the game for which to retrieve the status. | Numeric game IDs |    ✅     |
-| Request query | `format` | `string` | The format in which to retrieve the details.         | `json`, `pdf`    |    ✅     |
+| Location      | Name     | Type     | Description                                                         | Accepted values  | Required |
+|---------------|----------|----------|---------------------------------------------------------------------|------------------|:--------:|
+| URL           | `gameId` | `number` | The ID of the game for which to retrieve the status.                | Numeric game IDs |    ✅     |
+| Request query | `format` | `string` | The format in which to retrieve the details. Default value: `json`. | `json`, `pdf`    |    ❌     |
 
 ### Request example
 
@@ -708,23 +710,21 @@ that PDF:
 
 ![PDF move history example](README-assets/game_details_example.png)
 
-## POST `/games/{gameId}/abandon`
+## POST `/games/move/abandon`
 
-The POST `/games/{gameId}/abandon` endpoint allows a player to abandon a game. The player must be authenticated and must
-be one of the players of the game. The game must be in progress. The game is marked as abandoned (finished) and the
+The POST `/games/move/abandon` endpoint allows a player to abandon the currently active game. The player must be
+authenticated, and it must be the player's turn. The game is marked as abandoned (finished) and the
 winner is the other player. The player who abandons the game loses 0.5 points and the winner gains 1 point. A valid JWT
 token in the Authorization header is required to authenticate the request.
 
 ### Parameters
 
-| Location | Name     | Type     | Description                    | Required |
-|----------|----------|----------|--------------------------------|:--------:|
-| URL      | `gameId` | `number` | The ID of the game to abandon. |    ✅     |
+This endpoint does not require any parameters.
 
 ### Request example
 
 ```http
-POST /games/2/abandon HTTP/1.1
+POST /games/move/abandon HTTP/1.1
 Authorization: Bearer <JWT token>
 ```
 
@@ -734,7 +734,7 @@ Authorization: Bearer <JWT token>
 {
   "success": true,
   "statusCode": 201,
-  "message": "Game 1 abandoned. You lost!"
+  "message": "Game abandoned. You lost!"
 }
 ```
 
@@ -748,7 +748,8 @@ The following use case diagram illustrates the interactions between the actors a
 
 \* The use case marked with an asterisk (*) represents all the use cases that include the JWT token authentication.
 Every `<<include>>` relationship with the `Authenticate` use case indicates that the JWT token is required to access the
-specific functionality. The multiple `<<include>>` relationships with the `Authenticate` use case have been omitted for clarity.
+specific functionality. The multiple `<<include>>` relationships with the `Authenticate` use case have been omitted for
+clarity.
 
 ## Sequence diagrams
 
@@ -1273,7 +1274,8 @@ The following tools are required to be installed for building and running the pr
 
 - [Git](https://git-scm.com/downloads) - for repository cloning.
 - [Docker](https://www.docker.com/get-started) - for container building and running.
-- [Docker Compose](https://docs.docker.com/compose/install/) - for the orchestration of the two services of the application.
+- [Docker Compose](https://docs.docker.com/compose/install/) - for the orchestration of the two services of the
+  application.
 - [SSH](https://www.ssh.com/ssh/command/) and [OpenSSL](https://www.openssl.org/) - for JWT key pair generation.
 
 ### Step 1: Repository cloning
@@ -1288,7 +1290,8 @@ cd chess-backend
 ### Step 2: Environment configuration
 
 A `.env` file should be created in the root directory of the project.
-The sample from the provided [`.env.example`](https://github.com/nicolobartolinii/chess-backend/blob/main/.env.example) file can be copied
+The sample from the provided [`.env.example`](https://github.com/nicolobartolinii/chess-backend/blob/main/.env.example)
+file can be copied
 and the variables should be adjusted according to the environment needs:
 
 ```bash
@@ -1297,7 +1300,8 @@ cp .env.example .env
 
 ### Step 3: Private key and public key creation
 
-A private key and a public key files should be created in the root directory of the project. It can be done with the following commands:
+A private key and a public key files should be created in the root directory of the project. It can be done with the
+following commands:
 
 #### For the private key
 
@@ -1316,7 +1320,8 @@ openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
 ### Step 4: Docker images building
 
 With Docker and Docker Compose installed, the Docker images for the project should be built.
-In this step, the code is compiled, dependencies are installed, and everything needed to run the application is prepared.
+In this step, the code is compiled, dependencies are installed, and everything needed to run the application is
+prepared.
 The following command should be run in the project's root directory:
 
 ```bash
@@ -1330,6 +1335,9 @@ docker-compose up -d
 ```
 
 The `-d` flag allows the containers to be run in the background, so the terminal can continue to be used.
+
+**Note:** Even after the first run, the application may take a few moments to be fully operational. This is because it
+needs to install the dependencies and set up the database.
 
 ### Step 6: Installation verification
 
@@ -1349,11 +1357,67 @@ http://localhost:<APPLICATION_PORT>/
 
 The default port for the application is 3000. It can be changed in the `.env` file.
 
+### Default users
+
+Starting the application using `NODE_ENV=development` will create four default users:
+
+- prova@prova.it (password: prova) - Standard player
+- franco@giovanni.it (password: franco) - Admin
+- test@test.it (password: test) - Admin
+- test2@test.it (password: test2) - Standard player
+
 # 🧪 Testing
+
+The project includes a comprehensive test suite for every API endpoints. That test suite covers almost every possible
+response (e.g., success, bad request, unauthorized, forbidden, not found, etc.) and checks the correctness of the
+responses.
+
+**Note:** The tests have been written to be run immediately after the application has been started because they require
+a clean database. If the application has been running for a while, the tests may fail due to the existing data in the
+database.
+
+Before running the tests, Newman must be installed. It can be globally installed with the following command:
+
+```bash
+npm install -g newman
+```
+
+To run the tests, the following command should be executed in the project's root directory:
+
+```bash
+newman run api-tests/api-tests-collection.json -e api-tests/api-tests-environment.json
+```
+
+## Test results
+
+Running the tests (before performing any manual operations in the application) should result in the following output:
+
+```bash
+┌─────────────────────────┬───────────────────┬──────────────────┐
+│                         │          executed │           failed │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│              iterations │                 1 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│                requests │                68 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│            test-scripts │                62 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│      prerequest-scripts │                40 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│              assertions │               320 │                0 │
+├─────────────────────────┴───────────────────┴──────────────────┤
+│ total run duration: 6.7s                                       │
+├────────────────────────────────────────────────────────────────┤
+│ total data received: 505.44kB (approx)                         │
+├────────────────────────────────────────────────────────────────┤
+│ average response time: 24ms [min: 2ms, max: 791ms, s.d.: 97ms] │
+└────────────────────────────────────────────────────────────────┘
+```
 
 # 🌟 Additional features
 
-The project includes enhancements beyond the requirements provided by the teacher to improve user experience and functionality.
+The project includes enhancements beyond the requirements provided by the teacher to improve user experience and
+functionality.
 
 ### Chessboard visualization
 
@@ -1363,13 +1427,15 @@ The project includes enhancements beyond the requirements provided by the teache
     - Included in [victory certificates](#get-gamesgameidwin-certificate)
     - Incorporated in PDF exports of [game move history](#get-gamesgameiddetails)
 
-This additional feature enhances data presentation and improves the understanding of game progression. We built it to make testing and debugging easier.
+This additional feature enhances data presentation and improves the understanding of game progression. We built it to
+make testing and debugging easier.
 
 # 👥 Authors
 
 The contributors to this project are:
 
-#### [Nicolò Bartolini](https://github.com/nicolobartolinii) (Matricola 1118768) 
+#### [Nicolò Bartolini](https://github.com/nicolobartolinii) (Matricola 1118768)
+
 #### [Nicola Picciafuoco](https://github.com/NicolaPicciafuoco) (Matricola 1118755)
 
 # 📄 License

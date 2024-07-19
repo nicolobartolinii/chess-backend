@@ -23,20 +23,6 @@ function verifyGameStatus(game: Game) {
 }
 
 /**
- * Verifies if the player is part of the game.
- *
- * @param {Game} game - The game object
- * @param {number} playerId - The ID of the player
- *
- * @throws {ErrorFactory} - Throws an error if the player is not part of the game
- */
-function verifyPlayerParticipation(game: Game, playerId: number) {
-    if (game.player_1_id !== playerId && game.player_2_id !== playerId) {
-        throw ErrorFactory.forbidden('You are not part of the game');
-    }
-}
-
-/**
  * Verifies if it's the player's turn.
  *
  * @param {Game} game - The game object
@@ -175,14 +161,14 @@ async function executeAIMove(chessGame: any, gameId: number, aiLevel: AiLevel, u
  *
  * @returns {Promise<string>} - A message indicating the game result
  */
-async function handleGameFinished(newConfiguration: any, game: Game, gameId: number, returnString: string): Promise<string> {
+async function handleGameFinished(newConfiguration: any, game: Game, gameId: number, returnString: string, playerId: number): Promise<string> {
     const winnerId = isStalemate(newConfiguration) ? null : await winGame(newConfiguration, game.player_1_id, game.player_2_id ? game.player_2_id : 0);
     await repositories.game.update(gameId, {
         game_status: Statuses.FINISHED,
         winner_id: winnerId || null,
         end_date: new Date()
     });
-    return returnString + ' Game finished. ' + (isStalemate(newConfiguration) ? 'Stalemate!' : (game.player_1_id === winnerId ? 'You won!' : 'You lost.'));
+    return returnString + ' Game finished. ' + (isStalemate(newConfiguration) ? 'Stalemate!' : (winnerId === playerId ? 'You won!' : 'You lost.'));
 }
 
 /**
@@ -200,13 +186,12 @@ async function handleGameFinished(newConfiguration: any, game: Game, gameId: num
  *
  * @returns {Promise<string>} - A promise that resolves to a string with the move information.
  */
-export async function move(from: string, to: string, playerId: number, gameId: number): Promise<string> {
-    const game = await repositories.game.findById(gameId);
+export async function move(from: string, to: string, playerId: number): Promise<string> {
+    const game = await repositories.game.findActiveGameByPlayer(playerId);
     if (!game) {
-        throw ErrorFactory.notFound('Game not found');
+        throw ErrorFactory.notFound('No active game found');
     }
     verifyGameStatus(game);
-    verifyPlayerParticipation(game, playerId);
     verifyPlayerTurn(game, playerId);
     verifyMoveLocations(from, to);
 
@@ -215,13 +200,15 @@ export async function move(from: string, to: string, playerId: number, gameId: n
         throw ErrorFactory.unauthorized('Insufficient tokens');
     }
 
+    const gameId = game.game_id;
+
     const chessGame = new jsChessEngine.Game(game.game_configuration);
     const {newConfiguration, pieceMoved} = await executePlayerMove(chessGame, from, to, playerId, gameId, game);
 
     let returnString = `You moved a ${pieceMoved} from ${from} to ${to}.`;
 
     if (isGameFinished(newConfiguration)) {
-        return handleGameFinished(newConfiguration, game, gameId, returnString);
+        return handleGameFinished(newConfiguration, game, gameId, returnString, playerId);
     }
 
     if (game.AI_difficulty) {
@@ -229,7 +216,7 @@ export async function move(from: string, to: string, playerId: number, gameId: n
         returnString += ` AI moved a ${aiMoveResult.pieceMoved} from ${aiMoveResult.from} to ${aiMoveResult.to}.`;
 
         if (isGameFinished(aiMoveResult.newConfiguration)) {
-            return handleGameFinished(aiMoveResult.newConfiguration, game, gameId, returnString);
+            return handleGameFinished(aiMoveResult.newConfiguration, game, gameId, returnString, playerId);
         }
     }
 
@@ -352,8 +339,8 @@ export async function getGameMoves(playerId: number, gameId: number) {
 }
 
 /**
- * This function makes a player abandon a specific game.
- * It checks if the game is active and if it is the player's turn.
+ * This function makes a player abandon the currently active game.
+ * It checks if it is the player's turn.
  * If the player abandons the game, the game status is updated to finished and the winner is the other player.
  *
  * @param {number} playerId - The id of the player who abandons the game
@@ -361,18 +348,10 @@ export async function getGameMoves(playerId: number, gameId: number) {
  *
  * @returns {Promise<void>} - A promise that resolves when the game is abandoned.
  */
-export async function abandon(playerId: number, gameId: number): Promise<void> {
-    const game = await repositories.game.findById(gameId);
+export async function abandon(playerId: number): Promise<void> {
+    const game = await repositories.game.findActiveGameByPlayer(playerId);
     if (!game) {
-        throw ErrorFactory.notFound('Game not found');
-    }
-
-    if (game.player_1_id !== playerId && game.player_2_id !== playerId) {
-        throw ErrorFactory.forbidden('You are not part of the game');
-    }
-
-    if (game.game_status !== Statuses.ACTIVE) {
-        throw ErrorFactory.badRequest('Game is already finished');
+        throw ErrorFactory.notFound('No active game found');
     }
 
     if ((game.player_1_id == playerId && game.game_configuration.turn == "black") || (game.player_2_id == playerId && game.game_configuration.turn == "white")) {
@@ -381,7 +360,7 @@ export async function abandon(playerId: number, gameId: number): Promise<void> {
 
     const winnerId = game.player_1_id === playerId ? game.player_2_id : game.player_1_id;
 
-    await repositories.game.update(gameId, {
+    await repositories.game.update(game.game_id, {
         game_status: Statuses.FINISHED,
         number_of_moves: game.number_of_moves + 1,
         winner_id: winnerId,
@@ -390,7 +369,7 @@ export async function abandon(playerId: number, gameId: number): Promise<void> {
 
     await repositories.move.create({
         player_id: playerId,
-        game_id: gameId,
+        game_id: game.game_id,
         move_number: game.number_of_moves + 1,
         from_position: null,
         to_position: null,
