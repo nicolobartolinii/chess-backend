@@ -249,7 +249,7 @@ code.
 | GET       | [`/games`](#get-games)                                               | Retrieve user's completed match history           |         ✅          |
 | GET       | [`/games[/{gameId}]/status`](#get-gamesgameidstatus)                 | Retrieve current status of a specific chess game  |         ✅          |
 | GET       | [`/games/{gameId}/win-certificate`](#get-gamesgameidwin-certificate) | Generate victory certificate for a match          |         ✅          |
-| POST      | [`/game/move`](#post-gamesmove)                                      | Make a move in the current active game            |         ✅          |
+| POST      | [`/games/move`](#post-gamesmove)                                     | Make a move in the current active game            |         ✅          |
 | GET       | [`/games/{gameId}/chessboard`](#get-gamesgameidchessboard)           | Retrieve the latest game chessboard configuration |         ✅          |
 | GET       | [`/games/{gameId}/details`](#get-gamesgameiddetails)                 | Retrieve game details (PDF or JSON format)        |         ✅          |
 | POST      | [`/games/move/abandon`](#post-gamesmoveabandon)                      | Forfeit a match                                   |         ✅          |
